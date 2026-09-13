@@ -17,7 +17,8 @@ only with selections frozen beforehand. Every number comes from the script named
   (3/10 re-planning every 10 actions, 4/10 with 1.7× more time). A forward pass every control step, blending
   overlapping action chunks, carries the release through: 10/10, no retraining. Drawer: 15/20 → 20/20
   (`scripts/eval_skill_variants.py`). This needs one network call per 40 ms step: OpenVINO INT8 weights (16 ms) fits,
-  PyTorch on the same CPU (39–45 ms) does not.
+  PyTorch on the same CPU (39–45 ms) does not. An end-to-end VLA is out of reach here: LeRobot's SmolVLA (450M
+  parameters) takes 6.6 s per 50-action chunk on this CPU in PyTorch (`scripts/bench_smolvla.py`, timing only).
 
 ## Making skills that work alone work in a chain
 
@@ -69,6 +70,12 @@ controller re-grips and finishes), 40 are plain pulls from a closed drawer; fine
 - Confirmation from the other side: feeding the broken first attempt's idle joints their training mean
   (`LeRobotPolicy(mask_idle_std=1e-4)`, `eval_table_chain.py --mask-idle`) brought its drawer back from 0/50 to 18/20.
   Masking the deployed skills on top of the new drawer did not help (34/50 vs 41/50), so it stays off.
+
+**Plate without the spoon step.** Demo seed 4 ("Just the plate and the cup.") lost the plate four times. The
+deployed plate started after the drawer alone and after drawer + spoon (scripted prefix, seeds 100–129,
+`eval_skill_context.py --deployed`): 30/30 each, so that start is not a weakness. Seed 4 is a hard table for the
+plate — it fails there from both starts even with the scripted drawer, and in every report-#5 run — and, being a
+reporting seed, it is not tuned on.
 
 **Where the chain still loses.** Fork, the weakest step, is mostly downstream: of its 25 failures (PyTorch, seeds
 0–49, release + home), 15 are on seeds where the spoon failed and 4 where the plate failed (the plate starts on the
