@@ -30,11 +30,14 @@ def main():
     ap.add_argument("--deployed", action="store_true",
                     help="the robot's own policy (out/eval/selected_checkpoints.json and exec_settings.json) instead of "
                          "the run's latest checkpoint with 10-action chunks")
+    ap.add_argument("--ckpt", default=None, metavar="DIR",
+                    help="with --deployed: this checkpoint for the skill instead of the selected one (a candidate)")
     args = ap.parse_args()
     if args.deployed:
         from tenplaces.skill_policies import SkillPolicies
 
-        skills = SkillPolicies(args.runs, skills=[args.skill], device="cuda", n_action_steps=10)
+        skills = SkillPolicies(args.runs, skills=[args.skill], device="cuda", n_action_steps=10,
+                               checkpoints={args.skill: args.ckpt} if args.ckpt else None)
         pol, ck = skills.policies[args.skill], skills.sources[args.skill]
     else:
         ck = latest_checkpoint(skill_run(args.runs, args.skill))

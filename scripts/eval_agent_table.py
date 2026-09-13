@@ -35,14 +35,17 @@ def main():
     ap.add_argument("--name", default=None)
     ap.add_argument("--push", action="append", default=[], metavar="T:BODY:DX:DY[:DUR]",
                     help="disturb every episode, e.g. after-plate:plate:0:-0.07 (see scripts/run_agent.py)")
+    ap.add_argument("--ckpt", action="append", default=[], metavar="SKILL=DIR",
+                    help="a candidate checkpoint for one skill; the other skills keep out/eval/selected_checkpoints.json")
     args = ap.parse_args()
     if args.seeds[0] < 100 and not args.report:
         sys.exit("tuning seeds are 100-149; pass --report to run the reporting seeds (once, with frozen selections)")
     kwargs = ({"device": "cuda", "n_action_steps": 10} if args.backend == "torch" else
               {"backend": args.backend, "n_action_steps": 10, "ov_config": {"INFERENCE_NUM_THREADS": 2},
                "calib_cache": "data/table_v1_skill_cache"})
+    overrides = dict(kv.split("=", 1) for kv in args.ckpt)
     spec = {"kind": "skills", "runs": [r for r in args.runs if Path(r).is_dir()], "exec_settings": load_exec_settings(),
-            "checkpoints": load_selected(), "kwargs": kwargs}
+            "checkpoints": {**load_selected(), **overrides}, "kwargs": kwargs}
     if args.backend != "torch":  # build each checkpoint's IR once here, so parallel workers only load it (no racing writers)
         from tenplaces.lerobot_policy import LeRobotPolicy
 
