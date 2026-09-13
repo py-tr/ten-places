@@ -1,0 +1,61 @@
+{
+ "repeats": 3,
+ "rows": [
+  {
+   "model": "drawer",
+   "cold_ms": 836,
+   "first_with_cache_ms": 936,
+   "cached_ms": 170,
+   "cache_mb": 150.5,
+   "speedup": 4.9
+  },
+  {
+   "model": "fork",
+   "cold_ms": 850,
+   "first_with_cache_ms": 934,
+   "cached_ms": 167,
+   "cache_mb": 150.5,
+   "speedup": 5.1
+  },
+  {
+   "model": "plate",
+   "cold_ms": 849,
+   "first_with_cache_ms": 927,
+   "cached_ms": 166,
+   "cache_mb": 150.5,
+   "speedup": 5.1
+  },
+  {
+   "model": "spoon",
+   "cold_ms": 834,
+   "first_with_cache_ms": 951,
+   "cached_ms": 162,
+   "cache_mb": 150.5,
+   "speedup": 5.1
+  },
+  {
+   "model": "cup",
+   "cold_ms": 860,
+   "first_with_cache_ms": 928,
+   "cached_ms": 165,
+   "cache_mb": 150.5,
+   "speedup": 5.2
+  },
+  {
+   "model": "classifier",
+   "cold_ms": 58,
+   "first_with_cache_ms": 83,
+   "cached_ms": 34,
+   "cache_mb": 21.4,
+   "speedup": 1.7
+  },
+  {
+   "model": "planner (Qwen3-VL-4B INT4)",
+   "cold_ms": 4724,
+   "first_with_cache_ms": 11485,
+   "cached_ms": 8759,
+   "cache_mb": 3011.1,
+   "speedup": 0.5
+  }
+ ]
+}

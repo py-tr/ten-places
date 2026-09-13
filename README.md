@@ -134,6 +134,10 @@ What the optimisation buys:
   OpenVINO GenAI) and the camera classifier (ResNet18, 5–6 ms); speech is Speechmatics' cloud service. The benchmark
   and evaluation scripts take `--device` and `benchmark.py` lists the machine's OpenVINO devices; the hybrid-core
   placement is CPU-only, and the Core Ultra iGPU/NPU paths are untested here.
+- **Model cache, measured rather than assumed.** OpenVINO's `CACHE_DIR` gets each skill policy ready in 0.16–0.17 s
+  instead of 0.83–0.86 s (5×) — but the 4B planner loads slower from its 3 GB cache (8.8 s) than it compiles from
+  its IR (4.7 s). The robot does not use the cache yet: the policies would save ~3.4 s per launch, the planner would
+  lose ~4 s (`scripts/bench_compile_cache.py`, `out/benchmark/compile_cache.md`).
 
 ## The scene
 
@@ -175,6 +179,7 @@ primitive.
 ```
 make third-party      # the official SO-101 model (TheRobotStudio/SO-ARM100) at the pinned commit
 pip install -r requirements-lock.txt
+make models HF_SKILLS_REPO=<user>/<repo>   # trained skills + classifier, and the OpenVINO planner (~4.4 GB)
 make test             # 164 tests
 make watch SEED=3                                        # scripted controller, live 3D viewer
 make watch-agent CMD="just the plate and the cup" SEED=3 # VLM plan + learned policies, live
