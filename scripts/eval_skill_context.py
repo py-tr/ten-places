@@ -27,10 +27,19 @@ def main():
     ap.add_argument("--seeds", type=int, nargs=2, default=[0, 10], metavar=("FIRST", "STOP"))
     ap.add_argument("--classifier", default="models/state_classifier_v3/state_classifier.xml")
     ap.add_argument("--name", default=None, help="output file name (default: the skill)")
+    ap.add_argument("--deployed", action="store_true",
+                    help="the robot's own policy (out/eval/selected_checkpoints.json and exec_settings.json) instead of "
+                         "the run's latest checkpoint with 10-action chunks")
     args = ap.parse_args()
-    ck = latest_checkpoint(skill_run(args.runs, args.skill))
+    if args.deployed:
+        from tenplaces.skill_policies import SkillPolicies
+
+        skills = SkillPolicies(args.runs, skills=[args.skill], device="cuda", n_action_steps=10)
+        pol, ck = skills.policies[args.skill], skills.sources[args.skill]
+    else:
+        ck = latest_checkpoint(skill_run(args.runs, args.skill))
+        pol = LeRobotPolicy(ck, device="cuda", n_action_steps=10)
     print(f"{args.skill}: {ck}", flush=True)
-    pol = LeRobotPolicy(ck, device="cuda", n_action_steps=10)
     clf = OVStateClassifier(args.classifier)
     out = OUT / "eval" / "context"
     name = args.name or args.skill
