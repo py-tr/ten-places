@@ -22,7 +22,9 @@ from tenplaces.state_classifier import N_SKILLS, build_model, labels_from_struct
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--cache", default=None, help="fastdata cache: labels from the demo structure")
-    ap.add_argument("--labelled", default=None, help="dir of shard_*.npz from record_state_data.py (simulator-truth labels)")
+    ap.add_argument("--labelled", nargs="+", default=None,
+                    help="dirs of shard_*.npz from record_state_data.py (simulator-truth labels); the last shard of "
+                         "each dir (whole runs) is held out for validation")
     ap.add_argument("--out", default="models/state_classifier")
     ap.add_argument("--epochs", type=int, default=2)
     ap.add_argument("--batch", type=int, default=128)
@@ -32,13 +34,15 @@ def main():
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     if args.labelled:
-        shards = sorted(Path(args.labelled).glob("shard_*.npz"))
-        data = [np.load(f) for f in shards]
+        data, held = [], []
+        for folder in args.labelled:
+            shards = [np.load(f) for f in sorted(Path(folder).glob("shard_*.npz"))]
+            data += shards
+            held += [np.full(len(s["labels"]), j == len(shards) - 1) for j, s in enumerate(shards)]
         imgs = np.concatenate([d["images"] for d in data])
         y = np.concatenate([d["labels"] for d in data]).astype(np.float32)
-        # Hold out the last shard (whole runs) for validation.
-        n_last = len(data[-1]["labels"])
-        tr_idx, va_idx = np.arange(len(y) - n_last), np.arange(len(y) - n_last, len(y))
+        held = np.concatenate(held)  # the last shard of each dir (whole runs) is validation
+        tr_idx, va_idx = np.where(~held)[0], np.where(held)[0]
     else:
         cache = Path(args.cache)
         imgs = np.load(cache / "observation__images__top.npy", mmap_mode="r")

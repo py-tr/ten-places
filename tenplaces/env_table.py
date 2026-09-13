@@ -107,8 +107,20 @@ def record_table_oracle(seed: int, image_hw=IMAGE_HW):
     return frames, segments, result
 
 
+def displace(m, d, body: str, dx: float, dy: float):
+    """Move a free body by (dx, dy) m at once — a knock, for training data and probes — with its velocity zeroed.
+    (At run time a push is a Slide in tenplaces.agent: a velocity over a quarter second.)"""
+    import mujoco
+
+    jnt = m.body_jntadr[m.body(body).id]
+    adr, dof = m.jnt_qposadr[jnt], m.jnt_dofadr[jnt]
+    d.qpos[adr:adr + 2] += (dx, dy)
+    d.qvel[dof:dof + 6] = 0.0
+    mujoco.mj_forward(m, d)
+
+
 def record_skill_oracle(seed: int, skill: str, before=(), image_hw=IMAGE_HW, policy=None, policy_frames: int = 0,
-                        drawer_open: float | None = None):
+                        drawer_open: float | None = None, displace_body: str | None = None, displace_xy=(0.0, 0.0)):
     """Scripted run of the skills in `before` (not recorded), then `skill` alone, recorded at FPS.
 
     Both arms are at home between skills (oracle.table.run_plan), so the recording starts from the same pose
@@ -120,6 +132,9 @@ def record_skill_oracle(seed: int, skill: str, before=(), image_hw=IMAGE_HW, pol
     that continuation is recorded: demonstrations of recovering from the policy's own approach errors. If the
     policy has already disturbed the object beyond what the script handles, the grade fails and the caller
     drops the episode.
+
+    displace_body: after the prefix (which placed it), knock that object by `displace_xy` m and let it settle,
+    unrecorded — the recorded skill then puts a displaced object back (disturbance-repair demonstrations).
     """
     from .control import IKFailure
     from .grader_table import grade_table
@@ -139,6 +154,9 @@ def record_skill_oracle(seed: int, skill: str, before=(), image_hw=IMAGE_HW, pol
     try:
         if before:
             table.run_plan(ep.ctl, ep.params, list(before))
+        if displace_body is not None:
+            displace(ep.m, ep.d, displace_body, *displace_xy)
+            ep.ctl.hold(0.5)  # settle; not recorded
         if policy is not None and policy_frames > 0:
             onehot = np.zeros(len(SKILLS), dtype=np.float32)
             onehot[[s for s, _, _ in SKILLS].index(skill)] = 1.0

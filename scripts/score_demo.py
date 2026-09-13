@@ -43,8 +43,10 @@ def score(entry: dict, run: dict) -> dict:
     ev = {e["kind"]: e for e in run["events"] if e["kind"] in ("plan", "finished")}
     said_unsupported = [i for e in run["events"] if e["kind"] in ("plan", "unsupported")
                         for i in (e.get("unsupported") or e.get("items") or [])]
-    expected = verify(entry["expected_steps"])[0]
+    # A prepared table (someone already did some steps) is scored on everything it should end with.
+    expected = verify(entry["expected_steps"] + entry.get("prepared", []))[0]
     done = [s for s in GRADE_KEY if run["grade"].get(GRADE_KEY[s])]
+    seen = next((e.get("steps", []) for e in run["events"] if e["kind"] == "seen_done"), [])
     # Every expected refusal must be named, and nothing refused that the command did not ask for.
     want = [w.lower() for w in entry.get("expected_unsupported", [])]
     said = " | ".join(said_unsupported).lower()
@@ -53,7 +55,8 @@ def score(entry: dict, run: dict) -> dict:
     return {"seed": entry["seed"], "mode": entry["mode"], "command": entry["command"], "heard": run["command"],
             "say": entry.get("say", ""), "plan": ev.get("plan", {}).get("steps", []), "expected": expected,
             "done": done, "unsupported": said_unsupported, "plan_s": round(ev.get("plan", {}).get("ms", 0) / 1000, 1),
-            "success": ok, "cause": "" if ok else failure_cause(run, expected, done, refusals_ok)}
+            "success": ok, "cause": "" if ok else failure_cause(run, expected, done, refusals_ok), "seen": seen,
+            "prepared": entry.get("prepared", [])}
 
 
 def main():
@@ -84,7 +87,10 @@ def main():
         heard = r["heard"] if r["heard"] == r["command"] else f"{r['command']} (heard: {r['heard']})"
         if r["say"]:
             heard += f" + said “{r['say']}”"
-        lines.append(f"| {r['seed']} | {r['mode']} | {heard} | {' → '.join(r['plan']) or '–'} | "
+        if r["prepared"]:
+            heard += f" [table prepared: {', '.join(r['prepared'])}]"
+        plan = (' → '.join(r['plan']) or '–') + (f" (seen done: {', '.join(r['seen'])})" if r["seen"] else "")
+        lines.append(f"| {r['seed']} | {r['mode']} | {heard} | {plan} | "
                      f"{', '.join(r['done']) or '–'} | {', '.join(r['unsupported']) or '–'} | {r['plan_s']} s | "
                      f"{'PASS' if r['success'] else 'FAIL: ' + r['cause']} |")
     (d / "summary.md").write_text("\n".join(lines) + "\n", encoding="utf-8")

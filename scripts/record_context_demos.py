@@ -62,10 +62,16 @@ def main():
     ap.add_argument("--drawer-open", type=float, nargs=2, default=None, metavar=("MIN", "MAX"),
                     help="scripted drawer opening drawn per episode (default: the scene's 0.09 m) — a learned drawer "
                          "opens 8.4-9.3 cm, so cutlery sits a few mm from where fixed-opening demos had it")
+    ap.add_argument("--displace", default=None, metavar="SKILL",
+                    help="disturbance repair: the prefix also performs this skill, the object is knocked "
+                         "--displace-range metres in a random direction, and the recorded skill puts it back")
+    ap.add_argument("--displace-range", type=float, nargs=2, default=[0.04, 0.09], metavar=("MIN", "MAX"))
     ap.add_argument("--overwrite", action="store_true")
     args = ap.parse_args()
     if len(args.episodes) != len(args.skills):
         sys.exit("--episodes needs one count per skill")
+    if args.displace and args.skills != [args.displace]:
+        sys.exit("--displace SKILL records that one skill: pass --skills SKILL")
     root = Path(args.root)
     if root.exists():
         if not args.overwrite:
@@ -93,12 +99,18 @@ def main():
                 seed += 1
                 continue
             before = starts[int(rng.integers(len(starts)))]
+            knock = None
+            if args.displace:  # the skill is done once, then knocked off its target
+                before = before + [skill]
+                ang, dist = rng.uniform(0, 2 * np.pi), rng.uniform(*args.displace_range)
+                knock = (float(dist * np.cos(ang)), float(dist * np.sin(ang)))
             k = 0
             if policy is not None and rng.random() < args.takeover_frac:
                 k = int(rng.integers(args.takeover_frames[0], args.takeover_frames[1] + 1))
             opening = float(rng.uniform(*args.drawer_open)) if args.drawer_open else None
             frames, result = record_skill_oracle(seed, skill, before, policy=policy if k else None, policy_frames=k,
-                                                 drawer_open=opening)
+                                                 drawer_open=opening, displace_body=skill if knock else None,
+                                                 displace_xy=knock or (0.0, 0.0))
             if result["error"] or not result[KEY[skill]] or not all(result[KEY[b]] for b in before):
                 skipped.append({"seed": seed, "skill": skill, "before": before, "takeover_frames": k,
                                 "failed": result["failed"], "error": result["error"]})
@@ -112,7 +124,8 @@ def main():
                 ds.save_episode()
                 by_skill[skill].append(ep_index)
                 episodes.append({"episode": ep_index, "skill": skill, "before": before, "seed": seed,
-                                 "frames": len(frames), "takeover_frames": k, "drawer_open": opening})
+                                 "frames": len(frames), "takeover_frames": k, "drawer_open": opening,
+                                 "displaced_xy": knock})
                 ep_index += 1
                 kept += 1
                 if kept % 10 == 0:

@@ -101,6 +101,7 @@ def default_checker(planner, classifier_xml="models/state_classifier_v3/state_cl
             done = clf.is_done(skill, top_small)
             return done, 1000 * (time.perf_counter() - t)
 
+        check.probs = clf.probs  # all five at once: the first look (run_command look_first)
         return check, "classifier"
     return None, "vlm"
 
@@ -160,8 +161,12 @@ class Slide:
 def run_command(policy, planner, command: str, seed: int, budgets=None, max_attempts: int = 2,
                 max_replans: int = 1, on_frame=None, log=print, checker=None, on_event=None, voice=None,
                 linger_s: float = 4.0, recheck: bool = True, max_repairs: int = 1, disturb=(),
-                async_amend: bool = True, home_frames: int = 20):
+                async_amend: bool = True, home_frames: int = 20, look_first: float | None = None, prepare=()):
     """Execute a command on one seeded scene. Returns (events, grade).
+
+    look_first: before planning, the camera classifier reads the table once; steps it sees done with probability
+    >= look_first are passed to the planner as already done and not planned again (a `seen_done` event). None: off.
+    prepare: steps the scripted controller does before the robot starts — a table someone else half-set.
 
     checker(skill, policy_top_image) -> (done, ms); defaults to the camera classifier if trained, else the VLM.
     on_frame(ep, obs) runs after every control step; on_event(event_dict) after every decision.
@@ -173,6 +178,10 @@ def run_command(policy, planner, command: str, seed: int, budgets=None, max_atte
     if checker is None:
         checker, _ = default_checker(planner)
     ep = TableEpisode(seed, render=True)
+    if prepare:  # someone else already did these: the scripted controller, before the robot's first frame
+        from .oracle import table
+
+        table.run_plan(ep.ctl, ep.params, list(prepare))
     prend = mujoco.Renderer(ep.m, *PLANNER_HW)
     obs = ep.observation()
     events, done, repairs = [], [], {}
@@ -312,6 +321,13 @@ def run_command(policy, planner, command: str, seed: int, budgets=None, max_atte
     # 18.7 s median to the first motion (out/planner/eval_planner_checked.json).
     # The arms are still until this plan arrives: a planner with an all-core pipeline (VLMPlanner idle_config)
     # uses it here, and its core-split pipeline for everything asked while the arms move.
+    # The first look: what the camera already sees done is not planned again (and is re-checked like any done step).
+    probs = getattr(checker, "probs", None)
+    if look_first is not None and probs is not None:
+        p = probs(latest["obs"]["images"]["top"])
+        seen = [s for s, v in zip(SKILL_NAMES, p) if v >= look_first]
+        event("seen_done", steps=seen, p={s: round(float(v), 3) for s, v in zip(SKILL_NAMES, p)}, threshold=look_first)
+        done.extend(s for s in seen if s not in done)
     image = planner_image(ep, prend)
     idle = {"idle": True} if getattr(planner, "idle_pipe", None) is not None else {}
     plan = planner.plan(command, image, done, **idle)

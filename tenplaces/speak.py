@@ -270,6 +270,14 @@ def phrase_for(event: dict, state: dict | None = None) -> str | None:
     st.setdefault("done", [])
     kind = event.get("kind")
     text = None
+    if kind == "seen_done":  # the first look (tenplaces.agent look_first): already done, so not planned
+        steps = list(event.get("steps") or [])
+        st["done"] += [s for s in steps if s not in st["done"]]
+        if not steps:
+            return None
+        said = _join(["the drawer is already open" if s == "drawer" else f"the {NOUN.get(s, s)} is already out"
+                      for s in steps])
+        return said[0].upper() + said[1:] + (" — I'll skip it." if len(steps) == 1 else " — I'll skip those.")
     if kind == "unsupported":  # asked while the arms already move (tenplaces.agent); silent when empty
         return _cannot(event.get("items"))
     if kind == "plan":

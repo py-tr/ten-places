@@ -13,6 +13,9 @@ skill finishes.
 6 cm: the learned pull sometimes stalls at 6-7 cm, the camera called that "done", and the spoon then failed.
 --short-frac runs pull the drawer short (3.5 cm up to the threshold) and idle, so those stalled states are seen
 labelled "not done". Every shard also stores the drawer opening per frame (drawer_m), so labels can be redrawn.
+--slide-frac runs knock a placed plate or cup 4-9 cm in a random direction after the plan and keep sampling: a
+placed object that was moved off its target is "not done" (v3 had only seen a plate off its target before placing,
+so it noticed a knocked plate only when it slid back toward its start).
 """
 import argparse
 import sys
@@ -25,7 +28,7 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from tenplaces import scene_table  # noqa: E402
 from tenplaces.control import GRIP_OPEN, Bimanual, IKFailure  # noqa: E402
-from tenplaces.env_table import IMAGE_HW, SKILLS  # noqa: E402
+from tenplaces.env_table import IMAGE_HW, SKILLS, displace  # noqa: E402
 from tenplaces.grader_table import grade_table  # noqa: E402
 from tenplaces.oracle import table  # noqa: E402
 from tenplaces.oracle.handoff import HOME  # noqa: E402
@@ -36,7 +39,7 @@ KEYS = ["drawer_open", "spoon", "plate", "fork", "cup"]
 SKILL_NAMES = [s for s, _, _ in SKILLS]
 
 
-def run(seed: int, rng, short: bool = False, drawer_enough: float | None = None):
+def run(seed: int, rng, short: bool = False, drawer_enough: float | None = None, slide: bool = False):
     raw = [s for s in SKILL_NAMES if rng.random() < 0.6] or [rng.choice(SKILL_NAMES)]
     p = scene_table.sample(seed)
     if short:  # a stalled pull, then only what needs no cutlery
@@ -71,6 +74,12 @@ def run(seed: int, rng, short: bool = False, drawer_enough: float | None = None)
         ctl.hold(0.5)
         table.run_plan(ctl, p, steps)
         ctl.hold(1.5)  # idle after the last skill: 'done' must hold while nothing moves
+        placed = [s for s in ("plate", "cup") if s in steps]
+        if slide and placed:
+            body = placed[int(rng.integers(len(placed)))]
+            ang, dist = rng.uniform(0, 2 * np.pi), rng.uniform(0.04, 0.09)
+            displace(m, d, body, dist * np.cos(ang), dist * np.sin(ang))
+            ctl.hold(1.5)  # knocked off its target: these frames are labelled 'not done' by the grader
         ok = True
     except IKFailure:
         ok = False
@@ -87,6 +96,8 @@ def main():
     ap.add_argument("--short-frac", type=float, default=0.0, help="fraction of runs whose drawer pull stops short")
     ap.add_argument("--drawer-enough", type=float, default=None,
                     help="drawer label threshold in m (default: the grader's DRAWER_OPEN_MIN)")
+    ap.add_argument("--slide-frac", type=float, default=0.0,
+                    help="fraction of runs that knock a placed plate or cup off its target at the end")
     args = ap.parse_args()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -94,7 +105,8 @@ def main():
     buf_x, buf_y, buf_d, t0 = [], [], [], time.time()
     for i in range(args.runs):
         short = bool(rng.random() < args.short_frac)
-        x, y, dm, steps, ok = run(args.start + i, rng, short, args.drawer_enough)
+        slide = bool(rng.random() < args.slide_frac)
+        x, y, dm, steps, ok = run(args.start + i, rng, short, args.drawer_enough, slide)
         if ok:
             buf_x.append(x)
             buf_y.append(y)

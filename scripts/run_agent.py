@@ -44,6 +44,10 @@ def main():
     ap.add_argument("--push", action="append", default=[], metavar="T:BODY:DX:DY[:DUR]",
                     help="slide BODY (plate, cup, spoon, fork) by DX, DY metres over DUR s (default 0.25) at "
                          "simulated time T, e.g. 20:plate:0:-0.07; finished steps are re-checked and redone")
+    ap.add_argument("--look-first", type=float, default=None, metavar="P",
+                    help="first look: steps the camera classifier already sees done with probability >= P are skipped")
+    ap.add_argument("--prepared", nargs="*", default=[], metavar="SKILL",
+                    help="steps the scripted controller does before the robot starts (a table someone half-set)")
     ap.add_argument("--cores", default="split", choices=["default", "split"],
                     help="split: policy + camera check on P-cores, VLM planner on E-cores (tenplaces.cores)")
     ap.add_argument("--seed", type=int, default=0)
@@ -129,8 +133,8 @@ def main():
 
         pushes = [parse_push(p) for p in args.push]  # "after-plate:...": 1 s after the plate is confirmed
         events, grade = run_command(policy, planner, command, args.seed, checker=checker, voice=voice,
-                                    linger_s=args.linger, disturb=pushes,
-                                    on_frame=rec.on_frame if rec else None, on_event=on_event)
+                                    linger_s=args.linger, disturb=pushes, look_first=args.look_first,
+                                    prepare=args.prepared, on_frame=rec.on_frame if rec else None, on_event=on_event)
     finally:
         if rec:
             rec.close()
@@ -147,6 +151,7 @@ def main():
     out = Path(args.video).with_suffix(".json") if args.video else OUT / "agent" / f"seed{args.seed}.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps({"command": command, "voice": spoken, "seed": args.seed, "backend": args.backend,
+                               "look_first": args.look_first, "prepared": args.prepared,
                                "cores": args.cores, "sources": policy.sources, "exec_settings": policy.exec_settings,
                                "events": events, "grade": grade}, indent=1,
                               default=lambda o: o.item() if hasattr(o, "item") else str(o)), encoding="utf-8")

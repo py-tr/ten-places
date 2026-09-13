@@ -38,7 +38,7 @@ class DemoRecorder:
         self._last, self.hold_frames = None, int(hold_s * fps)
         self.state = {"command": "", "proposed": [], "steps": [], "corrections": [], "current": None,
                       "checks": [], "planner_ms": None, "heard": [], "notes": [], "unsupported": [], "said": "",
-                      "replanned_from": None}
+                      "replanned_from": None, "seen": []}
         self.f_big, self.f, self.f_small = _font(26), _font(20), _font(16)
 
     @property
@@ -65,6 +65,8 @@ class DemoRecorder:
             s["replanned_from"] = e.get("replanned_from") if e["kind"] == "plan" else s["replanned_from"]
         elif e["kind"] == "unsupported":  # the check that runs while the arms already move
             s["unsupported"] = e.get("items", [])
+        elif e["kind"] == "seen_done":  # the first look: already done before the robot started
+            s["seen"] = e.get("steps", [])
         elif e["kind"] == "amend":
             done = self._done()
             kept = [x for x in s["steps"] if x in done or x == e.get("after")]
@@ -138,6 +140,9 @@ class DemoRecorder:
         y = text(y, "Command", self.f_small, head, 22)
         for line in _wrap(f'"{s["command"]}"', 38):
             y = text(y, line, self.f, (255, 255, 255), 26)
+        if s["seen"]:
+            for line in _wrap("camera, first look — already done: " + ", ".join(s["seen"]), 46):
+                y = text(y, line, self.f_small, (120, 220, 120), 20)
         y += 8
         y = text(y, f"VLM proposed ({s['planner_ms'] or 0:.0f} ms, OpenVINO INT4)", self.f_small, head, 22)
         y = text(y, " → ".join(s["proposed"]) or "–", self.f, (230, 230, 230), 30)
