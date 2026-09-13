@@ -78,6 +78,17 @@ fork's spot); 6 are the fork's own. The drawer pull sometimes stalls at 5–6.5 
 --retry`, seeds 100–149): a tray dragged there under high friction, with the arm still hung on the handle, is not the
 same start as a tray set there.
 
+## Planner
+
+- **Plan first, check later.** Asking for the plan and then for what no skill can do, both before moving, took
+  18.7 s median to the first motion. Now the plan alone starts the arms (13.5 s on the E-cores, seed 3, "I want to
+  eat soup.") and the text-only check answers 4.5 s later on the planner's worker thread.
+- **A dangling "and" emptied the plan.** "Set the table and light a candle." makes the 4B model return no steps;
+  the re-plan without the impossible part used "Set the table and .", which it also read as incomplete, so the
+  robot did nothing. Found on demo seed 6's pre-registered command; the re-plan now drops the dangling join
+  ("Set the table."): dev set 4/5 → 5/5, the other sets unchanged, and seed 6 sets the full table and names the
+  candle (`scripts/eval_planner.py`, `tests/test_planner.py`).
+
 ## OpenVINO precision study
 
 One hand-off checkpoint (40k steps), 20 held-out seeds, task success re-measured in closed loop for every precision
