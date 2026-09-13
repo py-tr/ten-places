@@ -43,16 +43,18 @@ changes the plan after the current step, verified like any plan. The robot answe
 
 ## Results
 
-**Full table, 50 held-out randomised tables** (seeds 0–49; `out/eval/final4/`, `out/eval/agent_table/torch_report4.json`):
+**Full table, 50 held-out randomised tables** (seeds 0–49, run once with every selection frozen beforehand;
+`out/eval/final5/`, `out/eval/agent_table/ov_w8_report5.json`):
 
 | Run | Full tables (95% CI) | Mean steps of 5 | Drawer | Spoon | Plate | Fork | Cup |
 |---|---|---|---|---|---|---|---|
-| OpenVINO INT8 weights (what the robot runs) | 23/50 (33–60%) | 3.66 | 39 | 30 | 43 | 26 | 45 |
-| PyTorch reference | 24/50 (35–62%) | 3.78 | 43 | 34 | 41 | 25 | 46 |
-| Full agent (re-checks, retries, re-plans), PyTorch reference | 26/50 (39–65%) | 4.00 | 45 | 35 | 41 | 31 | 48 |
+| **Full agent on OpenVINO** (what the robot runs: re-checks, retries, re-plans) | **43/50 (74–93%)** | 4.76 | 50 | 47 | 47 | 45 | 49 |
+| Fixed five-step sequence, OpenVINO INT8 weights | 41/50 (69–90%) | 4.74 | 50 | 46 | 47 | 46 | 48 |
+| Fixed five-step sequence, PyTorch reference | 39/50 (65–87%) | 4.62 | 49 | 46 | 45 | 43 | 48 |
 
-The same code on the 50 tuning tables (seeds 100–149): 30/50 PyTorch, 31/50 OpenVINO. The submission video shows
-the first 10 seeds as a grid with pass/fail per seed.
+OpenVINO INT8 and PyTorch are indistinguishable per seed (5 tables differ one way, 3 the other; McNemar p = 0.73).
+The configuration was chosen on 50 separate tuning tables (seeds 100–149), where it set 41/50 with PyTorch. The
+submission video shows the first 10 seeds as a grid with pass/fail per seed.
 
 | Component | Result | Evidence |
 |---|---|---|
@@ -61,7 +63,7 @@ the first 10 seeds as a grid with pass/fail per seed.
 | Camera classifier on learned-policy states | false "drawer done" 3/363, false "spoon done" 1/671 | `docs/findings.md` |
 | Scripted demonstrator (training data) | 60/60 full tables, 72/72 verified subset plans | `make spike-table` |
 
-How the system got from 0 to about half of all tables — every change, what it measured, and what did not work —
+How the system got from 0 to 43 of 50 tables — every change, what it measured, and what did not work —
 is in [`docs/findings.md`](docs/findings.md).
 
 ## OpenVINO on an Intel Core i5-13600KF
@@ -104,7 +106,7 @@ the split itself helps in every run.
 | … at 25 Hz, P-cores, pinned | 56.0 W | 25 | 1.52 J |
 
 What the optimisation buys:
-- **Precision chosen by task success, not output error.** INT8 weights keep full-table success (23 vs 24 of 50);
+- **Precision chosen by task success, not output error.** INT8 weights keep full-table success (41 vs 39 of 50);
   INT8 activations in the transformer cost it (hand-off checkpoint: 7/20 against 13/20 for FP32 and 14/20 for INT8
   weights on the same seeds, `docs/findings.md`), so they are not shipped.
 - **Latency spent on quality.** At 16 ms the policy can run every control step with temporal ensembling, which is
@@ -170,7 +172,8 @@ default (`--cores default` turns it off).
 
 ## Limitations
 
-- About half of all tables are set completely; most losses are the spoon hand-off and, downstream of it, the fork.
+- 7 of 50 held-out tables are not set completely; the losses are spread over the spoon hand-off (3), the plate (2)
+  and the fork (2).
 - The robot does not yet repair a table knocked by someone else: the camera misses a plate slid off its mat, and the
   plate policy never learned to re-place one (`docs/findings.md`).
 - Learned rollouts are repeatable only up to rendering (a new OpenGL context can shift a few pixels by one intensity

@@ -39,14 +39,20 @@ Reporting seeds 0–49, each run once with frozen selections (`scripts/final_rep
 | Configuration | PyTorch | OpenVINO INT8 weights | Full agent |
 |---|---|---|---|
 | Per-skill policies, no hand-over between skills | 2/50 | 5/50 | – |
-| + release and home between skills | 23/50 | 22/50 | 24/50 |
-| + drawer runs its budget | 26/50 | 24/50 | 26/50 |
-| + classifier v3 (final) | 24/50 | 23/50 | 26/50 |
+| + release and home between skills | 23/50 | 22/50 | 24/50 (PyTorch) |
+| + drawer runs its budget | 26/50 | 24/50 | 26/50 (PyTorch) |
+| + classifier v3 | 24/50 | 23/50 | 26/50 (PyTorch) |
+| + drawer fine-tuned on genuinely stalled pulls (final, below) | 39/50 | 41/50 | **43/50 (OpenVINO)** |
 
 The last two changes were chosen on 20 tuning seeds and do not show up on the reporting seeds: paired against the
 row above, full-table success is within noise (PyTorch +7 / −4 tables, McNemar p = 0.55). One step moved the wrong
 way: the OpenVINO drawer, 48 → 42 → 39 of 50 (vs the release-and-home row: 0 gained, 9 lost), which does not
 reproduce on the 50 tuning seeds (44 vs 44). Lesson: 20 tuning seeds are too few to choose on — later decisions use 50.
+
+The final row was chosen that way (41/50 on the tuning seeds) and holds on the reporting seeds. Paired against the
+classifier-v3 row: PyTorch +15 / −0 tables (McNemar p < 0.001), OpenVINO +20 / −2 (p < 0.001), full agent 26 → 43
+(+21 / −4, PyTorch then, OpenVINO now). The agent's re-checks and retries add 3 tables and lose 1 over the fixed
+sequence (p = 0.62). Its 7 remaining losses: spoon 3, plate 2, fork 2.
 
 **Drawer demos from genuinely stalled pulls (the fix that worked).** 100 new drawer demos
 (`scripts/record_chain_demos.py`): 60 start where a learned pull really stalled (release + home, then the scripted
