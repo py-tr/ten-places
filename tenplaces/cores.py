@@ -5,9 +5,10 @@ request every 40 ms control step) and the VLM planner (seconds per answer, and i
 the planner's threads land on the performance cores and the control step misses its budget. So control gets
 the performance cores (latency hint, one stream, hyper-threading off) and the planner gets the efficiency
 cores, both with their threads pinned. Measured with the real models on an idle i5-13600KF while the planner
-generates (scripts/bench_concurrency.py): default scheduling 141 ms control step p50, 100% of steps over the
-40 ms budget; P/E split 62 ms, 97%; + hyper-threading on 37 ms, 10%; + pinning (control and planner) 30 ms,
-5% — the default here. (A synthetic-model dry run had suggested the opposite about pinning.)
+generates (scripts/bench_concurrency.py, 60 s per placement): default scheduling 53 ms control step p50, 97%
+of steps over the 40 ms budget; P/E split 30 ms, 11%; + hyper-threading on 29 ms, 0%; + pinning (control and
+planner) 29 ms, 6% — the default here. Hyper-threading and pinning trade places between runs (an earlier run:
+10% vs 5%); the split is what matters.
 
     policy = LeRobotPolicy(ck, backend="ov-w8", ov_config=control_config())
     planner = VLMPlanner(ov_config=planner_config())

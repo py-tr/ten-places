@@ -1,0 +1,83 @@
+{
+ "env": {
+  "cpu": "13th Gen Intel(R) Core(TM) i5-13600KF",
+  "device": "13th Gen Intel(R) Core(TM) i5-13600KF",
+  "openvino": "2026.3.1-22476-759c5a6ab8c-releases/2026/3",
+  "torch": "2.11.0+cu128",
+  "python": "3.13.1",
+  "os": "Windows-11-10.0.22631-SP0",
+  "checkpoint": "out\\train\\skills_ctx\\cup\\checkpoints\\015000\\pretrained_model"
+ },
+ "rows": [
+  {
+   "variant": "pytorch",
+   "precision": "FP32 (PyTorch eager)",
+   "device": "CPU",
+   "latency_ms_median": 44.810350285843015,
+   "latency_ms_p95": 48.25056993868202,
+   "throughput_ips": null,
+   "ir_mb": null,
+   "success": null
+  },
+  {
+   "variant": "fp32",
+   "precision": "FP32",
+   "device": "CPU",
+   "latency_ms_median": 19.505450036376715,
+   "latency_ms_p95": 20.668284920975562,
+   "throughput_ips": 84.61678343442225,
+   "infer_requests": 6,
+   "ir_mb": 130.5,
+   "success": null
+  },
+  {
+   "variant": "w8",
+   "precision": "INT8 weights only",
+   "device": "CPU",
+   "latency_ms_median": 15.610750066116452,
+   "latency_ms_p95": 19.96905510313809,
+   "throughput_ips": 111.34204274922212,
+   "infer_requests": 6,
+   "ir_mb": 33.0,
+   "success": null
+  }
+ ],
+ "cpu_sweep": [
+  {
+   "core_type": "ANY_CORE",
+   "hyper_threading": true,
+   "latency_ms_median": 17.170649953186512,
+   "latency_ms_p95": 18.88468977995217
+  },
+  {
+   "core_type": "ANY_CORE",
+   "hyper_threading": false,
+   "latency_ms_median": 15.63430018723011,
+   "latency_ms_p95": 18.6441752128303
+  },
+  {
+   "core_type": "PCORE_ONLY",
+   "hyper_threading": true,
+   "latency_ms_median": 17.1745999250561,
+   "latency_ms_p95": 18.7057200120762
+  },
+  {
+   "core_type": "PCORE_ONLY",
+   "hyper_threading": false,
+   "latency_ms_median": 23.43354979529977,
+   "latency_ms_p95": 23.922039614990354
+  },
+  {
+   "core_type": "ECORE_ONLY",
+   "hyper_threading": true,
+   "latency_ms_median": 37.310849875211716,
+   "latency_ms_p95": 51.35281013790518
+  },
+  {
+   "core_type": "ECORE_ONLY",
+   "hyper_threading": false,
+   "latency_ms_median": 37.09044982679188,
+   "latency_ms_p95": 43.42838500160724
+  }
+ ]
+}

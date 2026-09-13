@@ -1,0 +1,49 @@
+{
+ "checkpoint": "out\\train\\skills_ctx\\cup\\checkpoints\\015000\\pretrained_model",
+ "cpu": "13th Gen Intel(R) Core(TM) i5-13600KF",
+ "seconds": 60.0,
+ "phases": [
+  {
+   "phase": "idle",
+   "start": "2026-09-13T18:02:23.585407",
+   "end": "2026-09-13T18:03:23.585794",
+   "inferences": 0,
+   "cpu_pct": 0.3
+  },
+  {
+   "phase": "pytorch_fp32",
+   "start": "2026-09-13T18:03:28.586573",
+   "end": "2026-09-13T18:04:28.601828",
+   "inferences": 1559,
+   "cpu_pct": 64.3
+  },
+  {
+   "phase": "openvino_fp32",
+   "start": "2026-09-13T18:04:33.603240",
+   "end": "2026-09-13T18:05:33.606773",
+   "inferences": 3160,
+   "cpu_pct": 8.5
+  },
+  {
+   "phase": "openvino_int8w",
+   "start": "2026-09-13T18:05:38.607180",
+   "end": "2026-09-13T18:06:38.609668",
+   "inferences": 3728,
+   "cpu_pct": 8.8
+  },
+  {
+   "phase": "openvino_int8w_25hz",
+   "start": "2026-09-13T18:06:43.610383",
+   "end": "2026-09-13T18:07:43.610524",
+   "inferences": 1500,
+   "cpu_pct": 2.7
+  },
+  {
+   "phase": "openvino_int8w_25hz_pcores_pinned",
+   "start": "2026-09-13T18:07:48.611168",
+   "end": "2026-09-13T18:08:48.611502",
+   "inferences": 1500,
+   "cpu_pct": 1.9
+  }
+ ]
+}

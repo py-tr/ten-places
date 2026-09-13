@@ -1,0 +1,68 @@
+[
+ {
+  "phase": "idle",
+  "samples": 30,
+  "seconds": 60.0,
+  "inferences": 0,
+  "mean_w": 18.03373333333333,
+  "cpu_pct": 0.3,
+  "mj_per_inference": null,
+  "mj_per_inference_above_idle": null,
+  "inferences_per_s": null
+ },
+ {
+  "phase": "pytorch_fp32",
+  "samples": 30,
+  "seconds": 60.0,
+  "inferences": 1559,
+  "mean_w": 108.9369,
+  "cpu_pct": 64.3,
+  "mj_per_inference": 4192.568313021167,
+  "mj_per_inference_above_idle": 3498.518280949326,
+  "inferences_per_s": 25.983333333333334
+ },
+ {
+  "phase": "openvino_fp32",
+  "samples": 30,
+  "seconds": 60.0,
+  "inferences": 3160,
+  "mean_w": 109.26456666666667,
+  "cpu_pct": 8.5,
+  "mj_per_inference": 2074.643670886076,
+  "mj_per_inference_above_idle": 1732.231012658228,
+  "inferences_per_s": 52.666666666666664
+ },
+ {
+  "phase": "openvino_int8w",
+  "samples": 30,
+  "seconds": 60.0,
+  "inferences": 3728,
+  "mean_w": 106.6215,
+  "cpu_pct": 8.8,
+  "mj_per_inference": 1716.0112660944205,
+  "mj_per_inference_above_idle": 1425.7687768240344,
+  "inferences_per_s": 62.13333333333333
+ },
+ {
+  "phase": "openvino_int8w_25hz",
+  "samples": 30,
+  "seconds": 60.0,
+  "inferences": 1500,
+  "mean_w": 63.30126666666667,
+  "cpu_pct": 2.7,
+  "mj_per_inference": 2532.0506666666665,
+  "mj_per_inference_above_idle": 1810.7013333333337,
+  "inferences_per_s": 25.0
+ },
+ {
+  "phase": "openvino_int8w_25hz_pcores_pinned",
+  "samples": 30,
+  "seconds": 60.0,
+  "inferences": 1500,
+  "mean_w": 56.048066666666664,
+  "cpu_pct": 1.9,
+  "mj_per_inference": 2241.922666666667,
+  "mj_per_inference_above_idle": 1520.5733333333333,
+  "inferences_per_s": 25.0
+ }
+]

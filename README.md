@@ -31,7 +31,7 @@ MuJoCo: two SO-101 arms, randomised dinner table
 
 **Why a VLM above small learned policies.** Language and scene understanding live in the vision-language model;
 the visuomotor policies that move the arms are small ACT models (one of the candidate policies the challenge names),
-trained here in MuJoCo with LeRobot. The split is a latency decision: at 17 ms per forward pass on the CPU (OpenVINO
+trained here in MuJoCo with LeRobot. The split is a latency decision: at 16 ms per forward pass on the CPU (OpenVINO
 INT8 weights), a policy can run every 40 ms control step and blend overlapping action chunks, which is what lets the
 spoon hand-off complete (3/10 → 10/10 without it). A large end-to-end VLA predicts open-loop chunks — for scale,
 Intel's π0.5 reference takes 294 ms per inference with stock PyTorch on a Core Ultra X7 358H at 40 W
@@ -71,30 +71,48 @@ is in [`docs/findings.md`](docs/findings.md).
 
 | Variant | Latency median (p95) | Throughput | IR size |
 |---|---|---|---|
-| PyTorch FP32 eager (CPU) | 42–47 ms (50–54) | – | – |
-| OpenVINO FP32 | 20.9–21.9 ms (25–31) | 78–82 inf/s | 130.5 MB |
-| **OpenVINO INT8 weights** (deployed) | **16.3–17.1 ms** (19–25) | 92–100 inf/s | 33.0 MB |
-| … P-cores only, hyper-threading off | 16.2–16.7 ms | – | – |
-| … E-cores only | 93–96 ms | – | – |
+| PyTorch FP32 eager (CPU) | 39–45 ms (45–48) | – | – |
+| OpenVINO FP32 (drawer, cup) | 18.4–19.5 ms (21–22) | 85–92 inf/s | 130.5 MB |
+| **OpenVINO INT8 weights** (deployed) | **15.5–15.8 ms** (17–20) | 109–112 inf/s | 33.0 MB |
+| … E-cores only | 37–66 ms | – | – |
 
 **Control and planner at the same time** — policy with temporal ensembling + camera check at 25 Hz (40 ms budget)
-while the 4B planner generates (`scripts/bench_concurrency.py`):
+while the 4B planner generates, 60 s per placement (`scripts/bench_concurrency.py`, `out/benchmark/concurrency.md`):
 
-| Placement | Control step p50 / p99 | Steps over 40 ms |
-|---|---|---|
-| Control alone, default scheduling | 45 / 77 ms | 80% |
-| Control + planner, default scheduling | 141 / 438 ms | 100% |
-| P-cores for control, E-cores for the planner | 62 / 149 ms | 97% |
-| … + pinned threads (`--cores split`, `tenplaces/cores.py`) | **30 / 58 ms** | **5%** |
+| Placement | Control step p50 / p99 | Steps over 40 ms | Planner answer (median) |
+|---|---|---|---|
+| Control alone, default scheduling | 24 / 36 ms | 0.1% | – |
+| Control + planner, default scheduling | 53 / 70 ms | 97% | 4.2 s |
+| P-cores for control, E-cores for the planner | 30 / 54 ms | 11% | 5.5 s |
+| … + hyper-threading on for control | **29 / 36 ms** | **0%** | 5.5 s |
+| … + pinned threads (`--cores split`, `tenplaces/cores.py`) | 29 / 55 ms | 6% | 5.9 s |
+
+Left to the OS, the planner makes almost every control step late. Splitting the cores fixes that at the cost of a
+slower planner (4.2 → 5.5 s). Hyper-threading and pinning trade places between runs (an earlier run: 10% vs 5% late);
+the split itself helps in every run.
+
+**Power and energy** — CPU package power logged by HWiNFO64 (package, not wall power), cup policy, 60 s per phase
+(`scripts/power_bench.py`, `out/benchmark/power.md`):
+
+| Phase | Package power | Inferences/s | Energy per inference, above idle |
+|---|---|---|---|
+| Idle | 18.0 W | – | – |
+| PyTorch FP32, back to back | 108.9 W | 26 | 3.50 J |
+| OpenVINO FP32, back to back | 109.3 W | 53 | 1.73 J |
+| **OpenVINO INT8 weights, back to back** | 106.6 W | 62 | **1.43 J** |
+| OpenVINO INT8 weights at 25 Hz, default scheduling | 63.3 W | 25 | 1.81 J |
+| … at 25 Hz, P-cores, pinned | 56.0 W | 25 | 1.52 J |
 
 What the optimisation buys:
 - **Precision chosen by task success, not output error.** INT8 weights keep full-table success (23 vs 24 of 50);
   INT8 activations in the transformer cost it (hand-off checkpoint: 7/20 against 13/20 for FP32 and 14/20 for INT8
   weights on the same seeds, `docs/findings.md`), so they are not shipped.
-- **Latency spent on quality.** At 17 ms the policy can run every control step with temporal ensembling, which is
+- **Latency spent on quality.** At 16 ms the policy can run every control step with temporal ensembling, which is
   what lets the spoon hand-off complete (3/10 → 10/10).
-- **Hybrid-core placement for concurrent workloads.** Real-time control on the P-cores, the VLM on the E-cores,
-  threads pinned: the arms keep 25 Hz while the planner thinks (8–12 s per answer).
+- **Hybrid-core placement for concurrent workloads.** Real-time control on the P-cores, the VLM on the E-cores:
+  the arms keep 25 Hz while the planner thinks (6–8 s for a plan and its check).
+- **Energy.** INT8 weights use 2.5× less energy per inference than PyTorch on the same CPU (1.43 vs 3.50 J above
+  idle); at the robot's 25 Hz, P-core placement draws 7 W less than default scheduling.
 - Every model in the loop runs on OpenVINO: the policies (INT8 weights), the planner (Qwen3-VL-4B INT4, OpenVINO
   GenAI) and the camera classifier (ResNet18, 7.8 ms). Every script takes `--device`, so the same code targets the
   CPU, iGPU or NPU of a Core Ultra.

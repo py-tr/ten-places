@@ -1,0 +1,72 @@
+{
+ "env": {
+  "cpu": "13th Gen Intel(R) Core(TM) i5-13600KF",
+  "device": "13th Gen Intel(R) Core(TM) i5-13600KF",
+  "openvino": "2026.3.1-22476-759c5a6ab8c-releases/2026/3",
+  "torch": "2.11.0+cu128",
+  "python": "3.13.1",
+  "os": "Windows-11-10.0.22631-SP0",
+  "checkpoint": "out\\train\\cutlery_t1\\spoon\\checkpoints\\010000\\pretrained_model"
+ },
+ "rows": [
+  {
+   "variant": "pytorch",
+   "precision": "FP32 (PyTorch eager)",
+   "device": "CPU",
+   "latency_ms_median": 38.90600008890033,
+   "latency_ms_p95": 46.39603502582759,
+   "throughput_ips": null,
+   "ir_mb": null,
+   "success": null
+  },
+  {
+   "variant": "w8",
+   "precision": "INT8 weights only",
+   "device": "CPU",
+   "latency_ms_median": 15.7903500366956,
+   "latency_ms_p95": 17.756095319055017,
+   "throughput_ips": 109.368627154819,
+   "infer_requests": 6,
+   "ir_mb": 33.0,
+   "success": null
+  }
+ ],
+ "cpu_sweep": [
+  {
+   "core_type": "ANY_CORE",
+   "hyper_threading": true,
+   "latency_ms_median": 17.224149778485298,
+   "latency_ms_p95": 18.350500077940524
+  },
+  {
+   "core_type": "ANY_CORE",
+   "hyper_threading": false,
+   "latency_ms_median": 16.10990008339286,
+   "latency_ms_p95": 23.802094743587077
+  },
+  {
+   "core_type": "PCORE_ONLY",
+   "hyper_threading": true,
+   "latency_ms_median": 17.10339984856546,
+   "latency_ms_p95": 19.144205003976822
+  },
+  {
+   "core_type": "PCORE_ONLY",
+   "hyper_threading": false,
+   "latency_ms_median": 15.744199976325035,
+   "latency_ms_p95": 17.14339021127671
+  },
+  {
+   "core_type": "ECORE_ONLY",
+   "hyper_threading": true,
+   "latency_ms_median": 38.96080004051328,
+   "latency_ms_p95": 52.21258997917175
+  },
+  {
+   "core_type": "ECORE_ONLY",
+   "hyper_threading": false,
+   "latency_ms_median": 37.579450057819486,
+   "latency_ms_p95": 46.959184715524316
+  }
+ ]
+}

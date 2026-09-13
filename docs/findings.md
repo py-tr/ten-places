@@ -87,7 +87,7 @@ machine):
 
 Quantising the transformer's activations is what costs task success; INT8 weights keep it. (The later 75k hand-off
 checkpoint scored 19/20 on both FP32 and INT8 weights, `scripts/eval_checkpoints.py`.) The deployed table policies
-run INT8 weights (16–17 ms on an idle machine, README).
+run INT8 weights (15.5–16 ms on an idle machine, README).
 
 ## Disturbance repair (measured, not working yet)
 
