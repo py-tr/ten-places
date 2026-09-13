@@ -68,11 +68,15 @@ def resolve_checkpoints(runs_dirs, step: int | None = None, selected: dict | Non
 
 
 class SkillPolicies:
-    def __init__(self, runs_dir, step: int | None = None, exec_settings=None, checkpoints=None, **policy_kwargs):
+    def __init__(self, runs_dir, step: int | None = None, exec_settings=None, checkpoints=None, skills=None,
+                 **policy_kwargs):
+        """skills: load only these (default all five). Each policy costs memory in every worker process, and a
+        recording of the drawer, say, never runs the other four."""
         runs_dirs = [runs_dir] if isinstance(runs_dir, (str, Path)) else list(runs_dir)
         self.exec_settings = load_exec_settings(exec_settings)
         self.selected = load_selected(checkpoints)
-        self.sources = {s: str(p) for s, p in resolve_checkpoints(runs_dirs, step, self.selected).items()}
+        self.sources = {s: str(p) for s, p in resolve_checkpoints(runs_dirs, step, self.selected).items()
+                        if skills is None or s in skills}
         self.policies = {s: LeRobotPolicy(p, **{**policy_kwargs, **self.exec_settings.get(s, {})})
                          for s, p in self.sources.items()}
         print(f"[skills] execution settings: {self.exec_settings or 'default for every skill'}; "

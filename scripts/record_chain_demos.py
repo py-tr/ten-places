@@ -82,7 +82,9 @@ def init_worker(cfg):
     from tenplaces.state_classifier import OVStateClassifier
 
     torch.set_num_threads(1)
-    _W["policy"] = SkillPolicies(cfg["runs"], device="cuda", n_action_steps=10)
+    # Only the skills this recording runs (its learned prefix and the recorded skill's takeover frames): each
+    # policy held on the GPU also costs host memory, and Windows grows the page file to cover it.
+    _W["policy"] = SkillPolicies(cfg["runs"], device="cuda", n_action_steps=10, skills=cfg.get("skills_needed"))
     _W["clf"] = OVStateClassifier(cfg["classifier"], ov_config={"INFERENCE_NUM_THREADS": 1})
     _W["cfg"] = cfg
 
@@ -200,7 +202,9 @@ def main():
         if not args.overwrite:
             sys.exit(f"{root} exists; pass --overwrite to replace it")
         shutil.rmtree(root)
-    cfg = {"runs": [r for r in args.runs if Path(r).is_dir()], "classifier": args.classifier, "drawer_finish": args.drawer_finish}
+    cfg = {"runs": [r for r in args.runs if Path(r).is_dir()], "classifier": args.classifier, "drawer_finish": args.drawer_finish,
+           # every skill up to the last one recorded: the learned prefix plus the recorded skill's takeover frames
+           "skills_needed": SKILL_NAMES[:max(SKILL_NAMES.index(s) for s in args.skills) + 1]}
     ds = LeRobotDataset.create(repo_id=args.repo_id, fps=FPS, features=features(), root=root,
                                robot_type="bimanual_so101_sim", use_videos=False, image_writer_threads=args.writer_threads)
     rng = np.random.default_rng(args.start)

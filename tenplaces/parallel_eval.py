@@ -72,14 +72,27 @@ def _skill_job(job):
                              drawer_open=drawer_open)
 
 
+STEP_KEYS = ("drawer_open", "spoon", "plate", "fork", "cup")
+
+
+def _failed_row(seed: int, error: Exception, **extra) -> dict:
+    """A seed whose episode raised: counted as a failed table (never dropped), with the error kept, so one bad
+    seed does not discard a whole 50-seed run."""
+    return {"seed": seed, "success": False, "subtasks_done": 0, "failed": "error", "error": repr(error)[:300],
+            **{k: False for k in STEP_KEYS}, **extra}
+
+
 def _table_job(job):
     from .evaluate_table import run_episode
 
     from pathlib import Path
 
     seed, home_frames, budgets, video_path = job
-    return run_episode(_W["policy"], seed, budgets=budgets, checker=_W["checker"], home_frames=home_frames,
-                       video_path=Path(video_path) if video_path else None)
+    try:
+        return run_episode(_W["policy"], seed, budgets=budgets, checker=_W["checker"], home_frames=home_frames,
+                           video_path=Path(video_path) if video_path else None)
+    except Exception as e:
+        return _failed_row(seed, e)
 
 
 class FixedPlanner:
@@ -109,8 +122,11 @@ def _agent_job(job):
         t = time.perf_counter()
         return _W["checker"](skill, image), 1000 * (time.perf_counter() - t)
 
-    events, grade = run_command(_W["policy"], FixedPlanner(steps), "set the table", seed, budgets=budgets,
-                                checker=check, log=lambda *_: None, linger_s=0.0, disturb=disturb)
+    try:
+        events, grade = run_command(_W["policy"], FixedPlanner(steps), "set the table", seed, budgets=budgets,
+                                    checker=check, log=lambda *_: None, linger_s=0.0, disturb=disturb)
+    except Exception as e:
+        return _failed_row(seed, e, retries=0, replans=0, regressed=0, pushed=0, regressed_skills=[])
     kinds = [e["kind"] for e in events]
     return {**grade, "seed": seed, "retries": sum(e["kind"] == "skill_start" and e.get("attempt", 1) > 1 for e in events),
             "replans": kinds.count("replan"), "regressed": kinds.count("regressed"), "pushed": kinds.count("pushed"),
