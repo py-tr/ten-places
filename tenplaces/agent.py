@@ -211,6 +211,7 @@ def run_command(policy, planner, command: str, seed: int, budgets=None, max_atte
                 return
             remaining = said["queue"] if said["queue"] is not None else queue
             if amender is None:
+                announce_unsupported(wait=True)  # the VLM answers one call at a time
                 a = planner.amend(command, text, planner_image(ep, prend), done, said["current"], remaining)
                 event("amend", heard=text, proposed=a["proposed"], steps=a["steps"], corrections=a["corrections"],
                       after=said["current"], ms=round(a["ms"]))
@@ -238,6 +239,22 @@ def run_command(policy, planner, command: str, seed: int, budgets=None, max_atte
                   after=j["current"], ms=round(a["ms"]), waited_s=round(waited, 2))
             said["queue"] = a["steps"]
 
+    later = {"unsupported": None, "own_pool": None}  # the cannot_do answer still on its way (see the plan below)
+
+    def announce_unsupported(wait: bool):
+        """Say what no skill does once the background cannot_do answers; wait=True before any other planner call on
+        this thread (the VLM answers one call at a time) and at the end, so the answer is never lost."""
+        job = later["unsupported"]
+        if job is None or not (wait or job.done()):
+            return
+        later["unsupported"] = None
+        try:
+            items, ms = job.result()
+        except Exception as e:  # the plan stands; only the apology is lost
+            log(f"cannot_do failed: {e}")
+            return
+        event("unsupported", items=items, ms=round(ms))
+
     def frame(ep_, obs_):
         latest["obs"] = obs_
         while started:
@@ -247,6 +264,7 @@ def run_command(policy, planner, command: str, seed: int, budgets=None, max_atte
             on_frame(ep_, obs_)
         listen()
         collect()
+        announce_unsupported(wait=False)
 
     def hold_until_amended(obs):
         """At a step boundary: keep the arms where they are, still listening, until pending amendments arrive.
@@ -287,10 +305,20 @@ def run_command(policy, planner, command: str, seed: int, budgets=None, max_atte
         return sorted(broken, key=SKILL_NAMES.index)
 
     # The planner answers one call at a time: plan/replan/is_done below only run with no amendment pending.
-    # plan_checked also names what no skill does ("light a candle"), before the arms move (the planner answers
-    # one call at a time), so the robot can say so instead of silently ignoring it.
-    checked = getattr(planner, "plan_checked", None)
-    plan = (checked or planner.plan)(command, planner_image(ep, prend), done)
+    # plan() first, so the arms start as soon as there is a plan. What the command asks for that no skill does
+    # ("light a candle": cannot_do, text only — it never needs the image) is asked meanwhile on the planner's one
+    # worker thread and said when the answer arrives. Only an empty plan waits for it: plan_checked then re-plans
+    # without the impossible part ("set the table and light a candle"). Asking both in a row before moving took
+    # 18.7 s median to the first motion (out/planner/eval_planner_checked.json).
+    image = planner_image(ep, prend)
+    plan = planner.plan(command, image, done)
+    if hasattr(planner, "cannot_do"):
+        if not plan["steps"] and hasattr(planner, "plan_checked"):
+            plan = planner.plan_checked(command, image, done)
+        else:
+            pool = amender.pool if amender is not None else ThreadPoolExecutor(max_workers=1, thread_name_prefix="cannot")
+            later["own_pool"] = None if amender is not None else pool
+            later["unsupported"] = pool.submit(planner.cannot_do, command)
     event("plan", command=command, proposed=plan["proposed"], steps=plan["steps"], corrections=plan["corrections"],
           unsupported=plan.get("unsupported", []), ms=round(plan["ms"]))
     queue, replans = list(plan["steps"]), 0
@@ -335,6 +363,7 @@ def run_command(policy, planner, command: str, seed: int, budgets=None, max_atte
                 obs = hold_until_amended(obs)
                 if said["stop"]:
                     break
+                announce_unsupported(wait=True)  # the VLM answers one call at a time
                 ok, ms = planner.is_done(skill, planner_image(ep, prend))
             event("check", skill=skill, done=ok, ms=round(ms))
             if ok:
@@ -362,11 +391,14 @@ def run_command(policy, planner, command: str, seed: int, budgets=None, max_atte
             steps, notes = verify([s for s in wanted if s not in done], done)
             event("replan", reason=f"{skill} not confirmed", steps=steps, corrections=notes, ms=0)
             queue = steps
+    announce_unsupported(wait=True)  # a short plan can end before the answer: still say it
     grade = grade_table(ep.m, ep.d, ep.params)
     event("finished", done=done, stopped=said["stop"],
           graded=[s for s in ("drawer_open", "spoon", "plate", "fork", "cup") if grade[s]])
     if amender is not None:
         amender.close()
+    if later["own_pool"] is not None:
+        later["own_pool"].shutdown(wait=True)
     prend.close()
     ep.close()
     return events, grade

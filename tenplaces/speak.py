@@ -270,6 +270,8 @@ def phrase_for(event: dict, state: dict | None = None) -> str | None:
     st.setdefault("done", [])
     kind = event.get("kind")
     text = None
+    if kind == "unsupported":  # asked while the arms already move (tenplaces.agent); silent when empty
+        return _cannot(event.get("items"))
     if kind == "plan":
         steps = event.get("steps", [])
         parts = [_plan_sentence(steps) if steps else None, _why(event.get("corrections")),

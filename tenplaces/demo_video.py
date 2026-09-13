@@ -61,6 +61,8 @@ class DemoRecorder:
             s["proposed"] = e.get("proposed", s["proposed"])
             s["steps"], s["corrections"], s["planner_ms"] = e["steps"], e["corrections"], e.get("ms")
             s["unsupported"] = e.get("unsupported", s["unsupported"])
+        elif e["kind"] == "unsupported":  # the check that runs while the arms already move
+            s["unsupported"] = e.get("items", [])
         elif e["kind"] == "amend":
             done = self._done()
             kept = [x for x in s["steps"] if x in done or x == e.get("after")]

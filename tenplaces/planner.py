@@ -126,14 +126,16 @@ class VLMPlanner:
         if warmup:  # the first generate compiles kernels (~15 s); pay that at load, not mid-demo
             self._ask("Warm-up.", np.zeros((336, 448, 3), np.uint8), CHECK_SCHEMA, max_new_tokens=4)
 
-    def _ask(self, prompt: str, image: np.ndarray, schema: dict, max_new_tokens: int = 120):
+    def _ask(self, prompt: str, image: np.ndarray | None, schema: dict, max_new_tokens: int = 120):
+        """One structured answer from the VLM; image=None asks text-only (no vision encoding)."""
         import openvino as ov
 
         cfg = self.og.GenerationConfig()
         cfg.max_new_tokens = max_new_tokens
         cfg.structured_output_config = self.og.StructuredOutputConfig(json_schema=json.dumps(schema))
+        extra = {} if image is None else {"images": [ov.Tensor(np.ascontiguousarray(image[None]))]}
         t = time.perf_counter()
-        res = self.pipe.generate(prompt, images=[ov.Tensor(np.ascontiguousarray(image[None]))], generation_config=cfg)
+        res = self.pipe.generate(prompt, generation_config=cfg, **extra)
         ms = 1000 * (time.perf_counter() - t)
         text = res.texts[0]
         try:
@@ -151,11 +153,13 @@ class VLMPlanner:
         return {"command": command, "proposed": proposed, "steps": steps, "corrections": notes,
                 "reason": (parsed or {}).get("reason", ""), "unsupported": unsupported, "raw": raw, "ms": ms}
 
-    def cannot_do(self, command: str, image: np.ndarray):
+    def cannot_do(self, command: str, image: np.ndarray | None = None):
         """What the command asks for that no skill does ("light a candle"), so the robot can say so instead of
-        silently ignoring it. A separate question from plan(), so it cannot change the plan. Returns (list, ms)."""
+        silently ignoring it. A separate question from plan(), so it cannot change the plan. Returns (list, ms).
+        Text only: the question is about the command, not the scene (`image` is accepted and ignored), so it costs
+        no vision encoding and can run while the arms already move."""
         skills = "\n".join(f"- {s}: {SKILL_TEXT[s]}" for s in SKILL_NAMES)
-        parsed, raw, ms = self._ask(CANNOT_PROMPT.format(skills=skills, command=command), image, UNSUPPORTED_SCHEMA,
+        parsed, raw, ms = self._ask(CANNOT_PROMPT.format(skills=skills, command=command), None, UNSUPPORTED_SCHEMA,
                                     max_new_tokens=60)
         items = [u.strip() for u in (parsed or {}).get("unsupported", []) if isinstance(u, str) and u.strip()]
         # Leaving one of the robot's own objects out ("skip the cup") is the plan's business, not something it
@@ -187,7 +191,7 @@ class VLMPlanner:
         command without the impossible part. The plan dict gains "unsupported" (and "replanned_from")."""
         planner = self.plan_intent if use_intent else self.plan
         p = planner(command, image, done)
-        unsupported, ms = self.cannot_do(command, image)
+        unsupported, ms = self.cannot_do(command)  # text only
         p.update(unsupported=unsupported, ms=p["ms"] + ms)
         rest = command
         for u in unsupported:
