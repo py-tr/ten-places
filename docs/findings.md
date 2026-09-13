@@ -48,6 +48,19 @@ row above, full-table success is within noise (PyTorch +7 / −4 tables, McNemar
 way: the OpenVINO drawer, 48 → 42 → 39 of 50 (vs the release-and-home row: 0 gained, 9 lost), which does not
 reproduce on the 50 tuning seeds (44 vs 44). Lesson: 20 tuning seeds are too few to choose on — later decisions use 50.
 
+**Drawer demos from genuinely stalled pulls (the fix that worked).** 100 new drawer demos
+(`scripts/record_chain_demos.py`): 60 start where a learned pull really stalled (release + home, then the scripted
+controller re-grips and finishes), 40 are plain pulls from a closed drawer; fine-tuned from the deployed drawer.
+- First attempt, with the demo set's own statistics: the drawer froze in one pose on every table (0/50). Arm B never
+  moves in drawer demos, so several of its joint spreads were float32 rounding noise (~0) while the policy still
+  issued tiny arm-B commands; LeRobot's MEAN_STD normalisation divides the resulting 1e-5–1e-4 rad deviation by ~1e-8.
+  Reproduced offline: a 1e-4 rad nudge on one arm-B joint sends the predicted arm-A motion to the frozen pose.
+- Same data, fine-tuned with the parent's statistics (`scripts/use_parent_stats.py`; `train_skills.py` now refuses a
+  demo set with a near-zero spread), 7.5k steps, seeds 100–149: drawer 44 → 48/50, spoon 36 → 45, **full tables
+  30 → 41/50** (Wilson 69–90%); with a drawer retry 43/50. The spoon's losses were stalled drawers all along.
+- A spoon fine-tune on 190 new demos (after the learned drawer, plus drawer openings of 7.2–10.2 cm) made the spoon
+  worse (20–22/50) and was not used.
+
 **Where the chain still loses.** Fork, the weakest step, is mostly downstream: of its 25 failures (PyTorch, seeds
 0–49, release + home), 15 are on seeds where the spoon failed and 4 where the plate failed (the plate starts on the
 fork's spot); 6 are the fork's own. The drawer pull sometimes stalls at 5–6.5 cm, mostly on high-friction tables
