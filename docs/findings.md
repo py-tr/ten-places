@@ -50,8 +50,11 @@ reproduce on the 50 tuning seeds (44 vs 44). Lesson: 20 tuning seeds are too few
 
 **Where the chain still loses.** Fork, the weakest step, is mostly downstream: of its 25 failures (PyTorch, seeds
 0–49, release + home), 15 are on seeds where the spoon failed and 4 where the plate failed (the plate starts on the
-fork's spot); 6 are the fork's own. The drawer pull sometimes stalls at 5–6.5 cm; re-running the drawer policy from
-5 / 6 / 6.5 cm reaches ≥ 7.4 cm on 18 / 19 / 20 of 20 — so a retry can finish a stalled pull.
+fork's spot); 6 are the fork's own. The drawer pull sometimes stalls at 5–6.5 cm, mostly on high-friction tables
+(opening vs friction: Spearman −0.58). Started from a drawer set 5 / 6 / 6.5 cm open, the drawer policy reaches
+≥ 7.4 cm on 18 / 19 / 20 of 20 — but inside the chain a retry recovered 0 of 9 real stalls (`scripts/eval_table_chain.py
+--retry`, seeds 100–149): a tray dragged there under high friction, with the arm still hung on the handle, is not the
+same start as a tray set there.
 
 ## OpenVINO precision study
 
