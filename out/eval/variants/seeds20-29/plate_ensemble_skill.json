@@ -1,0 +1,86 @@
+{
+ "summary": {
+  "skill": "plate",
+  "label": "plate_ensemble",
+  "episodes": 10,
+  "success": 7,
+  "rate": 0.7,
+  "wilson95": [
+   0.397,
+   0.892
+  ],
+  "mean_frames": 182.7
+ },
+ "rows": [
+  {
+   "seed": 20,
+   "skill": "plate",
+   "success": true,
+   "frames": 161,
+   "err_m": 0.0054
+  },
+  {
+   "seed": 21,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0861
+  },
+  {
+   "seed": 22,
+   "skill": "plate",
+   "success": true,
+   "frames": 161,
+   "err_m": 0.0034
+  },
+  {
+   "seed": 23,
+   "skill": "plate",
+   "success": true,
+   "frames": 231,
+   "err_m": 0.006
+  },
+  {
+   "seed": 24,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0944
+  },
+  {
+   "seed": 25,
+   "skill": "plate",
+   "success": true,
+   "frames": 161,
+   "err_m": 0.0063
+  },
+  {
+   "seed": 26,
+   "skill": "plate",
+   "success": true,
+   "frames": 151,
+   "err_m": 0.0068
+  },
+  {
+   "seed": 27,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0643
+  },
+  {
+   "seed": 28,
+   "skill": "plate",
+   "success": true,
+   "frames": 161,
+   "err_m": 0.0052
+  },
+  {
+   "seed": 29,
+   "skill": "plate",
+   "success": true,
+   "frames": 171,
+   "err_m": 0.0058
+  }
+ ]
+}

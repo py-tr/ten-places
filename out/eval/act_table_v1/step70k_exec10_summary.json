@@ -1,0 +1,19 @@
+{
+ "label": "step70k_exec10",
+ "episodes": 10,
+ "full_success": 0,
+ "rate": 0.0,
+ "wilson95": [
+  -0.0,
+  0.278
+ ],
+ "per_subtask": {
+  "drawer": 10,
+  "spoon": 5,
+  "plate": 2,
+  "fork": 1,
+  "cup": 0
+ },
+ "mean_subtasks": 1.8,
+ "policy_ms_mean": 5.740316629964755
+}

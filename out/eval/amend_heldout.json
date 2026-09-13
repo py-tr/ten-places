@@ -1,0 +1,231 @@
+{
+ "set": "heldout",
+ "correct": 9,
+ "cases": 10,
+ "rows": [
+  {
+   "heard": "Leave out the fork.",
+   "planned": [
+    "spoon",
+    "plate",
+    "fork",
+    "cup"
+   ],
+   "proposed": [
+    "spoon",
+    "plate",
+    "cup"
+   ],
+   "steps": [
+    "spoon",
+    "plate",
+    "cup"
+   ],
+   "expected": [
+    "spoon",
+    "plate",
+    "cup"
+   ],
+   "ok": true,
+   "ms": 15137,
+   "corrections": [],
+   "raw": "{\"remove\": [\"fork\"], \"add\": [], \"only\": [], \"nothing_more\": false, \"reason\": \"fork no longer wanted\"}"
+  },
+  {
+   "heard": "Don't bother with the plate.",
+   "planned": [
+    "plate",
+    "fork",
+    "cup"
+   ],
+   "proposed": [
+    "fork",
+    "cup"
+   ],
+   "steps": [
+    "plate",
+    "fork",
+    "cup"
+   ],
+   "expected": [
+    "plate",
+    "fork",
+    "cup"
+   ],
+   "ok": true,
+   "ms": 8144,
+   "corrections": [
+    "added 'plate' before 'fork': the plate starts on the fork's spot"
+   ],
+   "raw": "{\"remove\": [\"plate\"], \"add\": [], \"only\": [], \"nothing_more\": false, \"reason\": \"person no longer wants the plate\"}"
+  },
+  {
+   "heard": "Add the spoon as well.",
+   "planned": [
+    "cup"
+   ],
+   "proposed": [
+    "cup",
+    "spoon"
+   ],
+   "steps": [
+    "spoon",
+    "cup"
+   ],
+   "expected": [
+    "spoon",
+    "cup"
+   ],
+   "ok": true,
+   "ms": 7718,
+   "corrections": [
+    "reordered to spoon -> cup: other orders collide on this table",
+    "'spoon' after 'plate' is outside the order tested collision-free"
+   ],
+   "raw": "{\"remove\": [], \"add\": [\"spoon\"], \"only\": [], \"nothing_more\": false, \"reason\": \"person now wants the spoon added\"}"
+  },
+  {
+   "heard": "Perfect, thank you.",
+   "planned": [],
+   "proposed": [],
+   "steps": [],
+   "expected": [],
+   "ok": true,
+   "ms": 9173,
+   "corrections": [],
+   "raw": "{\"remove\": [], \"add\": [], \"only\": [], \"nothing_more\": true, \"reason\": \"Person thanked the robot, indicating task completed\"}"
+  },
+  {
+   "heard": "Only the cutlery, please.",
+   "planned": [
+    "spoon",
+    "plate",
+    "fork",
+    "cup"
+   ],
+   "proposed": [
+    "spoon"
+   ],
+   "steps": [
+    "spoon"
+   ],
+   "expected": [
+    "spoon",
+    "plate",
+    "fork"
+   ],
+   "ok": false,
+   "ms": 13874,
+   "corrections": [],
+   "raw": "{\"remove\": [\"plate\", \"fork\", \"cup\"], \"add\": [], \"only\": [], \"nothing_more\": false, \"reason\": \"Only the cutlery is requested, so plate, fork, and cup are removed; only spoon remains as the only requested item.\"}"
+  },
+  {
+   "heard": "And the plate too, please.",
+   "planned": [],
+   "proposed": [
+    "plate"
+   ],
+   "steps": [
+    "drawer",
+    "plate"
+   ],
+   "expected": [
+    "drawer",
+    "plate"
+   ],
+   "ok": true,
+   "ms": 12087,
+   "corrections": [
+    "added 'drawer' before 'plate': the closed drawer's tray reaches the placemat's edge",
+    "'drawer' after 'cup' is outside the order tested collision-free",
+    "'plate' after 'cup' is outside the order tested collision-free"
+   ],
+   "raw": "{\"remove\": [], \"add\": [\"plate\"], \"only\": [], \"nothing_more\": false, \"reason\": \"plate also requested\"}"
+  },
+  {
+   "heard": "Hold on, no cup today.",
+   "planned": [
+    "plate",
+    "fork",
+    "cup"
+   ],
+   "proposed": [
+    "plate",
+    "fork"
+   ],
+   "steps": [
+    "plate",
+    "fork"
+   ],
+   "expected": [
+    "plate",
+    "fork"
+   ],
+   "ok": true,
+   "ms": 10671,
+   "corrections": [],
+   "raw": "{\"remove\": [\"cup\"], \"add\": [], \"only\": [], \"nothing_more\": false, \"reason\": \"person no longer wants the cup\"}"
+  },
+  {
+   "heard": "Actually we do need the cup.",
+   "planned": [
+    "fork"
+   ],
+   "proposed": [
+    "fork",
+    "cup"
+   ],
+   "steps": [
+    "fork",
+    "cup"
+   ],
+   "expected": [
+    "fork",
+    "cup"
+   ],
+   "ok": true,
+   "ms": 10013,
+   "corrections": [],
+   "raw": "{\"remove\": [], \"add\": [\"cup\"], \"only\": [], \"nothing_more\": false, \"reason\": \"The person now wants the cup added to the table setting.\"}"
+  },
+  {
+   "heard": "Skip the spoon and the cup.",
+   "planned": [
+    "spoon",
+    "plate",
+    "fork",
+    "cup"
+   ],
+   "proposed": [
+    "plate",
+    "fork"
+   ],
+   "steps": [
+    "plate",
+    "fork"
+   ],
+   "expected": [
+    "plate",
+    "fork"
+   ],
+   "ok": true,
+   "ms": 8895,
+   "corrections": [],
+   "raw": "{\"remove\": [\"spoon\", \"cup\"], \"add\": [], \"only\": [], \"nothing_more\": false, \"reason\": \"person wants to skip spoon and cup\"}"
+  },
+  {
+   "heard": "That's enough, no more.",
+   "planned": [
+    "fork",
+    "cup"
+   ],
+   "proposed": [],
+   "steps": [],
+   "expected": [],
+   "ok": true,
+   "ms": 10106,
+   "corrections": [],
+   "raw": "{\"remove\": [], \"add\": [], \"only\": [], \"nothing_more\": true, \"reason\": \"person said no more\"}"
+  }
+ ]
+}

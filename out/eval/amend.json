@@ -1,0 +1,200 @@
+{
+ "correct": 9,
+ "cases": 10,
+ "rows": [
+  {
+   "heard": "Skip the fork.",
+   "planned": [
+    "plate",
+    "fork",
+    "cup"
+   ],
+   "proposed": [
+    "plate",
+    "cup"
+   ],
+   "steps": [
+    "plate",
+    "cup"
+   ],
+   "expected": [
+    "plate",
+    "cup"
+   ],
+   "ok": true,
+   "ms": 12594,
+   "corrections": []
+  },
+  {
+   "heard": "Actually, just the cup.",
+   "planned": [
+    "plate",
+    "fork",
+    "cup"
+   ],
+   "proposed": [
+    "cup"
+   ],
+   "steps": [
+    "cup"
+   ],
+   "expected": [
+    "cup"
+   ],
+   "ok": true,
+   "ms": 4840,
+   "corrections": []
+  },
+  {
+   "heard": "Forget the cup.",
+   "planned": [
+    "cup"
+   ],
+   "proposed": [
+    "fork"
+   ],
+   "steps": [],
+   "expected": [],
+   "ok": true,
+   "ms": 8523,
+   "corrections": [
+    "skipped 'fork': already done"
+   ]
+  },
+  {
+   "heard": "Oh, and put the cup out too.",
+   "planned": [],
+   "proposed": [
+    "plate",
+    "cup"
+   ],
+   "steps": [
+    "cup"
+   ],
+   "expected": [
+    "cup"
+   ],
+   "ok": true,
+   "ms": 6418,
+   "corrections": [
+    "skipped 'plate': already done"
+   ]
+  },
+  {
+   "heard": "I changed my mind, I want the fork too.",
+   "planned": [
+    "cup"
+   ],
+   "proposed": [
+    "fork",
+    "cup"
+   ],
+   "steps": [
+    "fork",
+    "cup"
+   ],
+   "expected": [
+    "fork",
+    "cup"
+   ],
+   "ok": true,
+   "ms": 7366,
+   "corrections": []
+  },
+  {
+   "heard": "Looks great, carry on.",
+   "planned": [
+    "fork",
+    "cup"
+   ],
+   "proposed": [
+    "fork",
+    "cup"
+   ],
+   "steps": [
+    "fork",
+    "cup"
+   ],
+   "expected": [
+    "fork",
+    "cup"
+   ],
+   "ok": true,
+   "ms": 7656,
+   "corrections": []
+  },
+  {
+   "heard": "No spoon, please.",
+   "planned": [
+    "spoon",
+    "plate",
+    "fork",
+    "cup"
+   ],
+   "proposed": [
+    "drawer"
+   ],
+   "steps": [],
+   "expected": [
+    "plate",
+    "fork",
+    "cup"
+   ],
+   "ok": false,
+   "ms": 9959,
+   "corrections": [
+    "skipped 'drawer': already done"
+   ]
+  },
+  {
+   "heard": "Thanks, that's all.",
+   "planned": [],
+   "proposed": [
+    "cup"
+   ],
+   "steps": [],
+   "expected": [],
+   "ok": true,
+   "ms": 6502,
+   "corrections": [
+    "skipped 'cup': already done"
+   ]
+  },
+  {
+   "heard": "We're having soup, skip the plate and the fork.",
+   "planned": [
+    "plate",
+    "fork",
+    "cup"
+   ],
+   "proposed": [
+    "cup"
+   ],
+   "steps": [
+    "cup"
+   ],
+   "expected": [
+    "cup"
+   ],
+   "ok": true,
+   "ms": 7171,
+   "corrections": []
+  },
+  {
+   "heard": "Can you leave out the cup and stop there?",
+   "planned": [
+    "cup"
+   ],
+   "proposed": [
+    "fork"
+   ],
+   "steps": [],
+   "expected": [],
+   "ok": true,
+   "ms": 6937,
+   "corrections": [
+    "skipped 'fork': already done"
+   ]
+  }
+ ]
+}

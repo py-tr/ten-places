@@ -1,0 +1,26 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.tutor/
+data/
+checkpoints/
+models/
+*.mp4
+third_party/SO-ARM100/
+# Working drafts for the submission (form text, video script, slide outline) stay local.
+docs/submission.md
+docs/video_script.md
+docs/slides.md
+# out/: generated artefacts stay local (checkpoints, videos, caches); the small result files every number in the
+# README comes from are kept (evaluation summaries, per-seed rows, benchmark tables).
+out/*
+!out/eval/
+out/eval/**/*.*
+!out/eval/**/*.json
+!out/eval/**/*.csv
+!out/eval/**/*.md
+!out/benchmark/
+out/benchmark/*.*
+!out/benchmark/*.json
+!out/benchmark/*.md

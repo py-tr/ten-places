@@ -1,0 +1,11 @@
+seed,success,subtasks_done,drawer_open,spoon,plate,fork,cup,policy_ms_mean
+0,False,4,True,False,True,True,True,7.729746423636193
+1,False,3,True,True,False,False,True,7.693616442433367
+2,False,2,True,False,False,False,True,7.812881501302225
+3,False,1,False,False,False,False,True,7.78429513631312
+4,False,3,True,True,False,False,True,8.199342878930883
+5,False,3,True,True,False,False,True,8.032300674088605
+6,False,3,True,True,True,False,False,8.177344177288246
+7,False,4,True,True,True,False,True,8.048894109000285
+8,False,3,True,True,False,False,True,8.054785951270327
+9,False,4,True,True,True,False,True,7.834097597913893

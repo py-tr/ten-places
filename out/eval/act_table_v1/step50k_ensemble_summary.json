@@ -1,0 +1,19 @@
+{
+ "label": "step50k_ensemble",
+ "episodes": 3,
+ "full_success": 0,
+ "rate": 0.0,
+ "wilson95": [
+  0.0,
+  0.562
+ ],
+ "per_subtask": {
+  "drawer": 3,
+  "spoon": 0,
+  "plate": 2,
+  "fork": 1,
+  "cup": 0
+ },
+ "mean_subtasks": 2.0,
+ "policy_ms_mean": 40.441837115957476
+}

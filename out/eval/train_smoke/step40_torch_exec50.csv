@@ -1,0 +1,3 @@
+seed,success,failure,place_err_m,policy_ms_mean,policy_ms_p95
+0,False,place_off_target,0.19315193137061631,4.009700247552246,2.2486249916255465
+1,False,place_off_target,0.21450628763977503,1.80626924848184,2.0087650511413813

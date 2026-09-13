@@ -1,0 +1,86 @@
+{
+ "summary": {
+  "skill": "fork",
+  "label": "fork_ensemble",
+  "episodes": 10,
+  "success": 9,
+  "rate": 0.9,
+  "wilson95": [
+   0.596,
+   0.982
+  ],
+  "mean_frames": 310.9
+ },
+ "rows": [
+  {
+   "seed": 20,
+   "skill": "fork",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.0047
+  },
+  {
+   "seed": 21,
+   "skill": "fork",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.005
+  },
+  {
+   "seed": 22,
+   "skill": "fork",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.0083
+  },
+  {
+   "seed": 23,
+   "skill": "fork",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.0033
+  },
+  {
+   "seed": 24,
+   "skill": "fork",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0039
+  },
+  {
+   "seed": 25,
+   "skill": "fork",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.0063
+  },
+  {
+   "seed": 26,
+   "skill": "fork",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0044
+  },
+  {
+   "seed": 27,
+   "skill": "fork",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.0013
+  },
+  {
+   "seed": 28,
+   "skill": "fork",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0032
+  },
+  {
+   "seed": 29,
+   "skill": "fork",
+   "success": false,
+   "frames": 360,
+   "err_m": 0.1927
+  }
+ ]
+}

@@ -1,0 +1,11 @@
+{
+ "label": "best_ov_int8_backbone_exec10",
+ "episodes": 20,
+ "success": 17,
+ "rate": 0.85,
+ "wilson95": [
+  0.64,
+  0.948
+ ],
+ "policy_ms_mean": 4.71772356441943
+}

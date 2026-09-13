@@ -1,0 +1,86 @@
+{
+ "summary": {
+  "skill": "cup",
+  "label": "cup_after_drawer-spoon-plate-fork",
+  "episodes": 10,
+  "success": 10,
+  "rate": 1.0,
+  "wilson95": [
+   0.722,
+   1.0
+  ],
+  "mean_frames": 169.0
+ },
+ "rows": [
+  {
+   "seed": 0,
+   "skill": "cup",
+   "success": true,
+   "frames": 151,
+   "err_m": 0.0118
+  },
+  {
+   "seed": 1,
+   "skill": "cup",
+   "success": true,
+   "frames": 171,
+   "err_m": 0.0043
+  },
+  {
+   "seed": 2,
+   "skill": "cup",
+   "success": true,
+   "frames": 171,
+   "err_m": 0.0036
+  },
+  {
+   "seed": 3,
+   "skill": "cup",
+   "success": true,
+   "frames": 161,
+   "err_m": 0.0055
+  },
+  {
+   "seed": 4,
+   "skill": "cup",
+   "success": true,
+   "frames": 171,
+   "err_m": 0.0102
+  },
+  {
+   "seed": 5,
+   "skill": "cup",
+   "success": true,
+   "frames": 171,
+   "err_m": 0.0057
+  },
+  {
+   "seed": 6,
+   "skill": "cup",
+   "success": true,
+   "frames": 181,
+   "err_m": 0.0048
+  },
+  {
+   "seed": 7,
+   "skill": "cup",
+   "success": true,
+   "frames": 201,
+   "err_m": 0.007
+  },
+  {
+   "seed": 8,
+   "skill": "cup",
+   "success": true,
+   "frames": 161,
+   "err_m": 0.0036
+  },
+  {
+   "seed": 9,
+   "skill": "cup",
+   "success": true,
+   "frames": 151,
+   "err_m": 0.0091
+  }
+ ]
+}

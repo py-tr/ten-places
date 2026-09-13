@@ -1,0 +1,406 @@
+{
+ "default": [
+  {
+   "drawer_open": true,
+   "spoon": false,
+   "spoon_err_m": 0.2323,
+   "fork": false,
+   "fork_err_m": 0.1637,
+   "plate": true,
+   "plate_err_m": 0.0055,
+   "cup": true,
+   "cup_err_m": 0.0064,
+   "subtasks_done": 3,
+   "success": false,
+   "failed": [
+    "spoon",
+    "fork"
+   ],
+   "seed": 100,
+   "policy_ms_mean": 25.528379686848883,
+   "policy_ms_p95": 57.50652006827295
+  },
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.0052,
+   "fork": false,
+   "fork_err_m": 0.1903,
+   "plate": true,
+   "plate_err_m": 0.0053,
+   "cup": true,
+   "cup_err_m": 0.0057,
+   "subtasks_done": 4,
+   "success": false,
+   "failed": [
+    "fork"
+   ],
+   "seed": 101,
+   "policy_ms_mean": 22.84869482903566,
+   "policy_ms_p95": 56.27760014031082
+  },
+  {
+   "drawer_open": false,
+   "spoon": false,
+   "spoon_err_m": 0.1918,
+   "fork": false,
+   "fork_err_m": 0.0962,
+   "plate": true,
+   "plate_err_m": 0.0044,
+   "cup": true,
+   "cup_err_m": 0.0003,
+   "subtasks_done": 2,
+   "success": false,
+   "failed": [
+    "drawer_open",
+    "spoon",
+    "fork"
+   ],
+   "seed": 102,
+   "policy_ms_mean": 28.044637879722842,
+   "policy_ms_p95": 60.25420012883841
+  },
+  {
+   "drawer_open": true,
+   "spoon": false,
+   "spoon_err_m": 0.0305,
+   "fork": false,
+   "fork_err_m": 0.1849,
+   "plate": false,
+   "plate_err_m": 0.047,
+   "cup": false,
+   "cup_err_m": 0.0828,
+   "subtasks_done": 1,
+   "success": false,
+   "failed": [
+    "spoon",
+    "fork",
+    "plate",
+    "cup"
+   ],
+   "seed": 103,
+   "policy_ms_mean": 24.170182801192414,
+   "policy_ms_p95": 59.081095131114125
+  },
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.0071,
+   "fork": false,
+   "fork_err_m": 0.1694,
+   "plate": true,
+   "plate_err_m": 0.0068,
+   "cup": true,
+   "cup_err_m": 0.0041,
+   "subtasks_done": 4,
+   "success": false,
+   "failed": [
+    "fork"
+   ],
+   "seed": 104,
+   "policy_ms_mean": 23.435806462496547,
+   "policy_ms_p95": 58.451805030927055
+  },
+  {
+   "drawer_open": true,
+   "spoon": false,
+   "spoon_err_m": 0.2408,
+   "fork": false,
+   "fork_err_m": 0.1947,
+   "plate": true,
+   "plate_err_m": 0.0018,
+   "cup": true,
+   "cup_err_m": 0.0038,
+   "subtasks_done": 3,
+   "success": false,
+   "failed": [
+    "spoon",
+    "fork"
+   ],
+   "seed": 105,
+   "policy_ms_mean": 24.595571990001805,
+   "policy_ms_p95": 59.393719723448136
+  },
+  {
+   "drawer_open": true,
+   "spoon": false,
+   "spoon_err_m": 0.1641,
+   "fork": false,
+   "fork_err_m": 0.1721,
+   "plate": false,
+   "plate_err_m": 0.0911,
+   "cup": true,
+   "cup_err_m": 0.0123,
+   "subtasks_done": 2,
+   "success": false,
+   "failed": [
+    "spoon",
+    "fork",
+    "plate"
+   ],
+   "seed": 106,
+   "policy_ms_mean": 25.98727170637427,
+   "policy_ms_p95": 60.98727039061485
+  },
+  {
+   "drawer_open": true,
+   "spoon": false,
+   "spoon_err_m": 0.2412,
+   "fork": false,
+   "fork_err_m": 0.1229,
+   "plate": false,
+   "plate_err_m": 0.0261,
+   "cup": true,
+   "cup_err_m": 0.0159,
+   "subtasks_done": 2,
+   "success": false,
+   "failed": [
+    "spoon",
+    "fork",
+    "plate"
+   ],
+   "seed": 107,
+   "policy_ms_mean": 24.72256103737891,
+   "policy_ms_p95": 59.50572998262942
+  },
+  {
+   "drawer_open": true,
+   "spoon": false,
+   "spoon_err_m": 0.2383,
+   "fork": false,
+   "fork_err_m": 0.1767,
+   "plate": true,
+   "plate_err_m": 0.0022,
+   "cup": true,
+   "cup_err_m": 0.0024,
+   "subtasks_done": 3,
+   "success": false,
+   "failed": [
+    "spoon",
+    "fork"
+   ],
+   "seed": 108,
+   "policy_ms_mean": 25.836042104676846,
+   "policy_ms_p95": 61.40335018280891
+  },
+  {
+   "drawer_open": true,
+   "spoon": false,
+   "spoon_err_m": 0.2452,
+   "fork": false,
+   "fork_err_m": 0.1994,
+   "plate": false,
+   "plate_err_m": 0.0607,
+   "cup": true,
+   "cup_err_m": 0.0073,
+   "subtasks_done": 2,
+   "success": false,
+   "failed": [
+    "spoon",
+    "fork",
+    "plate"
+   ],
+   "seed": 109,
+   "policy_ms_mean": 26.367938443372893,
+   "policy_ms_p95": 60.18953982274981
+  }
+ ],
+ "long": [
+  {
+   "drawer_open": true,
+   "spoon": false,
+   "spoon_err_m": 0.2191,
+   "fork": false,
+   "fork_err_m": 0.163,
+   "plate": true,
+   "plate_err_m": 0.006,
+   "cup": true,
+   "cup_err_m": 0.0092,
+   "subtasks_done": 3,
+   "success": false,
+   "failed": [
+    "spoon",
+    "fork"
+   ],
+   "seed": 100,
+   "policy_ms_mean": 25.41364300454026,
+   "policy_ms_p95": 58.311600238084786
+  },
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.0043,
+   "fork": false,
+   "fork_err_m": 0.1796,
+   "plate": false,
+   "plate_err_m": 0.0624,
+   "cup": true,
+   "cup_err_m": 0.0054,
+   "subtasks_done": 3,
+   "success": false,
+   "failed": [
+    "fork",
+    "plate"
+   ],
+   "seed": 101,
+   "policy_ms_mean": 22.968543532080457,
+   "policy_ms_p95": 56.438420061022036
+  },
+  {
+   "drawer_open": false,
+   "spoon": false,
+   "spoon_err_m": 0.1919,
+   "fork": false,
+   "fork_err_m": 0.0963,
+   "plate": true,
+   "plate_err_m": 0.0045,
+   "cup": false,
+   "cup_err_m": 0.0687,
+   "subtasks_done": 1,
+   "success": false,
+   "failed": [
+    "drawer_open",
+    "spoon",
+    "fork",
+    "cup"
+   ],
+   "seed": 102,
+   "policy_ms_mean": 28.740813284255434,
+   "policy_ms_p95": 58.03196516353637
+  },
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.005,
+   "fork": true,
+   "fork_err_m": 0.007,
+   "plate": true,
+   "plate_err_m": 0.0038,
+   "cup": true,
+   "cup_err_m": 0.0017,
+   "subtasks_done": 5,
+   "success": true,
+   "failed": [],
+   "seed": 103,
+   "policy_ms_mean": 25.344070915032077,
+   "policy_ms_p95": 56.57580001279711
+  },
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.0066,
+   "fork": false,
+   "fork_err_m": 0.1335,
+   "plate": true,
+   "plate_err_m": 0.0083,
+   "cup": true,
+   "cup_err_m": 0.0048,
+   "subtasks_done": 4,
+   "success": false,
+   "failed": [
+    "fork"
+   ],
+   "seed": 104,
+   "policy_ms_mean": 21.24325989127719,
+   "policy_ms_p95": 56.1093798605725
+  },
+  {
+   "drawer_open": true,
+   "spoon": false,
+   "spoon_err_m": 0.2389,
+   "fork": false,
+   "fork_err_m": 0.1917,
+   "plate": true,
+   "plate_err_m": 0.0011,
+   "cup": true,
+   "cup_err_m": 0.0027,
+   "subtasks_done": 3,
+   "success": false,
+   "failed": [
+    "spoon",
+    "fork"
+   ],
+   "seed": 105,
+   "policy_ms_mean": 21.328719073980153,
+   "policy_ms_p95": 56.108675128780305
+  },
+  {
+   "drawer_open": true,
+   "spoon": false,
+   "spoon_err_m": 0.1592,
+   "fork": false,
+   "fork_err_m": 0.1682,
+   "plate": false,
+   "plate_err_m": 0.0835,
+   "cup": true,
+   "cup_err_m": 0.0124,
+   "subtasks_done": 2,
+   "success": false,
+   "failed": [
+    "spoon",
+    "fork",
+    "plate"
+   ],
+   "seed": 106,
+   "policy_ms_mean": 23.91311394881391,
+   "policy_ms_p95": 55.96726487856358
+  },
+  {
+   "drawer_open": true,
+   "spoon": false,
+   "spoon_err_m": 0.241,
+   "fork": true,
+   "fork_err_m": 0.0072,
+   "plate": true,
+   "plate_err_m": 0.0035,
+   "cup": true,
+   "cup_err_m": 0.0011,
+   "subtasks_done": 4,
+   "success": false,
+   "failed": [
+    "spoon"
+   ],
+   "seed": 107,
+   "policy_ms_mean": 23.479233822528865,
+   "policy_ms_p95": 56.76422999240457
+  },
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.0029,
+   "fork": true,
+   "fork_err_m": 0.0014,
+   "plate": true,
+   "plate_err_m": 0.0048,
+   "cup": true,
+   "cup_err_m": 0.0037,
+   "subtasks_done": 5,
+   "success": true,
+   "failed": [],
+   "seed": 108,
+   "policy_ms_mean": 25.80010869229833,
+   "policy_ms_p95": 56.21711993589997
+  },
+  {
+   "drawer_open": true,
+   "spoon": false,
+   "spoon_err_m": 0.2489,
+   "fork": false,
+   "fork_err_m": 0.16,
+   "plate": false,
+   "plate_err_m": 0.0507,
+   "cup": true,
+   "cup_err_m": 0.0184,
+   "subtasks_done": 2,
+   "success": false,
+   "failed": [
+    "spoon",
+    "fork",
+    "plate"
+   ],
+   "seed": 109,
+   "policy_ms_mean": 22.00599184763395,
+   "policy_ms_p95": 55.37938510533422
+  }
+ ]
+}

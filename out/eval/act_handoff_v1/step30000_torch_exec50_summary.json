@@ -1,0 +1,11 @@
+{
+ "label": "step30000_torch_exec50",
+ "episodes": 10,
+ "success": 6,
+ "rate": 0.6,
+ "wilson95": [
+  0.313,
+  0.832
+ ],
+ "policy_ms_mean": 1.350653148489073
+}

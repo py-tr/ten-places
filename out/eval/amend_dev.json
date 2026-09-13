@@ -1,0 +1,202 @@
+{
+ "set": "dev",
+ "correct": 10,
+ "cases": 10,
+ "rows": [
+  {
+   "heard": "Skip the fork.",
+   "planned": [
+    "plate",
+    "fork",
+    "cup"
+   ],
+   "proposed": [
+    "plate",
+    "cup"
+   ],
+   "steps": [
+    "plate",
+    "cup"
+   ],
+   "expected": [
+    "plate",
+    "cup"
+   ],
+   "ok": true,
+   "ms": 12239,
+   "corrections": [],
+   "raw": "{\"remove\": [\"fork\"], \"add\": [], \"only\": [], \"nothing_more\": false, \"reason\": \"fork skipped as per instruction\"}"
+  },
+  {
+   "heard": "Actually, just the cup.",
+   "planned": [
+    "plate",
+    "fork",
+    "cup"
+   ],
+   "proposed": [
+    "cup"
+   ],
+   "steps": [
+    "cup"
+   ],
+   "expected": [
+    "cup"
+   ],
+   "ok": true,
+   "ms": 8731,
+   "corrections": [],
+   "raw": "{\"remove\": [\"plate\", \"fork\"], \"add\": [], \"only\": [\"cup\"], \"nothing_more\": false, \"reason\": \"person now wants only the cup\"}"
+  },
+  {
+   "heard": "Forget the cup.",
+   "planned": [
+    "cup"
+   ],
+   "proposed": [],
+   "steps": [],
+   "expected": [],
+   "ok": true,
+   "ms": 8488,
+   "corrections": [],
+   "raw": "{\"remove\": [\"cup\"], \"add\": [], \"only\": [], \"nothing_more\": false, \"reason\": \"The person no longer wants the cup.\"}"
+  },
+  {
+   "heard": "Oh, and put the cup out too.",
+   "planned": [],
+   "proposed": [
+    "cup"
+   ],
+   "steps": [
+    "cup"
+   ],
+   "expected": [
+    "cup"
+   ],
+   "ok": true,
+   "ms": 8934,
+   "corrections": [],
+   "raw": "{\"remove\": [], \"add\": [\"cup\"], \"only\": [], \"nothing_more\": false, \"reason\": \"person now wants the cup placed as well after the plate\"}"
+  },
+  {
+   "heard": "I changed my mind, I want the fork too.",
+   "planned": [
+    "cup"
+   ],
+   "proposed": [
+    "cup",
+    "fork"
+   ],
+   "steps": [
+    "fork",
+    "cup"
+   ],
+   "expected": [
+    "fork",
+    "cup"
+   ],
+   "ok": true,
+   "ms": 11437,
+   "corrections": [
+    "reordered to fork -> cup: other orders collide on this table"
+   ],
+   "raw": "{\"remove\": [], \"add\": [\"fork\"], \"only\": [], \"nothing_more\": false, \"reason\": \"fork was previously not wanted but now requested\"}"
+  },
+  {
+   "heard": "Looks great, carry on.",
+   "planned": [
+    "fork",
+    "cup"
+   ],
+   "proposed": [
+    "fork",
+    "cup"
+   ],
+   "steps": [
+    "fork",
+    "cup"
+   ],
+   "expected": [
+    "fork",
+    "cup"
+   ],
+   "ok": true,
+   "ms": 10552,
+   "corrections": [],
+   "raw": "{\"remove\": [], \"add\": [], \"only\": [], \"nothing_more\": false, \"reason\": \"no change\"}"
+  },
+  {
+   "heard": "No spoon, please.",
+   "planned": [
+    "spoon",
+    "plate",
+    "fork",
+    "cup"
+   ],
+   "proposed": [
+    "plate",
+    "fork",
+    "cup"
+   ],
+   "steps": [
+    "plate",
+    "fork",
+    "cup"
+   ],
+   "expected": [
+    "plate",
+    "fork",
+    "cup"
+   ],
+   "ok": true,
+   "ms": 11137,
+   "corrections": [],
+   "raw": "{\"remove\": [\"spoon\"], \"add\": [], \"only\": [], \"nothing_more\": false, \"reason\": \"person no longer wants spoon\"}"
+  },
+  {
+   "heard": "Thanks, that's all.",
+   "planned": [],
+   "proposed": [],
+   "steps": [],
+   "expected": [],
+   "ok": true,
+   "ms": 8975,
+   "corrections": [],
+   "raw": "{\"remove\": [], \"add\": [], \"only\": [], \"nothing_more\": true, \"reason\": \"person said 'that's all' indicating task complete\"}"
+  },
+  {
+   "heard": "We're having soup, skip the plate and the fork.",
+   "planned": [
+    "plate",
+    "fork",
+    "cup"
+   ],
+   "proposed": [
+    "cup"
+   ],
+   "steps": [
+    "cup"
+   ],
+   "expected": [
+    "cup"
+   ],
+   "ok": true,
+   "ms": 11975,
+   "corrections": [],
+   "raw": "{\"remove\": [\"plate\", \"fork\"], \"add\": [], \"only\": [], \"nothing_more\": false, \"reason\": \"person wants soup, so skip plate and fork\"}"
+  },
+  {
+   "heard": "Can you leave out the cup and stop there?",
+   "planned": [
+    "cup"
+   ],
+   "proposed": [],
+   "steps": [],
+   "expected": [],
+   "ok": true,
+   "ms": 12018,
+   "corrections": [],
+   "raw": "{\"remove\": [\"cup\"], \"add\": [], \"only\": [], \"nothing_more\": true, \"reason\": \"person wants to stop after fork, no cup\"}"
+  }
+ ]
+}

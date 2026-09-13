@@ -1,0 +1,189 @@
+{
+ "run": "out\\train\\act_handoff_v1",
+ "seeds": [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9
+ ],
+ "checkpoints": [
+  {
+   "checkpoint": 5000,
+   "label": "step5000_torch_exec50",
+   "episodes": 10,
+   "success": 1,
+   "rate": 0.1,
+   "wilson95": [
+    0.018,
+    0.404
+   ],
+   "policy_ms_mean": 1.4177274035755545
+  },
+  {
+   "checkpoint": 10000,
+   "label": "step10000_torch_exec50",
+   "episodes": 10,
+   "success": 1,
+   "rate": 0.1,
+   "wilson95": [
+    0.018,
+    0.404
+   ],
+   "policy_ms_mean": 1.4009048521984369
+  },
+  {
+   "checkpoint": 15000,
+   "label": "step15000_torch_exec50",
+   "episodes": 10,
+   "success": 1,
+   "rate": 0.1,
+   "wilson95": [
+    0.018,
+    0.404
+   ],
+   "policy_ms_mean": 1.3512075513135642
+  },
+  {
+   "checkpoint": 20000,
+   "label": "step20000_torch_exec50",
+   "episodes": 10,
+   "success": 1,
+   "rate": 0.1,
+   "wilson95": [
+    0.018,
+    0.404
+   ],
+   "policy_ms_mean": 1.3948422248940915
+  },
+  {
+   "checkpoint": 25000,
+   "label": "step25000_torch_exec50",
+   "episodes": 10,
+   "success": 4,
+   "rate": 0.4,
+   "wilson95": [
+    0.168,
+    0.687
+   ],
+   "policy_ms_mean": 1.358583876513876
+  },
+  {
+   "checkpoint": 30000,
+   "label": "step30000_torch_exec50",
+   "episodes": 10,
+   "success": 6,
+   "rate": 0.6,
+   "wilson95": [
+    0.313,
+    0.832
+   ],
+   "policy_ms_mean": 1.350653148489073
+  },
+  {
+   "checkpoint": 35000,
+   "label": "step35000_torch_exec50",
+   "episodes": 10,
+   "success": 5,
+   "rate": 0.5,
+   "wilson95": [
+    0.237,
+    0.763
+   ],
+   "policy_ms_mean": 1.355134601937607
+  },
+  {
+   "checkpoint": 40000,
+   "label": "step40000_torch_exec50",
+   "episodes": 10,
+   "success": 7,
+   "rate": 0.7,
+   "wilson95": [
+    0.397,
+    0.892
+   ],
+   "policy_ms_mean": 1.4072130050044507
+  }
+ ],
+ "best_checkpoint": 40000,
+ "variants": [
+  {
+   "variant": "torch_exec50",
+   "label": "best_torch_exec50",
+   "episodes": 10,
+   "success": 8,
+   "rate": 0.8,
+   "wilson95": [
+    0.49,
+    0.943
+   ],
+   "policy_ms_mean": 1.3415066715097055
+  },
+  {
+   "variant": "torch_exec10",
+   "label": "best_torch_exec10",
+   "episodes": 10,
+   "success": 9,
+   "rate": 0.9,
+   "wilson95": [
+    0.596,
+    0.982
+   ],
+   "policy_ms_mean": 2.3983992013381794
+  },
+  {
+   "variant": "torch_ensemble",
+   "label": "best_torch_ensemble",
+   "episodes": 10,
+   "success": 9,
+   "rate": 0.9,
+   "wilson95": [
+    0.596,
+    0.982
+   ],
+   "policy_ms_mean": 14.660467526642606
+  },
+  {
+   "variant": "ov_fp32_exec50",
+   "label": "best_ov_fp32_exec50",
+   "episodes": 10,
+   "success": 7,
+   "rate": 0.7,
+   "wilson95": [
+    0.397,
+    0.892
+   ],
+   "policy_ms_mean": 2.404644125024788
+  },
+  {
+   "variant": "ov_int8_exec50",
+   "label": "best_ov_int8_exec50",
+   "episodes": 10,
+   "success": 4,
+   "rate": 0.4,
+   "wilson95": [
+    0.168,
+    0.687
+   ],
+   "policy_ms_mean": 1.8416244537802413
+  },
+  {
+   "variant": "ov_int8_exec10",
+   "label": "best_ov_int8_exec10",
+   "episodes": 10,
+   "success": 1,
+   "rate": 0.1,
+   "wilson95": [
+    0.018,
+    0.404
+   ],
+   "policy_ms_mean": 3.027837100205943
+  }
+ ],
+ "wall_minutes": 6.8
+}

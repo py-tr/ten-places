@@ -1,0 +1,19 @@
+{
+ "label": "torch_budget",
+ "episodes": 10,
+ "full_success": 0,
+ "rate": 0.0,
+ "wilson95": [
+  -0.0,
+  0.278
+ ],
+ "per_subtask": {
+  "drawer": 9,
+  "spoon": 7,
+  "plate": 4,
+  "fork": 1,
+  "cup": 9
+ },
+ "mean_subtasks": 3.0,
+ "policy_ms_mean": 7.936730489217714
+}

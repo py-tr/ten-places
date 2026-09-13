@@ -1,0 +1,19 @@
+{
+ "label": "ov_w8_clf",
+ "episodes": 10,
+ "full_success": 0,
+ "rate": 0.0,
+ "wilson95": [
+  -0.0,
+  0.278
+ ],
+ "per_subtask": {
+  "drawer": 7,
+  "spoon": 2,
+  "plate": 3,
+  "fork": 0,
+  "cup": 8
+ },
+ "mean_subtasks": 2.0,
+ "policy_ms_mean": 16.229996075570533
+}

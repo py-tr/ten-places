@@ -1,0 +1,156 @@
+{
+ "summary": {
+  "skill": "drawer",
+  "label": "drawer_exec50",
+  "episodes": 20,
+  "success": 18,
+  "rate": 0.9,
+  "wilson95": [
+   0.699,
+   0.972
+  ],
+  "mean_frames": 157.45
+ },
+ "rows": [
+  {
+   "seed": 100,
+   "skill": "drawer",
+   "success": true,
+   "frames": 151,
+   "err_m": null
+  },
+  {
+   "seed": 101,
+   "skill": "drawer",
+   "success": true,
+   "frames": 151,
+   "err_m": null
+  },
+  {
+   "seed": 102,
+   "skill": "drawer",
+   "success": true,
+   "frames": 161,
+   "err_m": null
+  },
+  {
+   "seed": 103,
+   "skill": "drawer",
+   "success": true,
+   "frames": 151,
+   "err_m": null
+  },
+  {
+   "seed": 104,
+   "skill": "drawer",
+   "success": false,
+   "frames": 300,
+   "err_m": null
+  },
+  {
+   "seed": 105,
+   "skill": "drawer",
+   "success": true,
+   "frames": 131,
+   "err_m": null
+  },
+  {
+   "seed": 106,
+   "skill": "drawer",
+   "success": true,
+   "frames": 241,
+   "err_m": null
+  },
+  {
+   "seed": 107,
+   "skill": "drawer",
+   "success": true,
+   "frames": 121,
+   "err_m": null
+  },
+  {
+   "seed": 108,
+   "skill": "drawer",
+   "success": true,
+   "frames": 141,
+   "err_m": null
+  },
+  {
+   "seed": 109,
+   "skill": "drawer",
+   "success": true,
+   "frames": 151,
+   "err_m": null
+  },
+  {
+   "seed": 110,
+   "skill": "drawer",
+   "success": true,
+   "frames": 121,
+   "err_m": null
+  },
+  {
+   "seed": 111,
+   "skill": "drawer",
+   "success": true,
+   "frames": 131,
+   "err_m": null
+  },
+  {
+   "seed": 112,
+   "skill": "drawer",
+   "success": true,
+   "frames": 171,
+   "err_m": null
+  },
+  {
+   "seed": 113,
+   "skill": "drawer",
+   "success": true,
+   "frames": 141,
+   "err_m": null
+  },
+  {
+   "seed": 114,
+   "skill": "drawer",
+   "success": true,
+   "frames": 151,
+   "err_m": null
+  },
+  {
+   "seed": 115,
+   "skill": "drawer",
+   "success": true,
+   "frames": 141,
+   "err_m": null
+  },
+  {
+   "seed": 116,
+   "skill": "drawer",
+   "success": true,
+   "frames": 171,
+   "err_m": null
+  },
+  {
+   "seed": 117,
+   "skill": "drawer",
+   "success": true,
+   "frames": 121,
+   "err_m": null
+  },
+  {
+   "seed": 118,
+   "skill": "drawer",
+   "success": false,
+   "frames": 171,
+   "err_m": null
+  },
+  {
+   "seed": 119,
+   "skill": "drawer",
+   "success": true,
+   "frames": 131,
+   "err_m": null
+  }
+ ]
+}

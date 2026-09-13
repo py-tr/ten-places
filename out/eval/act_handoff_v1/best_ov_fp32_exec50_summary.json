@@ -1,0 +1,11 @@
+{
+ "label": "best_ov_fp32_exec50",
+ "episodes": 10,
+ "success": 7,
+ "rate": 0.7,
+ "wilson95": [
+  0.397,
+  0.892
+ ],
+ "policy_ms_mean": 2.404644125024788
+}

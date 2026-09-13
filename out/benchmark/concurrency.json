@@ -1,0 +1,222 @@
+{
+ "env": {
+  "cpu": "13th Gen Intel(R) Core(TM) i5-13600KF",
+  "topology": "6 P-cores (12 threads) + 8 E-cores (8 threads) (Windows GetLogicalProcessorInformationEx)",
+  "openvino": "2026.3.1-22476-759c5a6ab8c-releases/2026/3",
+  "openvino_genai": "2026.3.1.0-3290-56d9685302d",
+  "python": "3.13.1",
+  "os": "Windows-11-10.0.22631-SP0",
+  "cpu_busy_before_pct": 4.6,
+  "seconds_per_scenario": 60.0,
+  "models": {
+   "policy": "out/train/skills_v2/spoon/checkpoints/040000/pretrained_model ov-w8, temporal ensembling 0.01",
+   "classifier": "models/state_classifier_v2/state_classifier.xml",
+   "planner": "models/Qwen3-VL-4B-Instruct-int4-ov"
+  }
+ },
+ "budget_ms": 40.0,
+ "rows": [
+  {
+   "scenario": "a",
+   "label": "control alone, default",
+   "control_config": {},
+   "planner_config": null,
+   "control_effective": {
+    "PERFORMANCE_HINT": "LATENCY",
+    "SCHEDULING_CORE_TYPE": "SchedulingCoreType.ANY_CORE",
+    "INFERENCE_NUM_THREADS": "6",
+    "NUM_STREAMS": "1",
+    "ENABLE_HYPER_THREADING": "False",
+    "ENABLE_CPU_PINNING": "False"
+   },
+   "steps": 1213,
+   "step_ms_p50": 45.48,
+   "step_ms_p95": 70.18,
+   "step_ms_p99": 76.56,
+   "step_ms_max": 91.34,
+   "over_budget_pct": 79.72,
+   "policy_ms_p50": 36.38,
+   "classifier_ms_p50": 8.12,
+   "planner_calls": 0,
+   "planner_s_median": null,
+   "planner_s_max": null,
+   "util_pcore_pct": 93.1,
+   "util_ecore_pct": 11.9
+  },
+  {
+   "scenario": "a'",
+   "label": "control alone, P-cores",
+   "control_config": {
+    "PERFORMANCE_HINT": "LATENCY",
+    "NUM_STREAMS": 1,
+    "ENABLE_HYPER_THREADING": false,
+    "ENABLE_CPU_PINNING": false,
+    "SCHEDULING_CORE_TYPE": "PCORE_ONLY",
+    "INFERENCE_NUM_THREADS": 6
+   },
+   "planner_config": null,
+   "control_effective": {
+    "PERFORMANCE_HINT": "LATENCY",
+    "SCHEDULING_CORE_TYPE": "SchedulingCoreType.PCORE_ONLY",
+    "INFERENCE_NUM_THREADS": "6",
+    "NUM_STREAMS": "1",
+    "ENABLE_HYPER_THREADING": "False",
+    "ENABLE_CPU_PINNING": "False"
+   },
+   "steps": 1351,
+   "step_ms_p50": 43.74,
+   "step_ms_p95": 51.67,
+   "step_ms_p99": 58.78,
+   "step_ms_max": 88.95,
+   "over_budget_pct": 76.39,
+   "policy_ms_p50": 35.53,
+   "classifier_ms_p50": 8.17,
+   "planner_calls": 0,
+   "planner_s_median": null,
+   "planner_s_max": null,
+   "util_pcore_pct": 93.3,
+   "util_ecore_pct": 13.8
+  },
+  {
+   "scenario": "b",
+   "label": "control + planner, both default",
+   "control_config": {},
+   "planner_config": {},
+   "control_effective": {
+    "PERFORMANCE_HINT": "LATENCY",
+    "SCHEDULING_CORE_TYPE": "SchedulingCoreType.ANY_CORE",
+    "INFERENCE_NUM_THREADS": "6",
+    "NUM_STREAMS": "1",
+    "ENABLE_HYPER_THREADING": "False",
+    "ENABLE_CPU_PINNING": "False"
+   },
+   "steps": 372,
+   "step_ms_p50": 140.58,
+   "step_ms_p95": 288.25,
+   "step_ms_p99": 437.9,
+   "step_ms_max": 475.14,
+   "over_budget_pct": 100.0,
+   "policy_ms_p50": 86.69,
+   "classifier_ms_p50": 19.77,
+   "planner_calls": 6,
+   "planner_s_median": 8.23,
+   "planner_s_max": 21.23,
+   "util_pcore_pct": 88.9,
+   "util_ecore_pct": 16.2
+  },
+  {
+   "scenario": "c",
+   "label": "control P-cores + planner E-cores",
+   "control_config": {
+    "PERFORMANCE_HINT": "LATENCY",
+    "NUM_STREAMS": 1,
+    "ENABLE_HYPER_THREADING": false,
+    "ENABLE_CPU_PINNING": false,
+    "SCHEDULING_CORE_TYPE": "PCORE_ONLY",
+    "INFERENCE_NUM_THREADS": 6
+   },
+   "planner_config": {
+    "SCHEDULING_CORE_TYPE": "ECORE_ONLY",
+    "INFERENCE_NUM_THREADS": 8,
+    "ENABLE_CPU_PINNING": false
+   },
+   "control_effective": {
+    "PERFORMANCE_HINT": "LATENCY",
+    "SCHEDULING_CORE_TYPE": "SchedulingCoreType.PCORE_ONLY",
+    "INFERENCE_NUM_THREADS": "6",
+    "NUM_STREAMS": "1",
+    "ENABLE_HYPER_THREADING": "False",
+    "ENABLE_CPU_PINNING": "False"
+   },
+   "steps": 902,
+   "step_ms_p50": 62.06,
+   "step_ms_p95": 93.78,
+   "step_ms_p99": 148.58,
+   "step_ms_max": 391.06,
+   "over_budget_pct": 96.9,
+   "policy_ms_p50": 48.38,
+   "classifier_ms_p50": 9.93,
+   "planner_calls": 6,
+   "planner_s_median": 8.33,
+   "planner_s_max": 25.26,
+   "util_pcore_pct": 99.8,
+   "util_ecore_pct": 43.2
+  },
+  {
+   "scenario": "d",
+   "label": "as c, control hyper-threading on",
+   "control_config": {
+    "PERFORMANCE_HINT": "LATENCY",
+    "NUM_STREAMS": 1,
+    "ENABLE_HYPER_THREADING": true,
+    "ENABLE_CPU_PINNING": false,
+    "SCHEDULING_CORE_TYPE": "PCORE_ONLY",
+    "INFERENCE_NUM_THREADS": 12
+   },
+   "planner_config": {
+    "SCHEDULING_CORE_TYPE": "ECORE_ONLY",
+    "INFERENCE_NUM_THREADS": 8,
+    "ENABLE_CPU_PINNING": false
+   },
+   "control_effective": {
+    "PERFORMANCE_HINT": "LATENCY",
+    "SCHEDULING_CORE_TYPE": "SchedulingCoreType.PCORE_ONLY",
+    "INFERENCE_NUM_THREADS": "12",
+    "NUM_STREAMS": "1",
+    "ENABLE_HYPER_THREADING": "True",
+    "ENABLE_CPU_PINNING": "False"
+   },
+   "steps": 1492,
+   "step_ms_p50": 36.91,
+   "step_ms_p95": 41.09,
+   "step_ms_p99": 43.67,
+   "step_ms_max": 71.34,
+   "over_budget_pct": 9.99,
+   "policy_ms_p50": 29.91,
+   "classifier_ms_p50": 7.12,
+   "planner_calls": 7,
+   "planner_s_median": 9.13,
+   "planner_s_max": 9.63,
+   "util_pcore_pct": 96.6,
+   "util_ecore_pct": 30.1
+  },
+  {
+   "scenario": "e",
+   "label": "as c, CPU pinning on",
+   "control_config": {
+    "PERFORMANCE_HINT": "LATENCY",
+    "NUM_STREAMS": 1,
+    "ENABLE_HYPER_THREADING": false,
+    "ENABLE_CPU_PINNING": true,
+    "SCHEDULING_CORE_TYPE": "PCORE_ONLY",
+    "INFERENCE_NUM_THREADS": 6
+   },
+   "planner_config": {
+    "SCHEDULING_CORE_TYPE": "ECORE_ONLY",
+    "INFERENCE_NUM_THREADS": 8,
+    "ENABLE_CPU_PINNING": true
+   },
+   "control_effective": {
+    "PERFORMANCE_HINT": "LATENCY",
+    "SCHEDULING_CORE_TYPE": "SchedulingCoreType.PCORE_ONLY",
+    "INFERENCE_NUM_THREADS": "6",
+    "NUM_STREAMS": "1",
+    "ENABLE_HYPER_THREADING": "False",
+    "ENABLE_CPU_PINNING": "True"
+   },
+   "steps": 1456,
+   "step_ms_p50": 29.69,
+   "step_ms_p95": 40.23,
+   "step_ms_p99": 57.78,
+   "step_ms_max": 276.09,
+   "over_budget_pct": 5.22,
+   "policy_ms_p50": 23.92,
+   "classifier_ms_p50": 5.58,
+   "planner_calls": 4,
+   "planner_s_median": 12.23,
+   "planner_s_max": 27.44,
+   "util_pcore_pct": 94.3,
+   "util_ecore_pct": 34.6
+  }
+ ]
+}

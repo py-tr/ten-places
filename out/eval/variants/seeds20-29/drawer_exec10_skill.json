@@ -1,0 +1,86 @@
+{
+ "summary": {
+  "skill": "drawer",
+  "label": "drawer_exec10",
+  "episodes": 10,
+  "success": 10,
+  "rate": 1.0,
+  "wilson95": [
+   0.722,
+   1.0
+  ],
+  "mean_frames": 158.0
+ },
+ "rows": [
+  {
+   "seed": 20,
+   "skill": "drawer",
+   "success": true,
+   "frames": 131,
+   "err_m": null
+  },
+  {
+   "seed": 21,
+   "skill": "drawer",
+   "success": true,
+   "frames": 171,
+   "err_m": null
+  },
+  {
+   "seed": 22,
+   "skill": "drawer",
+   "success": true,
+   "frames": 181,
+   "err_m": null
+  },
+  {
+   "seed": 23,
+   "skill": "drawer",
+   "success": true,
+   "frames": 121,
+   "err_m": null
+  },
+  {
+   "seed": 24,
+   "skill": "drawer",
+   "success": true,
+   "frames": 181,
+   "err_m": null
+  },
+  {
+   "seed": 25,
+   "skill": "drawer",
+   "success": true,
+   "frames": 141,
+   "err_m": null
+  },
+  {
+   "seed": 26,
+   "skill": "drawer",
+   "success": true,
+   "frames": 171,
+   "err_m": null
+  },
+  {
+   "seed": 27,
+   "skill": "drawer",
+   "success": true,
+   "frames": 161,
+   "err_m": null
+  },
+  {
+   "seed": 28,
+   "skill": "drawer",
+   "success": true,
+   "frames": 161,
+   "err_m": null
+  },
+  {
+   "seed": 29,
+   "skill": "drawer",
+   "success": true,
+   "frames": 161,
+   "err_m": null
+  }
+ ]
+}

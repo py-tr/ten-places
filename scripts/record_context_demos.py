@@ -1,0 +1,135 @@
+"""Per-skill demonstrations from every start a verified plan can produce, not only the full-table order.
+
+    python scripts/record_context_demos.py --skills cup plate fork --episodes 80 60 60 --root data/table_ctx_v1
+    python scripts/record_context_demos.py --skills plate --episodes 100 --start 8000 --plate-y-max 0.085 \
+        --takeover-policy out/train/skills_ctx/plate/checkpoints/015000/pretrained_model --root data/table_plate_t1
+
+Why: the full-table demos show each skill only after every earlier one. A subset command such as "open the
+drawer and put the cup out" starts the cup with the plate still on its start spot, and the cup policy trained
+on full tables drops from 10/10 to 5/10 there (scripts/eval_skill_context.py). Here each episode draws a
+verified prefix uniformly (tenplaces.evaluate_skill.verified_prefixes, the full-table one included), the
+scripted controller performs it unrecorded, then the skill itself is recorded. Same features as
+data/table_v1_skill (with the skill one-hot), so the per-skill policies fine-tune on it directly.
+--plate-y-max keeps only seeds whose plate starts at most that far from the placemat's side (the learned plate
+grasp flips the plate with its open jaw on those layouts: y 0.071-0.082 fail, 0.080-0.098 pass on seeds 0-9).
+--takeover-policy: in a share of episodes the learned policy starts the skill for a random number of frames and
+the scripted controller takes over (env_table.record_skill_oracle) — recovery demonstrations from the states
+the policy actually reaches. Seeds 5000+ (table demos 3000+, classifier data 4000+, evaluation 0-149).
+"""
+import argparse
+import json
+import shutil
+import sys
+import time
+from pathlib import Path
+
+import numpy as np
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from lerobot.datasets.lerobot_dataset import LeRobotDataset  # noqa: E402
+
+from tenplaces import scene_table  # noqa: E402
+from tenplaces.env import CAMERAS, FPS, JOINTS  # noqa: E402
+from tenplaces.env_table import IMAGE_HW, SKILLS, record_skill_oracle  # noqa: E402
+from tenplaces.evaluate_skill import KEY, SKILL_NAMES, verified_prefixes  # noqa: E402
+
+
+def features():
+    h, w = IMAGE_HW
+    feats = {
+        "observation.state": {"dtype": "float32", "shape": (len(JOINTS),), "names": list(JOINTS)},
+        "action": {"dtype": "float32", "shape": (len(JOINTS),), "names": list(JOINTS)},
+        "observation.environment_state": {"dtype": "float32", "shape": (len(SKILLS),), "names": SKILL_NAMES},
+    }
+    for cam in CAMERAS:
+        feats[f"observation.images.{cam}"] = {"dtype": "image", "shape": (h, w, 3), "names": ["height", "width", "channels"]}
+    return feats
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--skills", nargs="+", default=["cup", "plate", "fork"])
+    ap.add_argument("--episodes", nargs="+", type=int, default=[80, 60, 60], help="episodes to keep, per skill")
+    ap.add_argument("--start", type=int, default=5000)
+    ap.add_argument("--root", default="data/table_ctx_v1")
+    ap.add_argument("--repo-id", default="local/tenplaces_table")
+    ap.add_argument("--writer-threads", type=int, default=4)
+    ap.add_argument("--plate-y-max", type=float, default=None, help="only seeds whose plate starts at y <= this")
+    ap.add_argument("--takeover-policy", default=None, help="checkpoint (pretrained_model dir) that starts the skill")
+    ap.add_argument("--takeover-frac", type=float, default=0.4, help="share of episodes that are takeovers")
+    ap.add_argument("--takeover-frames", type=int, nargs=2, default=[10, 30], metavar=("MIN", "MAX"),
+                    help="policy frames before the scripted controller takes over")
+    ap.add_argument("--drawer-open", type=float, nargs=2, default=None, metavar=("MIN", "MAX"),
+                    help="scripted drawer opening drawn per episode (default: the scene's 0.09 m) — a learned drawer "
+                         "opens 8.4-9.3 cm, so cutlery sits a few mm from where fixed-opening demos had it")
+    ap.add_argument("--overwrite", action="store_true")
+    args = ap.parse_args()
+    if len(args.episodes) != len(args.skills):
+        sys.exit("--episodes needs one count per skill")
+    root = Path(args.root)
+    if root.exists():
+        if not args.overwrite:
+            sys.exit(f"{root} exists; pass --overwrite to replace it")
+        shutil.rmtree(root)
+    policy = None
+    if args.takeover_policy:
+        from tenplaces.lerobot_policy import LeRobotPolicy
+
+        policy = LeRobotPolicy(args.takeover_policy, device="cuda", n_action_steps=10)
+
+    ds = LeRobotDataset.create(repo_id=args.repo_id, fps=FPS, features=features(), root=root,
+                               robot_type="bimanual_so101_sim", use_videos=False, image_writer_threads=args.writer_threads)
+    rng = np.random.default_rng(args.start)
+    text = {s: t for s, _, t in SKILLS}
+    by_skill = {s: [] for s in args.skills}
+    episodes, skipped, seed, ep_index, t0 = [], [], args.start, 0, time.time()
+    for skill, n in zip(args.skills, args.episodes):
+        starts = verified_prefixes(skill)
+        onehot = np.zeros(len(SKILLS), dtype=np.float32)
+        onehot[SKILL_NAMES.index(skill)] = 1.0
+        kept = 0
+        while kept < n:
+            if args.plate_y_max is not None and scene_table.sample(seed).plate_xy[1] > args.plate_y_max:
+                seed += 1
+                continue
+            before = starts[int(rng.integers(len(starts)))]
+            k = 0
+            if policy is not None and rng.random() < args.takeover_frac:
+                k = int(rng.integers(args.takeover_frames[0], args.takeover_frames[1] + 1))
+            opening = float(rng.uniform(*args.drawer_open)) if args.drawer_open else None
+            frames, result = record_skill_oracle(seed, skill, before, policy=policy if k else None, policy_frames=k,
+                                                 drawer_open=opening)
+            if result["error"] or not result[KEY[skill]] or not all(result[KEY[b]] for b in before):
+                skipped.append({"seed": seed, "skill": skill, "before": before, "takeover_frames": k,
+                                "failed": result["failed"], "error": result["error"]})
+            else:
+                for f in frames:
+                    frame = {"observation.state": f["state"], "action": f["action"],
+                             "observation.environment_state": onehot, "task": text[skill]}
+                    for cam in CAMERAS:
+                        frame[f"observation.images.{cam}"] = f["images"][cam]
+                    ds.add_frame(frame)
+                ds.save_episode()
+                by_skill[skill].append(ep_index)
+                episodes.append({"episode": ep_index, "skill": skill, "before": before, "seed": seed,
+                                 "frames": len(frames), "takeover_frames": k, "drawer_open": opening})
+                ep_index += 1
+                kept += 1
+                if kept % 10 == 0:
+                    print(f"{skill}: {kept}/{n} ({ep_index} episodes, {len(skipped)} skipped, "
+                          f"{sum(e['takeover_frames'] > 0 for e in episodes)} takeovers, {time.time() - t0:.0f} s)",
+                          flush=True)
+            seed += 1
+    ds.finalize()
+    manifest = {"repo_id": args.repo_id, "root": str(root), "fps": FPS, "image_hw": IMAGE_HW,
+                "plate_y_max": args.plate_y_max, "takeover_policy": args.takeover_policy,
+                "skills": {s: {"instruction": text[s], "episodes": by_skill[s]} for s in args.skills},
+                "episodes": episodes, "skipped_oracle_failures": skipped, "wall_seconds": round(time.time() - t0, 1)}
+    (root / "tenplaces_manifest.json").write_text(json.dumps(manifest, indent=1))
+    print(json.dumps({k: v for k, v in manifest.items() if k in ("root", "wall_seconds")} |
+                     {"episodes": ep_index, "frames": sum(e["frames"] for e in episodes), "skipped": len(skipped),
+                      "takeovers": sum(e["takeover_frames"] > 0 for e in episodes)}))
+
+
+if __name__ == "__main__":
+    main()

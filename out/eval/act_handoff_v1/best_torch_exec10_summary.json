@@ -1,0 +1,11 @@
+{
+ "label": "best_torch_exec10",
+ "episodes": 10,
+ "success": 9,
+ "rate": 0.9,
+ "wilson95": [
+  0.596,
+  0.982
+ ],
+ "policy_ms_mean": 2.3983992013381794
+}

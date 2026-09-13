@@ -1,0 +1,86 @@
+{
+ "summary": {
+  "skill": "cup",
+  "label": "cup_exec10_clf",
+  "episodes": 10,
+  "success": 9,
+  "rate": 0.9,
+  "wilson95": [
+   0.596,
+   0.982
+  ],
+  "mean_frames": 139.0
+ },
+ "rows": [
+  {
+   "seed": 0,
+   "skill": "cup",
+   "success": true,
+   "frames": 121,
+   "err_m": 0.0093
+  },
+  {
+   "seed": 1,
+   "skill": "cup",
+   "success": true,
+   "frames": 161,
+   "err_m": 0.0045
+  },
+  {
+   "seed": 2,
+   "skill": "cup",
+   "success": true,
+   "frames": 141,
+   "err_m": 0.0033
+  },
+  {
+   "seed": 3,
+   "skill": "cup",
+   "success": true,
+   "frames": 131,
+   "err_m": 0.0069
+  },
+  {
+   "seed": 4,
+   "skill": "cup",
+   "success": false,
+   "frames": 141,
+   "err_m": 0.0027
+  },
+  {
+   "seed": 5,
+   "skill": "cup",
+   "success": true,
+   "frames": 141,
+   "err_m": 0.0032
+  },
+  {
+   "seed": 6,
+   "skill": "cup",
+   "success": true,
+   "frames": 151,
+   "err_m": 0.0056
+  },
+  {
+   "seed": 7,
+   "skill": "cup",
+   "success": true,
+   "frames": 151,
+   "err_m": 0.0009
+  },
+  {
+   "seed": 8,
+   "skill": "cup",
+   "success": true,
+   "frames": 131,
+   "err_m": 0.0047
+  },
+  {
+   "seed": 9,
+   "skill": "cup",
+   "success": true,
+   "frames": 121,
+   "err_m": 0.0081
+  }
+ ]
+}

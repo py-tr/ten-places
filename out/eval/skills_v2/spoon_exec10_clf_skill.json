@@ -1,0 +1,86 @@
+{
+ "summary": {
+  "skill": "spoon",
+  "label": "spoon_exec10_clf",
+  "episodes": 10,
+  "success": 4,
+  "rate": 0.4,
+  "wilson95": [
+   0.168,
+   0.687
+  ],
+  "mean_frames": 345.4
+ },
+ "rows": [
+  {
+   "seed": 0,
+   "skill": "spoon",
+   "success": true,
+   "frames": 331,
+   "err_m": 0.0059
+  },
+  {
+   "seed": 1,
+   "skill": "spoon",
+   "success": true,
+   "frames": 321,
+   "err_m": 0.0015
+  },
+  {
+   "seed": 2,
+   "skill": "spoon",
+   "success": false,
+   "frames": 360,
+   "err_m": 0.0877
+  },
+  {
+   "seed": 3,
+   "skill": "spoon",
+   "success": false,
+   "frames": 360,
+   "err_m": 0.0837
+  },
+  {
+   "seed": 4,
+   "skill": "spoon",
+   "success": false,
+   "frames": 360,
+   "err_m": 0.0907
+  },
+  {
+   "seed": 5,
+   "skill": "spoon",
+   "success": false,
+   "frames": 360,
+   "err_m": 0.0886
+  },
+  {
+   "seed": 6,
+   "skill": "spoon",
+   "success": false,
+   "frames": 360,
+   "err_m": 0.0753
+  },
+  {
+   "seed": 7,
+   "skill": "spoon",
+   "success": true,
+   "frames": 331,
+   "err_m": 0.0005
+  },
+  {
+   "seed": 8,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0037
+  },
+  {
+   "seed": 9,
+   "skill": "spoon",
+   "success": false,
+   "frames": 360,
+   "err_m": 0.0883
+  }
+ ]
+}

@@ -1,0 +1,86 @@
+{
+ "summary": {
+  "skill": "plate",
+  "label": "plate_exec10_clf",
+  "episodes": 10,
+  "success": 0,
+  "rate": 0.0,
+  "wilson95": [
+   -0.0,
+   0.278
+  ],
+  "mean_frames": 199.3
+ },
+ "rows": [
+  {
+   "seed": 0,
+   "skill": "plate",
+   "success": false,
+   "frames": 181,
+   "err_m": 0.0045
+  },
+  {
+   "seed": 1,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1887
+  },
+  {
+   "seed": 2,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1905
+  },
+  {
+   "seed": 3,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.176
+  },
+  {
+   "seed": 4,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.2823
+  },
+  {
+   "seed": 5,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0912
+  },
+  {
+   "seed": 6,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.256
+  },
+  {
+   "seed": 7,
+   "skill": "plate",
+   "success": false,
+   "frames": 171,
+   "err_m": 0.0113
+  },
+  {
+   "seed": 8,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1872
+  },
+  {
+   "seed": 9,
+   "skill": "plate",
+   "success": false,
+   "frames": 171,
+   "err_m": 0.0052
+  }
+ ]
+}
