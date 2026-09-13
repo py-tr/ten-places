@@ -40,12 +40,19 @@ def example_inputs(policy):
     return x
 
 
-def run_phases(checkpoint: Path, seconds: float, out: Path):
+def run_phases(checkpoint: Path, seconds: float, out: Path, max_busy: float = 5.0):
     import openvino as ov
+    import psutil
     import torch
 
     from tenplaces.lerobot_policy import LeRobotPolicy
     from tenplaces.ov_backend import ACTCore
+
+    # A power number from a busy machine is not a power number (the first run's "idle" phase was 28% busy).
+    busy = psutil.cpu_percent(interval=5.0)
+    if busy > max_busy:
+        raise SystemExit(f"CPU {busy:.0f}% busy before the run (limit {max_busy:.0f}%): stop other jobs and apps first")
+    print(f"CPU {busy:.1f}% busy before the run: ok", flush=True)
 
     pol = LeRobotPolicy(checkpoint, device="cpu")
     x = example_inputs(pol)
@@ -80,24 +87,33 @@ def run_phases(checkpoint: Path, seconds: float, out: Path):
         time.sleep(seconds)
         return 0
 
+    from tenplaces.cores import control_config
+
+    # What the robot runs by default (scripts/run_agent.py --cores split): P-cores only, pinned, hyper-threading off.
+    pinned = core.compile_model(core.read_model(checkpoint / "openvino" / "act_w8.xml"), "CPU",
+                                {"PERFORMANCE_HINT": "LATENCY", **control_config()})
     with torch.no_grad():
         phases = [("idle", idle),
                   ("pytorch_fp32", flat_out(lambda: net(*x))),
                   ("openvino_fp32", flat_out(lambda: compiled["fp32"](feed))),
                   ("openvino_int8w", flat_out(lambda: compiled["w8"](feed))),
-                  (f"openvino_int8w_{CONTROL_HZ}hz", paced(lambda: compiled["w8"](feed), CONTROL_HZ))]
+                  (f"openvino_int8w_{CONTROL_HZ}hz", paced(lambda: compiled["w8"](feed), CONTROL_HZ)),
+                  (f"openvino_int8w_{CONTROL_HZ}hz_pcores_pinned", paced(lambda: pinned(feed), CONTROL_HZ))]
         # Warm up every variant so compilation and first-call costs stay out of the timed phases.
-        for fn in (lambda: net(*x), lambda: compiled["fp32"](feed), lambda: compiled["w8"](feed)):
+        for fn in (lambda: net(*x), lambda: compiled["fp32"](feed), lambda: compiled["w8"](feed), lambda: pinned(feed)):
             for _ in range(10):
                 fn()
         rows = []
         for name, fn in phases:
             time.sleep(5.0)  # let the package power settle between phases
+            psutil.cpu_percent(None)  # start the CPU-load window for this phase
             start = datetime.now()
             n = fn()
             end = datetime.now()
-            rows.append({"phase": name, "start": start.isoformat(), "end": end.isoformat(), "inferences": n})
-            print(f"{name}: {n} inferences in {(end - start).total_seconds():.1f} s", flush=True)
+            cpu = psutil.cpu_percent(None)  # average load over the phase, all logical CPUs
+            rows.append({"phase": name, "start": start.isoformat(), "end": end.isoformat(), "inferences": n,
+                         "cpu_pct": cpu})
+            print(f"{name}: {n} inferences in {(end - start).total_seconds():.1f} s, CPU {cpu:.0f}%", flush=True)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps({"checkpoint": str(checkpoint), "cpu": core.get_property("CPU", "FULL_DEVICE_NAME"),
                                "seconds": seconds, "phases": rows}, indent=1))
@@ -154,7 +170,7 @@ def analyze(phases: dict, stamps, watts) -> list[dict]:
         inside = [w for t, w in zip(stamps, watts) if t0 <= t <= t1]
         dur = (t1 - t0).total_seconds()
         out.append({"phase": p["phase"], "samples": len(inside), "seconds": round(dur, 1), "inferences": p["inferences"],
-                    "mean_w": sum(inside) / len(inside) if inside else None})
+                    "mean_w": sum(inside) / len(inside) if inside else None, "cpu_pct": p.get("cpu_pct")})
     idle = next((r["mean_w"] for r in out if r["phase"] == "idle"), None)
     for r in out:
         n, w = r["inferences"], r["mean_w"]
@@ -186,11 +202,15 @@ def main():
     fmt = lambda v, f: "–" if v is None else format(v, f)  # noqa: E731
     lines = [f"# Power per inference — {phases.get('cpu', '')}", "",
              f"Meter: HWiNFO64 `{col}` (CPU package, not wall power). Checkpoint: `{phases['checkpoint']}`.", "",
-             "| phase | mean package power | inferences/s | energy per inference | above idle |", "|---|---|---|---|---|"]
+             "| phase | CPU busy | mean package power | inferences/s | energy per inference | above idle |",
+             "|---|---|---|---|---|---|"]
     for r in rows:
-        lines.append(f"| {r['phase']} | {fmt(r['mean_w'], '.1f')} W ({r['samples']} samples) | "
+        lines.append(f"| {r['phase']} | {fmt(r['cpu_pct'], '.0f')}% | {fmt(r['mean_w'], '.1f')} W ({r['samples']} samples) | "
                      f"{fmt(r['inferences_per_s'], '.0f')} | {fmt(r['mj_per_inference'], '.0f')} mJ | "
                      f"{fmt(r['mj_per_inference_above_idle'], '.0f')} mJ |")
+    idle_cpu = next((r["cpu_pct"] for r in rows if r["phase"] == "idle"), None)
+    if idle_cpu is not None and idle_cpu > 5:
+        lines += ["", f"**Not valid: the idle phase was {idle_cpu:.0f}% busy — something else was running.**"]
     out = Path(args.phases).with_name("power.md")
     out.write_text("\n".join(lines) + "\n", encoding="utf-8")
     Path(args.phases).with_name("power.json").write_text(json.dumps(rows, indent=1))

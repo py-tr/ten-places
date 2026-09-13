@@ -19,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from tenplaces.evaluate import wilson  # noqa: E402
 from tenplaces.parallel_eval import run_agent_parallel  # noqa: E402
 from tenplaces.paths import OUT  # noqa: E402
-from tenplaces.skill_policies import load_exec_settings, load_selected  # noqa: E402
+from tenplaces.skill_policies import load_exec_settings, load_selected, resolve_checkpoints  # noqa: E402
 
 KEYS = ["drawer_open", "spoon", "plate", "fork", "cup"]
 
@@ -43,6 +43,11 @@ def main():
                "calib_cache": "data/table_v1_skill_cache"})
     spec = {"kind": "skills", "runs": [r for r in args.runs if Path(r).is_dir()], "exec_settings": load_exec_settings(),
             "checkpoints": load_selected(), "kwargs": kwargs}
+    if args.backend != "torch":  # build each checkpoint's IR once here, so parallel workers only load it (no racing writers)
+        from tenplaces.lerobot_policy import LeRobotPolicy
+
+        for ck in resolve_checkpoints(spec["runs"], selected=spec["checkpoints"]).values():
+            LeRobotPolicy(ck, backend=args.backend, calib_cache=kwargs["calib_cache"])
     from tenplaces.agent import parse_push
 
     disturb = [parse_push(p) for p in args.push]
