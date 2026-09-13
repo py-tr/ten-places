@@ -4,7 +4,7 @@ from itertools import combinations
 import pytest
 
 from tenplaces.evaluate_skill import SKILL_NAMES, verified_prefixes
-from tenplaces.planner import PREREQS, verify
+from tenplaces.planner import PREREQS, verify, without_unsupported
 
 ALL_SUBSETS = [list(c) for r in range(1, len(SKILL_NAMES) + 1) for c in combinations(SKILL_NAMES, r)]
 
@@ -37,6 +37,19 @@ def test_every_subset_becomes_executable(request_):
     assert steps == sorted(steps, key=SKILL_NAMES.index)
     for i, s in enumerate(steps):
         assert set(PREREQS[s]) <= set(steps[:i])
+
+
+@pytest.mark.parametrize("command, unsupported, rest", [
+    ("Set the table and light a candle.", ["light a candle"], "Set the table."),
+    ("Just the cup, and bring me the salt.", ["bring me the salt"], "Just the cup."),
+    ("Lay the spoon, then wash the dishes.", ["wash the dishes"], "Lay the spoon."),
+    ("Light a candle and set the table.", ["light a candle"], "set the table."),
+    ("Full setting please, and dim the lights.", ["Dim the Lights"], "Full setting please."),
+    ("Set the table.", [], "Set the table."),
+    ("Set the table and light a candle.", ["pour water"], "Set the table and light a candle."),
+])
+def test_without_unsupported_leaves_no_dangling_join(command, unsupported, rest):
+    assert without_unsupported(command, unsupported) == rest
 
 
 def test_prefix_counts():

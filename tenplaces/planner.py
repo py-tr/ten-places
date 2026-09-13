@@ -7,6 +7,7 @@ The VLM proposes, the verifier disposes:
   is_done(skill, image)  -> a yes/no visual check after each skill, used to retry or re-plan.
 """
 import json
+import re
 import time
 from pathlib import Path
 
@@ -73,6 +74,22 @@ Examples:
 "Lay the cutlery and dim the lights." -> {{"unsupported": ["dim the lights"]}}
 "I'd like a spoon for my soup." -> {{"unsupported": []}}
 JSON only."""
+
+
+_JOIN = r"(?:,|;|\band\b|\bthen\b|\balso\b|\bplus\b)"
+
+
+def without_unsupported(command: str, unsupported) -> str:
+    """The command with what no skill does cut out, and the joins it leaves dangling: "Set the table and light a
+    candle." -> "Set the table." (the 4B model reads "Set the table and ." as incomplete and plans nothing)."""
+    rest = command
+    for u in unsupported:
+        i = rest.lower().find(u.lower())
+        if i >= 0:
+            rest = rest[:i] + " " + rest[i + len(u):]
+    rest = re.sub(rf"(?:\s*{_JOIN})+\s*([.!?]*)\s*$", r"\1", rest, flags=re.I)
+    rest = re.sub(rf"^\s*(?:{_JOIN}\s*)+", "", rest, flags=re.I)
+    return re.sub(r"\s+([,.!?])", r"\1", " ".join(rest.split()))
 
 
 def verify(steps, done=()):
@@ -193,12 +210,7 @@ class VLMPlanner:
         p = planner(command, image, done)
         unsupported, ms = self.cannot_do(command)  # text only
         p.update(unsupported=unsupported, ms=p["ms"] + ms)
-        rest = command
-        for u in unsupported:
-            i = rest.lower().find(u.lower())
-            if i >= 0:
-                rest = rest[:i] + " " + rest[i + len(u):]
-        rest = " ".join(rest.split())
+        rest = without_unsupported(command, unsupported)
         if unsupported and not p["steps"] and rest != command and len(rest.strip(" ,.!?")) > 3:
             p2 = planner(rest, image, done)
             p2.update(command=command, unsupported=unsupported, ms=p["ms"] + p2["ms"], replanned_from=rest)
