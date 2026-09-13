@@ -132,27 +132,39 @@ def verify(steps, done=()):
 
 class VLMPlanner:
     def __init__(self, model_dir: str | Path = "models/Qwen3-VL-4B-Instruct-int4-ov", device: str = "CPU",
-                 warmup: bool = True, ov_config: dict | None = None):
+                 warmup: bool = True, ov_config: dict | None = None, idle_config: dict | None = None):
         """ov_config: OpenVINO properties for the pipeline (e.g. the efficiency-core placement from
-        tenplaces.cores), passed through unchanged; None keeps OpenVINO's defaults."""
+        tenplaces.cores), passed through unchanged; None keeps OpenVINO's defaults.
+        idle_config: a second pipeline for calls made while the arms are still (idle=True: the first plan), which
+        may use every core; {} means OpenVINO's defaults. On the i5-13600KF a plan takes ~14 s on the E-cores and
+        6-8 s on all cores, so the arms start twice as soon. Costs a second copy of the model (~3 GB)."""
         import openvino_genai as og
 
         self.og = og
-        self.pipe = og.VLMPipeline(str(model_dir), device, **ov_config) if ov_config else og.VLMPipeline(str(model_dir), device)
+
+        def pipeline(cfg):
+            return og.VLMPipeline(str(model_dir), device, **cfg) if cfg else og.VLMPipeline(str(model_dir), device)
+
+        self.pipe = pipeline(ov_config)
+        self.idle_pipe = pipeline(idle_config) if idle_config is not None else None
         self.device = device
         if warmup:  # the first generate compiles kernels (~15 s); pay that at load, not mid-demo
             self._ask("Warm-up.", np.zeros((336, 448, 3), np.uint8), CHECK_SCHEMA, max_new_tokens=4)
+            if self.idle_pipe is not None:
+                self._ask("Warm-up.", np.zeros((336, 448, 3), np.uint8), CHECK_SCHEMA, max_new_tokens=4, idle=True)
 
-    def _ask(self, prompt: str, image: np.ndarray | None, schema: dict, max_new_tokens: int = 120):
-        """One structured answer from the VLM; image=None asks text-only (no vision encoding)."""
+    def _ask(self, prompt: str, image: np.ndarray | None, schema: dict, max_new_tokens: int = 120, idle: bool = False):
+        """One structured answer from the VLM; image=None asks text-only (no vision encoding). idle=True uses the
+        all-core pipeline when there is one: only for calls made while nothing else needs the CPU."""
         import openvino as ov
 
         cfg = self.og.GenerationConfig()
         cfg.max_new_tokens = max_new_tokens
         cfg.structured_output_config = self.og.StructuredOutputConfig(json_schema=json.dumps(schema))
         extra = {} if image is None else {"images": [ov.Tensor(np.ascontiguousarray(image[None]))]}
+        pipe = self.idle_pipe if idle and self.idle_pipe is not None else self.pipe
         t = time.perf_counter()
-        res = self.pipe.generate(prompt, generation_config=cfg, **extra)
+        res = pipe.generate(prompt, generation_config=cfg, **extra)
         ms = 1000 * (time.perf_counter() - t)
         text = res.texts[0]
         try:
@@ -160,24 +172,24 @@ class VLMPlanner:
         except json.JSONDecodeError:
             return None, text, ms
 
-    def plan(self, command: str, image: np.ndarray, done=()):
+    def plan(self, command: str, image: np.ndarray, done=(), idle: bool = False):
         skills = "\n".join(f"- {s}: {SKILL_TEXT[s]}" for s in SKILL_NAMES)
         prompt = PLAN_PROMPT.format(skills=skills, command=command, done=", ".join(done) or "none")
-        parsed, raw, ms = self._ask(prompt, image, PLAN_SCHEMA)
+        parsed, raw, ms = self._ask(prompt, image, PLAN_SCHEMA, idle=idle)
         proposed = parsed.get("steps", []) if parsed else []
         steps, notes = verify(proposed, done)
         unsupported = [u.strip() for u in (parsed or {}).get("unsupported", []) if isinstance(u, str) and u.strip()]
         return {"command": command, "proposed": proposed, "steps": steps, "corrections": notes,
                 "reason": (parsed or {}).get("reason", ""), "unsupported": unsupported, "raw": raw, "ms": ms}
 
-    def cannot_do(self, command: str, image: np.ndarray | None = None):
+    def cannot_do(self, command: str, image: np.ndarray | None = None, idle: bool = False):
         """What the command asks for that no skill does ("light a candle"), so the robot can say so instead of
         silently ignoring it. A separate question from plan(), so it cannot change the plan. Returns (list, ms).
         Text only: the question is about the command, not the scene (`image` is accepted and ignored), so it costs
         no vision encoding and can run while the arms already move."""
         skills = "\n".join(f"- {s}: {SKILL_TEXT[s]}" for s in SKILL_NAMES)
         parsed, raw, ms = self._ask(CANNOT_PROMPT.format(skills=skills, command=command), None, UNSUPPORTED_SCHEMA,
-                                    max_new_tokens=60)
+                                    max_new_tokens=60, idle=idle)
         items = [u.strip() for u in (parsed or {}).get("unsupported", []) if isinstance(u, str) and u.strip()]
         # Leaving one of the robot's own objects out ("skip the cup") is the plan's business, not something it
         # cannot do — it must not answer "Sorry, I can't skip the cup." ("a cup of coffee" stays: nothing is left out.)
@@ -190,29 +202,29 @@ class VLMPlanner:
         quantifiers = {"everything", "else", "the", "rest", "all", "of", "it", "and"}  # "everything else" asks nothing
         return [u for u in items if not (own & words(u) and omit & words(u)) and not words(u) <= quantifiers], ms
 
-    def plan_intent(self, command: str, image: np.ndarray, done=()):
+    def plan_intent(self, command: str, image: np.ndarray, done=(), idle: bool = False):
         """Like plan(), but the VLM only states the intent — the whole table or some skills, and what to leave out —
         and plain code assembles the steps (assemble_intent), as amend() does for spoken changes. Same dict as
         plan(), plus "intent"."""
         skills = "\n".join(f"- {s}: {SKILL_TEXT[s]}" for s in SKILL_NAMES)
         prompt = INTENT_PROMPT.format(skills=skills, command=command, done=", ".join(done) or "none")
-        intent, raw, ms = self._ask(prompt, image, INTENT_SCHEMA)
+        intent, raw, ms = self._ask(prompt, image, INTENT_SCHEMA, idle=idle)
         proposed = assemble_intent(intent) if intent else []
         steps, notes = verify(proposed, done)
         return {"command": command, "intent": intent, "proposed": proposed, "steps": steps, "corrections": notes,
                 "reason": (intent or {}).get("reason", ""), "raw": raw, "ms": ms}
 
-    def plan_checked(self, command: str, image: np.ndarray, done=(), use_intent: bool = False):
+    def plan_checked(self, command: str, image: np.ndarray, done=(), use_intent: bool = False, idle: bool = False):
         """plan() (or plan_intent()) plus cannot_do(). If the plan came back empty although only part of the
         command is impossible ("set the table and light a candle" -> nothing at all), plan once more from the
         command without the impossible part. The plan dict gains "unsupported" (and "replanned_from")."""
         planner = self.plan_intent if use_intent else self.plan
-        p = planner(command, image, done)
-        unsupported, ms = self.cannot_do(command)  # text only
+        p = planner(command, image, done, idle=idle)
+        unsupported, ms = self.cannot_do(command, idle=idle)  # text only
         p.update(unsupported=unsupported, ms=p["ms"] + ms)
         rest = without_unsupported(command, unsupported)
         if unsupported and not p["steps"] and rest != command and len(rest.strip(" ,.!?")) > 3:
-            p2 = planner(rest, image, done)
+            p2 = planner(rest, image, done, idle=idle)
             p2.update(command=command, unsupported=unsupported, ms=p["ms"] + p2["ms"], replanned_from=rest)
             return p2
         return p

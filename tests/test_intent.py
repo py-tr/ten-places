@@ -15,7 +15,7 @@ class ScriptedVLM(VLMPlanner):
     def __init__(self, answers):  # skip loading the model
         self.answers = list(answers)
 
-    def _ask(self, prompt, image, schema, max_new_tokens=120):
+    def _ask(self, prompt, image, schema, max_new_tokens=120, idle=False):
         answer = self.answers.pop(0)
         return answer, str(answer), 5.0
 
@@ -53,8 +53,8 @@ def test_cannot_do_filters():
 
 
 def test_empty_plan_is_redone_without_the_impossible_part():
-    # plan_intent -> nothing; cannot_do -> "light a candle"; plan_intent on "Set the table and" -> everything
+    # plan_intent -> nothing; cannot_do -> "light a candle"; plan_intent on "Set the table." -> everything
     vlm = ScriptedVLM([intent(), {"unsupported": ["light a candle"]}, intent(all_=True)])
     p = vlm.plan_checked("Set the table and light a candle.", IMAGE, use_intent=True)
     assert p["steps"] == SKILL_NAMES and p["unsupported"] == ["light a candle"]
-    assert p["replanned_from"] == "Set the table and ." and p["ms"] == 15.0
+    assert p["replanned_from"] == "Set the table." and p["ms"] == 15.0

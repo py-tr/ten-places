@@ -73,7 +73,8 @@ def main():
     policy = SkillPolicies(runs, n_action_steps=10, **kw)
     for skill, ck in policy.sources.items():
         print(f"policy {skill}: {ck}", flush=True)
-    planner = VLMPlanner(args.planner, ov_config=planner_cfg)
+    # With the core split, a second planner pipeline on every core makes the first plan (the arms are still then).
+    planner = VLMPlanner(args.planner, ov_config=planner_cfg, idle_config={} if args.cores == "split" else None)
     checker, _ = default_checker(planner, ov_config=control_cfg)
 
     command, spoken = args.command, None

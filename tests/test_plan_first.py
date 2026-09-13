@@ -80,11 +80,33 @@ def test_empty_plan_waits_for_the_check():
     assert not planner.overlap
 
 
+def test_only_the_first_plan_uses_the_idle_pipeline():
+    class IdlePlanner(CheckingPlanner):
+        idle_pipe = object()  # VLMPlanner(idle_config=...) has one
+
+        def __init__(self, *a, **kw):
+            super().__init__(*a, **kw)
+            self.calls = []
+
+        def plan(self, command, image, done=(), idle=False):
+            self.calls.append(("plan", idle))
+            return super().plan(command, image, done)
+
+        def cannot_do(self, command, image=None, idle=False):
+            self.calls.append(("cannot_do", idle))
+            return super().cannot_do(command, image)
+
+    planner = IdlePlanner(["cup"])
+    run_command(StillPolicy(), planner, "Only the cup, and light a candle.", seed=0, checker=instant_check,
+                log=lambda *_: None)
+    assert planner.calls == [("plan", True), ("cannot_do", False)]  # cannot_do runs while the arms move
+
+
 def test_cannot_do_sends_no_image():
     class RecordingVLM(ScriptedVLM):
-        def _ask(self, prompt, image, schema, max_new_tokens=120):
+        def _ask(self, prompt, image, schema, max_new_tokens=120, idle=False):
             self.images = getattr(self, "images", []) + [image]
-            return super()._ask(prompt, image, schema, max_new_tokens)
+            return super()._ask(prompt, image, schema, max_new_tokens, idle)
 
     vlm = RecordingVLM([{"unsupported": ["light a candle"]}])
     assert vlm.cannot_do("Set the table and light a candle.", IMAGE)[0] == ["light a candle"]

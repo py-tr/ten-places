@@ -15,7 +15,7 @@ class ScriptedVLM(VLMPlanner):
     def __init__(self, answers):  # skip loading the model
         self.answers, self.prompts = list(answers), []
 
-    def _ask(self, prompt, image, schema, max_new_tokens=120):
+    def _ask(self, prompt, image, schema, max_new_tokens=120, idle=False):
         self.prompts.append(prompt)
         answer = self.answers.pop(0)
         return answer, str(answer), 5.0

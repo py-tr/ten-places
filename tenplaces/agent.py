@@ -310,11 +310,14 @@ def run_command(policy, planner, command: str, seed: int, budgets=None, max_atte
     # worker thread and said when the answer arrives. Only an empty plan waits for it: plan_checked then re-plans
     # without the impossible part ("set the table and light a candle"). Asking both in a row before moving took
     # 18.7 s median to the first motion (out/planner/eval_planner_checked.json).
+    # The arms are still until this plan arrives: a planner with an all-core pipeline (VLMPlanner idle_config)
+    # uses it here, and its core-split pipeline for everything asked while the arms move.
     image = planner_image(ep, prend)
-    plan = planner.plan(command, image, done)
+    idle = {"idle": True} if getattr(planner, "idle_pipe", None) is not None else {}
+    plan = planner.plan(command, image, done, **idle)
     if hasattr(planner, "cannot_do"):
         if not plan["steps"] and hasattr(planner, "plan_checked"):
-            plan = planner.plan_checked(command, image, done)
+            plan = planner.plan_checked(command, image, done, **idle)
         else:
             pool = amender.pool if amender is not None else ThreadPoolExecutor(max_workers=1, thread_name_prefix="cannot")
             later["own_pool"] = None if amender is not None else pool
