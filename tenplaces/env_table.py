@@ -165,12 +165,15 @@ def record_skill_oracle(seed: int, skill: str, before=(), image_hw=IMAGE_HW, pol
 RELEASED = 0.35  # the gripper command every demonstrated skill starts from once that arm has let go (oracle runs)
 
 
-def go_home(ep: TableEpisode, frames: int = 20, on_frame=None, release_frames: int = 8):
+def go_home(ep: TableEpisode, frames: int = 20, on_frame=None, release_frames: int = 8, until: int = 60,
+            tol: float = 0.05):
     """Between chained skills: put both arms in the state every demonstration starts a skill from — first open
     each gripper to at least RELEASED for `release_frames` (lets go of anything still held, e.g. the drawer handle
     the camera judged "done" too early; an open gripper stays open), then a smooth joint-space interpolation of
-    the joint targets to the home pose over `frames` control steps. Proprioception only — no object state.
-    Returns the last observation."""
+    the joint targets to the home pose over `frames` control steps. Then, if a joint is still more than `tol` rad
+    from home, keep commanding home for up to `until` frames, opening both grippers fully half-way — an arm hung up
+    on the drawer handle (tuning seed 104: shoulder pan 0.78 rad off, the next skill started from there). Returns
+    at once when the arms are already home. Proprioception only — no object state. Returns the last observation."""
     obs = None
     cmd = ep.command().astype(np.float64)
     cmd[5], cmd[11] = max(cmd[5], RELEASED), max(cmd[11], RELEASED)
@@ -184,6 +187,15 @@ def go_home(ep: TableEpisode, frames: int = 20, on_frame=None, release_frames: i
     for i in range(1, frames + 1):
         s = 0.5 - 0.5 * np.cos(np.pi * i / frames)
         obs = ep.step(start + (goal - start) * s)
+        if on_frame is not None:
+            on_frame(ep, obs)
+    for i in range(until):
+        q = ep.state()
+        if max(np.abs(q[0:5] - HOME).max(), np.abs(q[6:11] - HOME).max()) < tol:
+            break
+        if i == until // 2:  # not converging: whatever holds the arm, let go of it
+            goal[5], goal[11] = GRIP_OPEN, GRIP_OPEN
+        obs = ep.step(goal)
         if on_frame is not None:
             on_frame(ep, obs)
     return obs

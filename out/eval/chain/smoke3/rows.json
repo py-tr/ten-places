@@ -1,0 +1,1077 @@
+[
+ {
+  "seed": 101,
+  "skills": {
+   "drawer": [
+    {
+     "ended": "budget",
+     "done_at": null,
+     "frames": 300,
+     "p_done_end": 0.001,
+     "cam_done_end": false,
+     "policy_ms": 45.4,
+     "attempt": 1,
+     "start": {
+      "drawer_cm": 0.0,
+      "a_q": [
+       -0.0,
+       -1.4,
+       1.3004,
+       1.1001,
+       -0.0
+      ],
+      "b_q": [
+       -0.0,
+       -1.4,
+       1.3004,
+       1.1001,
+       -0.0
+      ],
+      "a_grip_q": 1.0,
+      "b_grip_q": 1.0,
+      "a_grip_cmd": 1.0,
+      "b_grip_cmd": 1.0,
+      "a_home_err": 0.0004,
+      "b_home_err": 0.0004,
+      "spoon": {
+       "xy": [
+        0.0023,
+        0.0771
+       ],
+       "z": 0.0099,
+       "up": 1.0,
+       "axis_x": 0.0,
+       "held": false
+      },
+      "fork": {
+       "xy": [
+        0.0323,
+        0.0789
+       ],
+       "z": 0.01,
+       "up": 1.0,
+       "axis_x": 0.0,
+       "held": false
+      },
+      "plate": {
+       "xy": [
+        0.1848,
+        0.0809
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      },
+      "cup": {
+       "xy": [
+        0.2046,
+        -0.1466
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      }
+     },
+     "end": {
+      "drawer_cm": 6.36,
+      "a_q": [
+       -0.0057,
+       -1.3748,
+       1.291,
+       1.0993,
+       0.0448
+      ],
+      "b_q": [
+       0.0005,
+       -1.4027,
+       1.3031,
+       1.0998,
+       0.0011
+      ],
+      "a_grip_q": 0.316,
+      "b_grip_q": 1.005,
+      "a_grip_cmd": 0.316,
+      "b_grip_cmd": 1.005,
+      "a_home_err": 0.0448,
+      "b_home_err": 0.0031,
+      "spoon": {
+       "xy": [
+        -0.0613,
+        0.0768
+       ],
+       "z": 0.0099,
+       "up": 1.0,
+       "axis_x": 0.0,
+       "held": false
+      },
+      "fork": {
+       "xy": [
+        -0.0312,
+        0.0788
+       ],
+       "z": 0.01,
+       "up": 1.0,
+       "axis_x": 0.0,
+       "held": false
+      },
+      "plate": {
+       "xy": [
+        0.1848,
+        0.0809
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      },
+      "cup": {
+       "xy": [
+        0.2046,
+        -0.1466
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      }
+     },
+     "ok": true,
+     "grade": {
+      "drawer": true,
+      "spoon": false,
+      "plate": false,
+      "fork": false,
+      "cup": false
+     },
+     "errs": {
+      "spoon": 0.2121,
+      "fork": 0.1588,
+      "plate": 0.0981,
+      "cup": 0.0774
+     }
+    },
+    {
+     "ended": "budget",
+     "done_at": null,
+     "frames": 300,
+     "p_done_end": 0.001,
+     "cam_done_end": false,
+     "policy_ms": 46.1,
+     "attempt": 2,
+     "start": {
+      "drawer_cm": 6.36,
+      "a_q": [
+       -0.0,
+       -1.4,
+       1.3004,
+       1.1001,
+       0.0
+      ],
+      "b_q": [
+       0.0,
+       -1.4,
+       1.3004,
+       1.1001,
+       0.0
+      ],
+      "a_grip_q": 1.0,
+      "b_grip_q": 1.005,
+      "a_grip_cmd": 1.0,
+      "b_grip_cmd": 1.005,
+      "a_home_err": 0.0004,
+      "b_home_err": 0.0004,
+      "spoon": {
+       "xy": [
+        -0.0613,
+        0.0768
+       ],
+       "z": 0.0099,
+       "up": 1.0,
+       "axis_x": 0.0,
+       "held": false
+      },
+      "fork": {
+       "xy": [
+        -0.0312,
+        0.0788
+       ],
+       "z": 0.01,
+       "up": 1.0,
+       "axis_x": 0.0,
+       "held": false
+      },
+      "plate": {
+       "xy": [
+        0.1848,
+        0.0809
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      },
+      "cup": {
+       "xy": [
+        0.2046,
+        -0.1466
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      }
+     },
+     "end": {
+      "drawer_cm": 6.36,
+      "a_q": [
+       0.0008,
+       -1.3847,
+       1.2934,
+       1.099,
+       0.008
+      ],
+      "b_q": [
+       0.0005,
+       -1.4032,
+       1.3031,
+       1.0998,
+       -0.0012
+      ],
+      "a_grip_q": 0.327,
+      "b_grip_q": 1.004,
+      "a_grip_cmd": 0.327,
+      "b_grip_cmd": 1.004,
+      "a_home_err": 0.0153,
+      "b_home_err": 0.0032,
+      "spoon": {
+       "xy": [
+        -0.0613,
+        0.0768
+       ],
+       "z": 0.0099,
+       "up": 1.0,
+       "axis_x": 0.0,
+       "held": false
+      },
+      "fork": {
+       "xy": [
+        -0.0312,
+        0.0788
+       ],
+       "z": 0.01,
+       "up": 1.0,
+       "axis_x": 0.0,
+       "held": false
+      },
+      "plate": {
+       "xy": [
+        0.1848,
+        0.0809
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      },
+      "cup": {
+       "xy": [
+        0.2046,
+        -0.1466
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      }
+     },
+     "ok": true,
+     "grade": {
+      "drawer": true,
+      "spoon": false,
+      "plate": false,
+      "fork": false,
+      "cup": false
+     },
+     "errs": {
+      "spoon": 0.2121,
+      "fork": 0.1588,
+      "plate": 0.0981,
+      "cup": 0.0774
+     }
+    }
+   ],
+   "spoon": [
+    {
+     "ended": "budget",
+     "done_at": null,
+     "frames": 450,
+     "p_done_end": 0.0,
+     "cam_done_end": false,
+     "policy_ms": 45.9,
+     "attempt": 1,
+     "start": {
+      "drawer_cm": 6.36,
+      "a_q": [
+       0.0,
+       -1.4,
+       1.3004,
+       1.1001,
+       0.0
+      ],
+      "b_q": [
+       0.0,
+       -1.4,
+       1.3004,
+       1.1001,
+       -0.0
+      ],
+      "a_grip_q": 0.35,
+      "b_grip_q": 1.004,
+      "a_grip_cmd": 0.35,
+      "b_grip_cmd": 1.004,
+      "a_home_err": 0.0004,
+      "b_home_err": 0.0004,
+      "spoon": {
+       "xy": [
+        -0.0613,
+        0.0768
+       ],
+       "z": 0.0099,
+       "up": 1.0,
+       "axis_x": 0.0,
+       "held": false
+      },
+      "fork": {
+       "xy": [
+        -0.0312,
+        0.0788
+       ],
+       "z": 0.01,
+       "up": 1.0,
+       "axis_x": 0.0,
+       "held": false
+      },
+      "plate": {
+       "xy": [
+        0.1848,
+        0.0809
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      },
+      "cup": {
+       "xy": [
+        0.2046,
+        -0.1466
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      }
+     },
+     "end": {
+      "drawer_cm": 6.55,
+      "a_q": [
+       -0.0019,
+       -1.3802,
+       1.2838,
+       1.0986,
+       -0.0006
+      ],
+      "b_q": [
+       -0.0006,
+       -1.4022,
+       1.2987,
+       1.1007,
+       -0.0037
+      ],
+      "a_grip_q": 0.345,
+      "b_grip_q": 0.364,
+      "a_grip_cmd": 0.345,
+      "b_grip_cmd": 0.364,
+      "a_home_err": 0.0198,
+      "b_home_err": 0.0037,
+      "spoon": {
+       "xy": [
+        -0.061,
+        0.0768
+       ],
+       "z": 0.0099,
+       "up": 1.0,
+       "axis_x": 0.002,
+       "held": false
+      },
+      "fork": {
+       "xy": [
+        -0.0332,
+        0.0788
+       ],
+       "z": 0.01,
+       "up": 1.0,
+       "axis_x": 0.0,
+       "held": false
+      },
+      "plate": {
+       "xy": [
+        0.1848,
+        0.0809
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      },
+      "cup": {
+       "xy": [
+        0.2046,
+        -0.1466
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      }
+     },
+     "ok": false,
+     "grade": {
+      "drawer": true,
+      "spoon": false,
+      "plate": false,
+      "fork": false,
+      "cup": false
+     },
+     "errs": {
+      "spoon": 0.2119,
+      "fork": 0.1607,
+      "plate": 0.0981,
+      "cup": 0.0774
+     }
+    },
+    {
+     "ended": "budget",
+     "done_at": null,
+     "frames": 450,
+     "p_done_end": 0.0,
+     "cam_done_end": false,
+     "policy_ms": 44.9,
+     "attempt": 2,
+     "start": {
+      "drawer_cm": 6.55,
+      "a_q": [
+       -0.0,
+       -1.4,
+       1.3004,
+       1.1001,
+       -0.0
+      ],
+      "b_q": [
+       -0.0,
+       -1.4,
+       1.3004,
+       1.1001,
+       -0.0
+      ],
+      "a_grip_q": 0.35,
+      "b_grip_q": 0.364,
+      "a_grip_cmd": 0.35,
+      "b_grip_cmd": 0.364,
+      "a_home_err": 0.0004,
+      "b_home_err": 0.0004,
+      "spoon": {
+       "xy": [
+        -0.061,
+        0.0768
+       ],
+       "z": 0.0099,
+       "up": 1.0,
+       "axis_x": 0.002,
+       "held": false
+      },
+      "fork": {
+       "xy": [
+        -0.0332,
+        0.0788
+       ],
+       "z": 0.01,
+       "up": 1.0,
+       "axis_x": 0.0,
+       "held": false
+      },
+      "plate": {
+       "xy": [
+        0.1848,
+        0.0809
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      },
+      "cup": {
+       "xy": [
+        0.2046,
+        -0.1466
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      }
+     },
+     "end": {
+      "drawer_cm": 6.55,
+      "a_q": [
+       -0.0022,
+       -1.3779,
+       1.2826,
+       1.0982,
+       -0.0004
+      ],
+      "b_q": [
+       -0.0004,
+       -1.403,
+       1.2992,
+       1.1006,
+       -0.0045
+      ],
+      "a_grip_q": 0.344,
+      "b_grip_q": 0.364,
+      "a_grip_cmd": 0.344,
+      "b_grip_cmd": 0.364,
+      "a_home_err": 0.0221,
+      "b_home_err": 0.0045,
+      "spoon": {
+       "xy": [
+        -0.061,
+        0.0768
+       ],
+       "z": 0.0099,
+       "up": 1.0,
+       "axis_x": 0.002,
+       "held": false
+      },
+      "fork": {
+       "xy": [
+        -0.0332,
+        0.0788
+       ],
+       "z": 0.01,
+       "up": 1.0,
+       "axis_x": 0.0,
+       "held": false
+      },
+      "plate": {
+       "xy": [
+        0.1848,
+        0.0809
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      },
+      "cup": {
+       "xy": [
+        0.2046,
+        -0.1466
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      }
+     },
+     "ok": false,
+     "grade": {
+      "drawer": true,
+      "spoon": false,
+      "plate": false,
+      "fork": false,
+      "cup": false
+     },
+     "errs": {
+      "spoon": 0.2119,
+      "fork": 0.1607,
+      "plate": 0.0981,
+      "cup": 0.0774
+     }
+    }
+   ],
+   "plate": [
+    {
+     "ended": "camera",
+     "done_at": 130,
+     "frames": 161,
+     "p_done_end": 1.0,
+     "cam_done_end": true,
+     "policy_ms": 46.6,
+     "attempt": 1,
+     "start": {
+      "drawer_cm": 6.55,
+      "a_q": [
+       -0.0,
+       -1.4,
+       1.3004,
+       1.1001,
+       -0.0
+      ],
+      "b_q": [
+       -0.0,
+       -1.4,
+       1.3004,
+       1.1001,
+       -0.0
+      ],
+      "a_grip_q": 0.35,
+      "b_grip_q": 0.364,
+      "a_grip_cmd": 0.35,
+      "b_grip_cmd": 0.364,
+      "a_home_err": 0.0004,
+      "b_home_err": 0.0004,
+      "spoon": {
+       "xy": [
+        -0.061,
+        0.0768
+       ],
+       "z": 0.0099,
+       "up": 1.0,
+       "axis_x": 0.002,
+       "held": false
+      },
+      "fork": {
+       "xy": [
+        -0.0332,
+        0.0788
+       ],
+       "z": 0.01,
+       "up": 1.0,
+       "axis_x": 0.0,
+       "held": false
+      },
+      "plate": {
+       "xy": [
+        0.1848,
+        0.0809
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      },
+      "cup": {
+       "xy": [
+        0.2046,
+        -0.1466
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      }
+     },
+     "end": {
+      "drawer_cm": 6.55,
+      "a_q": [
+       0.0,
+       -1.4,
+       1.3004,
+       1.1001,
+       0.0
+      ],
+      "b_q": [
+       0.0642,
+       -1.2392,
+       1.1993,
+       1.132,
+       -0.1689
+      ],
+      "a_grip_q": 0.35,
+      "b_grip_q": 0.348,
+      "a_grip_cmd": 0.35,
+      "b_grip_cmd": 0.348,
+      "a_home_err": 0.0004,
+      "b_home_err": 0.1689,
+      "spoon": {
+       "xy": [
+        -0.061,
+        0.0768
+       ],
+       "z": 0.0099,
+       "up": 1.0,
+       "axis_x": 0.002,
+       "held": false
+      },
+      "fork": {
+       "xy": [
+        -0.0332,
+        0.0788
+       ],
+       "z": 0.01,
+       "up": 1.0,
+       "axis_x": 0.0,
+       "held": false
+      },
+      "plate": {
+       "xy": [
+        0.1206,
+        0.0053
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      },
+      "cup": {
+       "xy": [
+        0.2046,
+        -0.1466
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      }
+     },
+     "ok": true,
+     "grade": {
+      "drawer": true,
+      "spoon": false,
+      "plate": true,
+      "fork": false,
+      "cup": false
+     },
+     "errs": {
+      "spoon": 0.2119,
+      "fork": 0.1607,
+      "plate": 0.0015,
+      "cup": 0.0774
+     }
+    }
+   ],
+   "fork": [
+    {
+     "ended": "budget",
+     "done_at": null,
+     "frames": 500,
+     "p_done_end": 0.0,
+     "cam_done_end": false,
+     "policy_ms": 4.2,
+     "attempt": 1,
+     "start": {
+      "drawer_cm": 6.55,
+      "a_q": [
+       0.0,
+       -1.4,
+       1.3004,
+       1.1001,
+       -0.0
+      ],
+      "b_q": [
+       0.0001,
+       -1.3997,
+       1.3002,
+       1.1,
+       -0.0002
+      ],
+      "a_grip_q": 0.35,
+      "b_grip_q": 0.35,
+      "a_grip_cmd": 0.35,
+      "b_grip_cmd": 0.35,
+      "a_home_err": 0.0004,
+      "b_home_err": 0.0003,
+      "spoon": {
+       "xy": [
+        -0.061,
+        0.0768
+       ],
+       "z": 0.0099,
+       "up": 1.0,
+       "axis_x": 0.002,
+       "held": false
+      },
+      "fork": {
+       "xy": [
+        -0.0332,
+        0.0788
+       ],
+       "z": 0.01,
+       "up": 1.0,
+       "axis_x": 0.0,
+       "held": false
+      },
+      "plate": {
+       "xy": [
+        0.1206,
+        0.0053
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      },
+      "cup": {
+       "xy": [
+        0.2046,
+        -0.1466
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      }
+     },
+     "end": {
+      "drawer_cm": 6.61,
+      "a_q": [
+       0.259,
+       0.3902,
+       -0.2847,
+       1.4674,
+       -1.2647
+      ],
+      "b_q": [
+       -0.2363,
+       0.3661,
+       -0.3729,
+       1.5802,
+       1.3714
+      ],
+      "a_grip_q": -0.15,
+      "b_grip_q": 0.135,
+      "a_grip_cmd": -0.15,
+      "b_grip_cmd": 0.135,
+      "a_home_err": 1.7902,
+      "b_home_err": 1.7661,
+      "spoon": {
+       "xy": [
+        -0.0569,
+        0.0763
+       ],
+       "z": 0.0099,
+       "up": 1.0,
+       "axis_x": 0.005,
+       "held": false
+      },
+      "fork": {
+       "xy": [
+        -0.0345,
+        0.0785
+       ],
+       "z": 0.01,
+       "up": 1.0,
+       "axis_x": 0.024,
+       "held": false
+      },
+      "plate": {
+       "xy": [
+        0.1206,
+        0.0053
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      },
+      "cup": {
+       "xy": [
+        0.2046,
+        -0.1466
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      }
+     },
+     "ok": false,
+     "grade": {
+      "drawer": true,
+      "spoon": false,
+      "plate": true,
+      "fork": false,
+      "cup": false
+     },
+     "errs": {
+      "spoon": 0.2088,
+      "fork": 0.162,
+      "plate": 0.0015,
+      "cup": 0.0774
+     }
+    }
+   ],
+   "cup": [
+    {
+     "ended": "camera",
+     "done_at": 140,
+     "frames": 171,
+     "p_done_end": 1.0,
+     "cam_done_end": true,
+     "policy_ms": 8.4,
+     "attempt": 1,
+     "start": {
+      "drawer_cm": 6.61,
+      "a_q": [
+       0.0003,
+       -1.3994,
+       1.2997,
+       1.1005,
+       -0.0008
+      ],
+      "b_q": [
+       -0.0003,
+       -1.3994,
+       1.2997,
+       1.1007,
+       0.0008
+      ],
+      "a_grip_q": 0.35,
+      "b_grip_q": 0.35,
+      "a_grip_cmd": 0.35,
+      "b_grip_cmd": 0.35,
+      "a_home_err": 0.0008,
+      "b_home_err": 0.0008,
+      "spoon": {
+       "xy": [
+        -0.0569,
+        0.0763
+       ],
+       "z": 0.0099,
+       "up": 1.0,
+       "axis_x": 0.005,
+       "held": false
+      },
+      "fork": {
+       "xy": [
+        -0.0345,
+        0.0785
+       ],
+       "z": 0.01,
+       "up": 1.0,
+       "axis_x": 0.024,
+       "held": false
+      },
+      "plate": {
+       "xy": [
+        0.1206,
+        0.0053
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      },
+      "cup": {
+       "xy": [
+        0.2046,
+        -0.1466
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      }
+     },
+     "end": {
+      "drawer_cm": 6.61,
+      "a_q": [
+       -0.0,
+       -1.4,
+       1.3004,
+       1.1001,
+       -0.0
+      ],
+      "b_q": [
+       0.0117,
+       -1.4062,
+       1.313,
+       1.0966,
+       0.0131
+      ],
+      "a_grip_q": 0.35,
+      "b_grip_q": 0.351,
+      "a_grip_cmd": 0.35,
+      "b_grip_cmd": 0.35,
+      "a_home_err": 0.0004,
+      "b_home_err": 0.0131,
+      "spoon": {
+       "xy": [
+        -0.0569,
+        0.0763
+       ],
+       "z": 0.0099,
+       "up": 1.0,
+       "axis_x": 0.005,
+       "held": false
+      },
+      "fork": {
+       "xy": [
+        -0.0345,
+        0.0785
+       ],
+       "z": 0.01,
+       "up": 1.0,
+       "axis_x": 0.024,
+       "held": false
+      },
+      "plate": {
+       "xy": [
+        0.1206,
+        0.0053
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      },
+      "cup": {
+       "xy": [
+        0.189,
+        -0.0641
+       ],
+       "z": -0.0001,
+       "up": 1.0,
+       "axis_x": 1.0,
+       "held": false
+      }
+     },
+     "ok": true,
+     "grade": {
+      "drawer": true,
+      "spoon": false,
+      "plate": true,
+      "fork": false,
+      "cup": true
+     },
+     "errs": {
+      "spoon": 0.2088,
+      "fork": 0.162,
+      "plate": 0.0015,
+      "cup": 0.0098
+     }
+    }
+   ]
+  },
+  "drawer_open": true,
+  "spoon": false,
+  "spoon_err_m": 0.2088,
+  "fork": false,
+  "fork_err_m": 0.162,
+  "plate": true,
+  "plate_err_m": 0.0015,
+  "cup": true,
+  "cup_err_m": 0.0098,
+  "subtasks_done": 3,
+  "success": false,
+  "failed": [
+   "spoon",
+   "fork"
+  ],
+  "retries": 2,
+  "first_fail": "spoon"
+ }
+]

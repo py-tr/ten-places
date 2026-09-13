@@ -67,11 +67,11 @@ def main():
     import openvino
     import torch
 
-    from tenplaces.evaluate_table import CAMERA_ENDS, DEFAULT_BUDGETS, SETTLE
+    from tenplaces.evaluate_table import CAMERA_ENDS, DEFAULT_BUDGETS, RETRY, SETTLE
 
     (out / "provenance.json").write_text(json.dumps({
         "seeds": [seeds[0], seeds[-1]], "rows": args.rows, "home_frames": args.home_frames,
-        "budgets": DEFAULT_BUDGETS, "camera_ends": CAMERA_ENDS, "settle": SETTLE,
+        "budgets": DEFAULT_BUDGETS, "camera_ends": CAMERA_ENDS, "settle": SETTLE, "retry": RETRY,
         "exec_settings": exec_settings, "selected": selected,
         "checkpoints": sources, "runs": runs, "classifier": args.classifier, "date": time.strftime("%Y-%m-%d %H:%M"),
         "versions": {"openvino": openvino.__version__, "torch": torch.__version__, "mujoco": mujoco.__version__,

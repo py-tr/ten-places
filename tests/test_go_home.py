@@ -27,6 +27,13 @@ def test_arms_return_home():
     np.testing.assert_allclose(ep.state()[6:11], HOME, atol=0.03)
 
 
+def test_guard_holds_home_until_the_joints_arrive():
+    ep = displaced_episode(0.4, 1.0)
+    go_home(ep, frames=1)  # an interpolation far too short to get there
+    q = ep.state()
+    assert max(np.abs(q[0:5] - HOME).max(), np.abs(q[6:11] - HOME).max()) < 0.05
+
+
 def test_grippers_are_released_but_never_closed_further():
     ep = displaced_episode(-0.15, 1.0)  # A still closed (on a handle), B fully open
     go_home(ep, frames=5)

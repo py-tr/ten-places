@@ -35,43 +35,60 @@ for _item in filter(None, os.environ.get("TENPLACES_CAMERA_ENDS", "").split(",")
     _skill, _value = _item.split("=")
     CAMERA_ENDS[_skill] = _value == "1"
 SETTLE = {s: 30 for s in DEFAULT_BUDGETS}
+# One more attempt, from home, when the camera still says "not done" at the end of a skill. Tuning seeds 100-149
+# (scripts/eval_table_chain.py --retry): plate 3/7, fork 5/24, cup 1/4 retries recovered, none lost; drawer 1/21 and
+# spoon 0/23 — a stalled drawer and a spoon left in a short drawer are policy limits, not transients, so those two
+# are not retried (the agent uses the same table, tenplaces/agent.py).
+RETRY = {"drawer": False, "spoon": False, "plate": True, "fork": True, "cup": True}
 
 
 def run_episode(policy, seed: int, budgets=None, video_path: Path | None = None, checker=None,
-                check_every: int = 10, min_frames: int = 40, settle_frames: int = 30, home_frames: int = 0):
+                check_every: int = 10, min_frames: int = 40, settle_frames: int = 30, home_frames: int = 0,
+                retry: bool = True):
     """checker(skill, top_image) -> done: when given, a skill ends as soon as the camera says it is done
     (checked every `check_every` frames after `min_frames`); the budget is then only a cap.
     home_frames > 0: between skills the arms return to the home pose (env_table.go_home), where every
-    demonstration starts a skill."""
+    demonstration starts a skill. retry (needs a checker): a skill in RETRY that ends with the camera saying
+    "not done" is run once more from home."""
     budgets = budgets or DEFAULT_BUDGETS
     ep = TableEpisode(seed, render=True)
     obs = ep.observation()
     frames, latencies = [], []
+    record = (lambda e, o: frames.append(np.concatenate([o["images"][c] for c in CAMERAS], axis=1))) \
+        if video_path is not None else None
+    retries = []
     for k, (skill, _, text) in enumerate(SKILLS):
-        if k and home_frames:
-            obs = go_home(ep, home_frames, on_frame=(lambda e, o: frames.append(
-                np.concatenate([o["images"][c] for c in CAMERAS], axis=1))) if video_path is not None else None)
-        policy.reset()
-        onehot = np.zeros(len(SKILLS), dtype=np.float32)
-        onehot[k] = 1.0
-        for i in range(budgets[skill]):
-            obs["task"], obs["env_state"], obs["skill"] = text, onehot, skill
-            t = time.perf_counter()
-            action = np.asarray(policy.select_action(obs), dtype=np.float64)
-            latencies.append(time.perf_counter() - t)
-            obs = ep.step(action)
-            if video_path is not None:
-                frames.append(np.concatenate([obs["images"][c] for c in CAMERAS], axis=1))
-            if (checker is not None and CAMERA_ENDS[skill] and i >= min_frames and i % check_every == 0
-                    and checker(skill, obs["images"]["top"])):
-                # Let the policy finish releasing and retreating (the classifier sees "done" while still held).
-                for _ in range(max(settle_frames, SETTLE[skill])):
-                    obs["task"], obs["env_state"], obs["skill"] = text, onehot, skill
-                    obs = ep.step(np.asarray(policy.select_action(obs), dtype=np.float64))
-                    if video_path is not None:
-                        frames.append(np.concatenate([obs["images"][c] for c in CAMERAS], axis=1))
+        attempts = 2 if retry and checker is not None and RETRY[skill] else 1
+        for attempt in range(1, attempts + 1):
+            if (k or attempt > 1) and home_frames:
+                obs = go_home(ep, home_frames, on_frame=record)
+            policy.reset()
+            onehot = np.zeros(len(SKILLS), dtype=np.float32)
+            onehot[k] = 1.0
+            seen_done = False
+            for i in range(budgets[skill]):
+                obs["task"], obs["env_state"], obs["skill"] = text, onehot, skill
+                t = time.perf_counter()
+                action = np.asarray(policy.select_action(obs), dtype=np.float64)
+                latencies.append(time.perf_counter() - t)
+                obs = ep.step(action)
+                if record is not None:
+                    record(ep, obs)
+                if (checker is not None and CAMERA_ENDS[skill] and i >= min_frames and i % check_every == 0
+                        and checker(skill, obs["images"]["top"])):
+                    # Let the policy finish releasing and retreating (the classifier sees "done" while still held).
+                    for _ in range(max(settle_frames, SETTLE[skill])):
+                        obs["task"], obs["env_state"], obs["skill"] = text, onehot, skill
+                        obs = ep.step(np.asarray(policy.select_action(obs), dtype=np.float64))
+                        if record is not None:
+                            record(ep, obs)
+                    seen_done = True
+                    break
+            if attempt == attempts or seen_done or checker(skill, obs["images"]["top"]):
                 break
+            retries.append(skill)
     result = grade_table(ep.m, ep.d, ep.params)
+    result["retries"] = retries
     result.update(seed=seed, policy_ms_mean=1000 * float(np.mean(latencies)),
                   policy_ms_p95=1000 * float(np.percentile(latencies, 95)))
     if video_path is not None:
