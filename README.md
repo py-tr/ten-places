@@ -49,7 +49,7 @@ changes the plan after the current step, verified like any plan. The robot answe
 |---|---|---|---|---|---|---|---|
 | OpenVINO INT8 weights (what the robot runs) | 23/50 (33–60%) | 3.66 | 39 | 30 | 43 | 26 | 45 |
 | PyTorch reference | 24/50 (35–62%) | 3.78 | 43 | 34 | 41 | 25 | 46 |
-| Full agent (re-checks, retries, re-plans) | 26/50 (39–65%) | 4.00 | 45 | 35 | 41 | 31 | 48 |
+| Full agent (re-checks, retries, re-plans), PyTorch reference | 26/50 (39–65%) | 4.00 | 45 | 35 | 41 | 31 | 48 |
 
 The same code on the 50 tuning tables (seeds 100–149): 30/50 PyTorch, 31/50 OpenVINO. The submission video shows
 the first 10 seeds as a grid with pass/fail per seed.
@@ -147,8 +147,8 @@ Speak the command; the arms start as soon as the transcript is final. With `--li
 "stop" halts at once (matched locally, no model call); anything else goes to the planner, is verified, and takes
 over when the current step ends, so an object is never dropped mid-air. `--speak` lets the robot say its plan and
 the reason for any correction ("I'll open the drawer first — the spoon is inside") and what it cannot do. Speech runs
-on worker threads, so the control loop never waits for the network. `--cores split` applies the hybrid-core
-placement above.
+on worker threads, so the control loop never waits for the network. The hybrid-core placement above is on by
+default (`--cores default` turns it off).
 
 ## Limitations
 

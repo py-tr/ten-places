@@ -81,6 +81,10 @@ def main():
              "| row | full tables | 95% CI | seeds 0-9 | mean steps | " + " | ".join(KEYS) + " |",
              "|---|---|---|---|---|" + "---|" * len(KEYS)]
     for i, row in enumerate(args.rows):
+        if row == "torch" and not torch.cuda.is_available():
+            print("[torch] skipped: the PyTorch reference row needs a CUDA device; the OpenVINO rows run on any Intel CPU",
+                  flush=True)
+            continue
         if row != "torch":
             precompile(sources, row, args.calib_cache)
         spec = {"kind": "skills", "runs": runs, "exec_settings": exec_settings, "checkpoints": selected,

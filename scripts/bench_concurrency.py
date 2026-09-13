@@ -209,6 +209,9 @@ def main():
     ap.add_argument("--quick", action="store_true", help="20 s windows, no hyper-threading scenario")
     ap.add_argument("--dry-run", action="store_true", help="tiny synthetic models instead of ours")
     args = ap.parse_args()
+    import torch
+
+    torch.set_num_threads(1)  # as scripts/run_agent.py: pre/post-processing only; OpenVINO owns the control threads
     seconds = min(args.seconds, 20.0) if args.quick else args.seconds
     topo = cores.topology()
     # The defaults are the pinned placement (scenario e); a', c, d are measured against its unpinned form.

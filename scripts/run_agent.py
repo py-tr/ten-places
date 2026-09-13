@@ -44,7 +44,7 @@ def main():
     ap.add_argument("--push", action="append", default=[], metavar="T:BODY:DX:DY[:DUR]",
                     help="slide BODY (plate, cup, spoon, fork) by DX, DY metres over DUR s (default 0.25) at "
                          "simulated time T, e.g. 20:plate:0:-0.07; finished steps are re-checked and redone")
-    ap.add_argument("--cores", default="default", choices=["default", "split"],
+    ap.add_argument("--cores", default="split", choices=["default", "split"],
                     help="split: policy + camera check on P-cores, VLM planner on E-cores (tenplaces.cores)")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--runs", nargs="+", default=["out/train/skills_v1", "out/train/skills_v2", "out/train/skills_ctx",
@@ -54,6 +54,11 @@ def main():
     ap.add_argument("--calib-cache", default="data/table_v1_skill_cache")
     ap.add_argument("--video", default=None)
     args = ap.parse_args()
+    import torch
+
+    # The policy's pre/post-processing is 3 small images and a 12-D vector; torch's default (14 OpenMP threads over
+    # P- and E-cores on the i5-13600KF) competes with OpenVINO's control threads. One thread; OpenVINO does the work.
+    torch.set_num_threads(1)
 
     # Load the models first, so a spoken command is acted on as soon as it is transcribed.
     control_cfg = planner_cfg = None

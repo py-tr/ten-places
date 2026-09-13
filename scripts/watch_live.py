@@ -65,7 +65,7 @@ def run_agent(seed: int, command: str, runs, backend: str, view: LiveView):
     from tenplaces.planner import VLMPlanner
     from tenplaces.skill_policies import SkillPolicies
 
-    kw = dict(device="cuda") if backend == "torch" else dict(backend=backend)
+    kw = dict(device="cuda") if backend == "torch" else dict(backend=backend, calib_cache="data/table_v1_skill_cache")
     policy = SkillPolicies(runs, n_action_steps=10, **kw)
     planner = VLMPlanner()
     _, grade = run_command(policy, planner, command, seed, on_frame=lambda ep, obs: view.sync(ep.m, ep.d))
@@ -80,9 +80,13 @@ def main():
     ap.add_argument("--command", default="set the table")
     ap.add_argument("--runs", nargs="+", default=["out/train/skills_v1", "out/train/skills_v2", "out/train/skills_ctx",
                                                   "out/train/skills_ctx2"])
-    ap.add_argument("--backend", default="torch", choices=["torch", "ov-fp32", "ov-w8"])
+    ap.add_argument("--backend", default="ov-w8", choices=["torch", "ov-fp32", "ov-w8"],
+                    help="ov-w8 (default) is what the robot runs and needs no NVIDIA GPU; torch runs on CUDA")
     ap.add_argument("--speed", type=float, default=1.0)
     args = ap.parse_args()
+    import torch
+
+    torch.set_num_threads(1)  # as scripts/run_agent.py: pre/post-processing only; OpenVINO owns the control threads
     runs = [r for r in args.runs if Path(r).is_dir()]
     view = LiveView(args.speed)
     try:

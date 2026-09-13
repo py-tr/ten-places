@@ -1,6 +1,6 @@
 """Adapter: a trained LeRobot policy checkpoint as a `tenplaces.evaluate` policy (reset / select_action).
 
-backend: "torch" (any torch device), "ov-fp32" or "ov-int8" (OpenVINO on the Intel CPU; only the ACT
+backend: "torch" (any torch device), "ov-fp32", "ov-w8" (INT8 weights; what the robot runs) or "ov-int8" (INT8 weights + activations; rejected, 7/20) (OpenVINO on the Intel CPU; only the ACT
 network changes, normalisation / action queue / temporal ensembling stay LeRobot's).
 Execution settings that need no retraining:
   n_action_steps  - how many actions of each predicted chunk to execute before re-planning

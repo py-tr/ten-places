@@ -4,7 +4,7 @@ RUN ?= out/train/act_handoff_v1
 STEPS ?= 20000
 CKPT ?= $(RUN)/checkpoints/075000/pretrained_model
 
-SKILL_RUNS ?= out/train/skills_v1 out/train/skills_v2 out/train/skills_ctx2
+SKILL_RUNS ?= out/train/skills_v1 out/train/skills_v2 out/train/skills_ctx
 CMD ?= set the table
 SEED ?= 0
 .DEFAULT_GOAL := test
