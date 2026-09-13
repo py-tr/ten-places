@@ -74,6 +74,8 @@ def main():
         rows.append(r)
         print(json.dumps(r), flush=True)
     shutil.rmtree(CACHE, ignore_errors=True)
+    if CACHE.exists():  # a locked file on Windows can leave the ~3.7 GB cache behind; say so rather than fill the disk
+        print(f"could not delete {CACHE}; remove it by hand", flush=True)
     out = OUT / "benchmark"
     out.mkdir(parents=True, exist_ok=True)
     (out / "compile_cache.json").write_text(json.dumps({"repeats": args.repeats, "rows": rows}, indent=1))
