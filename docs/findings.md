@@ -16,8 +16,8 @@ only with selections frozen beforehand. Every number comes from the script named
 - **Temporal ensembling, made affordable by OpenVINO.** The spoon hand-off froze at the pause before arm A lets go
   (3/10 re-planning every 10 actions, 4/10 with 1.7× more time). A forward pass every control step, blending
   overlapping action chunks, carries the release through: 10/10, no retraining. Drawer: 15/20 → 20/20
-  (`scripts/eval_skill_variants.py`). This needs one network call per 40 ms step: OpenVINO INT8 weights (17 ms) fits,
-  PyTorch on the same CPU (42–47 ms) does not.
+  (`scripts/eval_skill_variants.py`). This needs one network call per 40 ms step: OpenVINO INT8 weights (16 ms) fits,
+  PyTorch on the same CPU (39–45 ms) does not.
 
 ## Making skills that work alone work in a chain
 
