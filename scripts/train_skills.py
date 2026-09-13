@@ -48,6 +48,13 @@ def main():
                     help="delete the checkpoints' optimizer state (~400 MB each); evaluation and --init-from don't need it")
     args = ap.parse_args()
     manifest = json.loads((ROOT / args.data / "tenplaces_manifest.json").read_text())
+    # A joint that never moves in the demo set (the idle arm) has a spread of ~0; MEAN_STD normalisation then divides
+    # its numerical wobble by ~eps and the policy breaks (a drawer fine-tune: 0/50 against 44/50). Refuse, and say how.
+    stats = json.loads((ROOT / args.data / "meta" / "stats.json").read_text())
+    tiny = {k: [i for i, s in enumerate(stats[k]["std"]) if s < 1e-4] for k in ("action", "observation.state")}
+    if any(tiny.values()):
+        sys.exit(f"{args.data}: near-zero spread in {tiny} (a joint that never moves). Fine-tune with the parent's "
+                 f"statistics: python scripts/use_parent_stats.py --data {args.data} --parent-data <parent's dataset>")
     skills = args.skills or list(manifest["skills"])
     env = {**os.environ, "TENPLACES_CACHE": args.cache, "PYTHONIOENCODING": "utf-8"}
     if args.amp:
