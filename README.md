@@ -23,8 +23,8 @@ Verifier  ── adds physical prerequisites (cutlery needs the drawer open; the
         │
         ▼
 One ACT policy per skill (3 cameras + joints → 12 joint targets at 25 Hz), OpenVINO INT8 weights
-        │   between skills: grippers released, arms home; after each: camera classifier (ResNet18, OpenVINO, 8 ms)
-        │   → done / retry / re-plan; finished steps are re-checked before the next one
+        │   between skills: grippers released, arms home; after each: camera classifier (ResNet18, OpenVINO, 5–6 ms)
+        │   → done / retry / re-queue the unfinished steps; finished steps are re-checked before the next one
         ▼
 MuJoCo: two SO-101 arms, randomised dinner table
 ```
@@ -52,9 +52,12 @@ changes the plan after the current step, verified like any plan. The robot answe
 
 | Run | Full tables (95% CI) | Mean steps of 5 | Drawer | Spoon | Plate | Fork | Cup |
 |---|---|---|---|---|---|---|---|
-| **Full agent on OpenVINO** (what the robot runs: re-checks, retries, re-plans) | **43/50 (74–93%)** | 4.76 | 50 | 47 | 47 | 45 | 49 |
-| Fixed five-step sequence, OpenVINO INT8 weights | 41/50 (69–90%) | 4.74 | 50 | 46 | 47 | 46 | 48 |
-| Fixed five-step sequence, PyTorch reference | 39/50 (65–87%) | 4.62 | 49 | 46 | 45 | 43 | 48 |
+| **Full agent on OpenVINO** (what the robot runs: re-checks, repairs, re-queues failed steps) | **43/50 (74–93%)** | 4.76 | 50 | 47 | 47 | 45 | 49 |
+| Fixed five-step sequence (plate, fork, cup retried once), OpenVINO INT8 weights | 41/50 (69–90%) | 4.74 | 50 | 46 | 47 | 46 | 48 |
+| Fixed five-step sequence, PyTorch reference (CUDA GPU) | 39/50 (65–87%) | 4.62 | 49 | 46 | 45 | 43 | 48 |
+
+Task success does not depend on inference speed: the simulation waits for each action, so the GPU reference and the
+CPU rows differ only in the numbers the networks compute.
 
 OpenVINO INT8 and PyTorch are indistinguishable per seed (5 tables differ one way, 3 the other; McNemar p = 0.73).
 The configuration was chosen on 50 separate tuning tables (seeds 100–149), where it set 41/50 with PyTorch. The
@@ -62,8 +65,8 @@ submission video shows the first 10 seeds as a grid with pass/fail per seed.
 
 | Component | Result | Evidence |
 |---|---|---|
-| Demonstration runs: 10 tables, 10 requests fixed before recording (2 spoken, 1 changed mid-run), full agent on OpenVINO | 9/10 done exactly as asked; seed 4's plate missed four times, each miss caught by the camera | `scripts/score_demo.py`, `out/video/demo/summary.md` |
-| Planner: unseen commands → correct verified plan | 10/10; 8/8 on a later set, incl. naming what no skill can do ("dim the lights") | `scripts/eval_planner.py` |
+| Demonstration runs: 10 tables, 10 requests fixed before recording (2 spoken, 1 changed mid-run by a scripted sentence), full agent on OpenVINO | 9/10 done exactly as asked; seed 4's plate missed four times, each miss caught by the camera | `scripts/score_demo.py`, `out/video/demo/summary.md` |
+| Planner: unseen commands → correct verified plan | 8/8 on the set written before it was scored, incl. naming what no skill can do ("dim the lights"); 10/10, 5/5 and 4/6 on the three sets used while writing the prompts | `scripts/eval_planner.py` |
 | Mid-run spoken changes understood | 8/10 on sentences written before the run | `scripts/eval_amend.py --set fresh` |
 | Camera classifier on learned-policy states | false "drawer done" 3/363, false "spoon done" 1/671 | `docs/findings.md` |
 | Scripted demonstrator (training data) | 60/60 full tables, 72/72 verified subset plans | `make spike-table` |
@@ -78,7 +81,7 @@ is in [`docs/findings.md`](docs/findings.md).
 
 | Variant | Latency median (p95) | Throughput | IR size |
 |---|---|---|---|
-| PyTorch FP32 eager (CPU) | 39–45 ms (45–48) | – | – |
+| PyTorch FP32 eager (CPU, its default 14 threads) | 39–45 ms (45–48) | – | – |
 | OpenVINO FP32 (drawer, cup) | 18.4–19.5 ms (21–22) | 85–92 inf/s | 130.5 MB |
 | **OpenVINO INT8 weights** (deployed) | **15.5–15.8 ms** (17–20) | 109–112 inf/s | 33.0 MB |
 | … E-cores only | 37–66 ms | – | – |
@@ -95,8 +98,8 @@ while the 4B planner generates, 60 s per placement (`scripts/bench_concurrency.p
 | … + pinned threads (`--cores split`, `tenplaces/cores.py`) | 29 / 55 ms | 6% | 5.9 s |
 
 Left to the OS, the planner makes almost every control step late. Splitting the cores fixes that at the cost of a
-slower planner (4.2 → 5.5 s). Hyper-threading and pinning trade places between runs (an earlier run: 10% vs 5% late);
-the split itself helps in every run.
+slower planner (4.2 → 5.5 s). The robot ships the pinned placement (6% late); hyper-threading on measured 0% in this
+run and is not shipped.
 
 **Power and energy** — CPU package power logged by HWiNFO64 (package, not wall power), cup policy, 60 s per phase
 (`scripts/power_bench.py`, `out/benchmark/power.md`):
@@ -121,11 +124,12 @@ What the optimisation buys:
   every core: median 7.1 s against 14.3 s on the E-cores, same plans (10 demo commands,
   `scripts/bench_planner_placement.py`). Everything asked while the arms move — the check for impossible parts
   ("light a candle"), spoken changes — stays on the E-cores.
-- **Energy.** INT8 weights use 2.5× less energy per inference than PyTorch on the same CPU (1.43 vs 3.50 J above
-  idle); at the robot's 25 Hz, P-core placement draws 7 W less than default scheduling.
-- Every model in the loop runs on OpenVINO: the policies (INT8 weights), the planner (Qwen3-VL-4B INT4, OpenVINO
-  GenAI) and the camera classifier (ResNet18, 7.8 ms). Every script takes `--device`, so the same code targets the
-  CPU, iGPU or NPU of a Core Ultra.
+- **Energy.** INT8 weights use 2.4× less energy per inference than PyTorch at its default 14 threads on the same
+  CPU (1.43 vs 3.50 J above idle); at the robot's 25 Hz, P-core placement draws 7 W less than default scheduling.
+- Every model that runs on the machine runs on OpenVINO: the policies (INT8 weights), the planner (Qwen3-VL-4B INT4,
+  OpenVINO GenAI) and the camera classifier (ResNet18, 5–6 ms); speech is Speechmatics' cloud service. The benchmark
+  and evaluation scripts take `--device` and `benchmark.py` lists the machine's OpenVINO devices; the hybrid-core
+  placement is CPU-only, and the Core Ultra iGPU/NPU paths are untested here.
 
 ## The scene
 
@@ -198,8 +202,8 @@ default (`--cores default` turns it off).
   plate policy never learned to re-place one (`docs/findings.md`).
 - Learned rollouts are repeatable only up to rendering (a new OpenGL context can shift a few pixels by one intensity
   level), so results are reported over 50 seeds with confidence intervals.
-- Benchmarked on a desktop Intel CPU without iGPU or NPU; the Core Ultra iGPU/NPU paths are supported by `--device`
-  but not measured here.
+- Measured on a desktop Intel CPU without iGPU or NPU (no Core Ultra was available); on a Core Ultra,
+  `scripts/benchmark.py --device GPU` or `NPU` is the path to try, untested here.
 
 ## Layout
 
@@ -210,7 +214,7 @@ tenplaces/oracle/                    scripted privileged-state controllers (demo
 tenplaces/env.py, env_table.py       25 Hz episode environments, demo recording, hand-over between skills
 tenplaces/planner.py                 VLM planner (OpenVINO GenAI) + symbolic verifier
 tenplaces/state_classifier.py        camera-only task-state classifier (OpenVINO)
-tenplaces/agent.py                   command → plan → per-skill policy → check → retry / re-plan
+tenplaces/agent.py                   command → plan → per-skill policy → check → retry / re-queue
 tenplaces/voice.py, listen.py, speak.py   Speechmatics speech-to-text, live listening, text-to-speech
 tenplaces/evaluate*.py, grader*.py   closed-loop evaluation and success predicates
 tenplaces/lerobot_policy.py, skill_policies.py, ov_backend.py   policies and their OpenVINO backends
@@ -221,7 +225,7 @@ tenplaces/demo_video.py              demo renderer with the live plan panel
 | Challenge deliverable | Where |
 |---|---|
 | Reproducible repository | this repo, `Makefile` |
-| MuJoCo simulation with randomisation and evaluation config | `tenplaces/scene_table.py`, `tenplaces/randomize.py`, `scripts/final_report.py` |
+| MuJoCo simulation with randomisation and evaluation config | `tenplaces/scene_table.py` (`sample()`), `scripts/final_report.py` |
 | Intel inference benchmark | `scripts/benchmark.py`, `scripts/bench_concurrency.py` |
 | Video across 10 randomised seeds | `scripts/final_report.py --videos 10` + `scripts/make_grid_video.py` |
 | Technical README / architecture | this file, `docs/findings.md` |

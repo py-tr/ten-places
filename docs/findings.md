@@ -10,9 +10,12 @@ only with selections frozen beforehand. Every number comes from the script named
   ignore it (same scene with each of the five one-hots → action chunks differ by ≤ 0.1) and inferred the phase from
   the cameras, so a planner could not steer it; it also froze at the hand-off, where the demos pause briefly and the
   policy has no sense of time. One skill-conditioned ACT: 1/10 full tables, 2.3/5 steps (`scripts/eval_table_checkpoints.py`).
-- **Context shift.** Skills trained only on full tables fail when a subset command skips a step: the cup scored 10/10
-  when the plate had been moved and 5/10 when not. Demonstrations from every start a verified plan can produce fixed
-  it: cup 15/30 → 29/30 with the plate not moved, 40/40 when it had been (`scripts/eval_skill_context.py`).
+- **Context shift.** Skills trained only on full tables fail when a subset command skips a step: the cup fails when
+  the plate has not been moved. Demonstrations from every start a verified plan can produce fixed it. On tuning seeds
+  100–129, 30 tables per start: with the plate not moved (3 starts) 54/90 → 80/90, with it moved (4 starts)
+  113/120 → 118/120 (`scripts/eval_skill_context.py --seeds 100 130`, `out/eval/context/cup_*_seeds100-129.md`).
+  The deployed cup was first chosen on seeds 0–9 (15/30 → 29/30), inside the reporting set; this re-check on the
+  tuning seeds confirms the choice.
 - **Temporal ensembling, made affordable by OpenVINO.** The spoon hand-off froze at the pause before arm A lets go
   (3/10 re-planning every 10 actions, 4/10 with 1.7× more time). A forward pass every control step, blending
   overlapping action chunks, carries the release through: 10/10, no retraining. Drawer: 15/20 → 20/20
@@ -28,7 +31,7 @@ Each skill scored ~90–100% started by the scripted controller, yet the chain o
 |---|---|---|
 | Per-skill ACT, each step alone from a realistic start (20k steps each), 10 held-out seeds | drawer 10/10, cup 10/10, plate 4/10, spoon 0/10, fork 0/10 | `scripts/watch_skill_evals.py` |
 | Plate: demos weighted to hard layouts + takeover demos (learned policy starts, scripted controller finishes), 10k-step fine-tune, seeds 100–119 | 14/20 → **20/20** | `scripts/eval_skill_checkpoints.py` |
-| Spoon vs drawer opening (8 / 9 / 10 cm), before → after demos with varied openings | 5/10, 10/10, 0/10 → 10/10, 10/10, 2/10 | `scripts/eval_skill_checkpoints.py --drawer-open` |
+| Spoon vs drawer opening (8 / 9 / 10 cm), before → after demos with varied openings | 4/10, 10/10, 0/10 → 10/10, 10/10, 2/10 | `scripts/eval_skill_checkpoints.py --drawer-open` |
 | Fork cut off by its time budget (seen on video) → longer caps, seeds 100–109 | fork 0 → 3/10 | `scripts/eval_table_budgets.py` |
 | Release the grippers and return home between skills (the state every demonstration starts from), seeds 100–119 | 4/20 → **10/20** full tables, 2.70 → 4.05 of 5 steps | `scripts/eval_table_home.py` |
 | Drawer runs its whole budget instead of stopping at the camera's "done" (≥ 6 cm; the cutlery needs ~7.4), seeds 100–119 | spoon after the learned drawer 12/20 → 16/20; 10/20 → 15/20 full tables | `scripts/eval_table_home.py` |
