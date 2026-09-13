@@ -107,21 +107,21 @@ def main():
     rows = [{"variant": "pytorch", "precision": "FP32 (PyTorch eager)", "device": "CPU", "latency_ms_median": pt_med,
              "latency_ms_p95": pt_p95, "throughput_ips": None, "ir_mb": None, "success": None}]
     models = {}
-    for name, label in VARIANTS.items():
-        xml = ck / "openvino" / f"act_{name}.xml"
+    for variant, label in VARIANTS.items():  # not `name`: that is the output file's name
+        xml = ck / "openvino" / f"act_{variant}.xml"
         if not xml.exists():
-            print(f"skip {name}: {xml} not built (run an evaluation or int8_study with that variant)", flush=True)
+            print(f"skip {variant}: {xml} not built (run an evaluation or int8_study with that variant)", flush=True)
             continue
         model = core.read_model(xml)
-        models[name] = model
+        models[variant] = model
         compiled = core.compile_model(model, args.device, {"PERFORMANCE_HINT": "LATENCY"})
         med, p95 = timeit(lambda: compiled(feed), args.iters)
         ips, nreq = throughput(core, model, feed, args.device)
-        rows.append({"variant": name, "precision": label, "device": args.device, "latency_ms_median": med,
+        rows.append({"variant": variant, "precision": label, "device": args.device, "latency_ms_median": med,
                      "latency_ms_p95": p95, "throughput_ips": ips, "infer_requests": nreq,
                      "ir_mb": round(xml.with_suffix(".bin").stat().st_size / 2**20, 1),
                      "success": success_for(Path(args.success) if args.success else None,
-                                            {"fp32": "ov_fp32", "w8": "ov_w8", "a8w8_backbone": "int8_backbone", "a8w8": "ov_int8"}[name])})
+                                            {"fp32": "ov_fp32", "w8": "ov_w8", "a8w8_backbone": "int8_backbone", "a8w8": "ov_int8"}[variant])})
         print(json.dumps(rows[-1]), flush=True)
 
     sweep = []

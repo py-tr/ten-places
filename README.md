@@ -89,7 +89,8 @@ while the 4B planner generates (`scripts/bench_concurrency.py`):
 
 What the optimisation buys:
 - **Precision chosen by task success, not output error.** INT8 weights keep full-table success (23 vs 24 of 50);
-  INT8 activations in the transformer cost it (7/20 vs 19/20 on the hand-off), so they are not shipped.
+  INT8 activations in the transformer cost it (hand-off checkpoint: 7/20 against 13/20 for FP32 and 14/20 for INT8
+  weights on the same seeds, `docs/findings.md`), so they are not shipped.
 - **Latency spent on quality.** At 17 ms the policy can run every control step with temporal ensembling, which is
   what lets the spoon hand-off complete (3/10 → 10/10).
 - **Hybrid-core placement for concurrent workloads.** Real-time control on the P-cores, the VLM on the E-cores,

@@ -58,18 +58,20 @@ same start as a tray set there.
 
 ## OpenVINO precision study
 
-Hand-off checkpoint, 20 held-out seeds, task success re-measured in closed loop for every precision
-(`scripts/int8_study.py`; latencies measured while training ran on the same machine):
+One hand-off checkpoint (40k steps), 20 held-out seeds, task success re-measured in closed loop for every precision
+(`scripts/int8_study.py`, `out/int8_study/040000/int8_study.json`; latencies measured while training ran on the same
+machine):
 
-| Variant | Latency | Success |
+| Variant | Latency | Success (Wilson 95%) |
 |---|---|---|
-| OpenVINO FP32 | 34.6 ms | 19/20 |
-| INT8 weights only | 29.5 ms | 19/20 |
-| INT8 image encoder, transformer float | 29.1 ms | 17/20 |
-| INT8 everything (weights + activations) | 13.8 ms | 7/20 |
+| OpenVINO FP32 | 33.7 ms | 13/20 (0.43–0.82) |
+| INT8 weights only | 28.6 ms | 14/20 (0.48–0.86) |
+| INT8 image encoder (weights + activations), transformer float | 20.2 ms | 12/20 (0.39–0.78) |
+| INT8 everything (weights + activations) | 13.8 ms | 7/20 (0.18–0.57) |
 
-Quantising the transformer's activations is what costs task success; INT8 weights keep it. The deployed table
-policies run INT8 weights (16–17 ms on an idle machine, README).
+Quantising the transformer's activations is what costs task success; INT8 weights keep it. (The later 75k hand-off
+checkpoint scored 19/20 on both FP32 and INT8 weights, `scripts/eval_checkpoints.py`.) The deployed table policies
+run INT8 weights (16–17 ms on an idle machine, README).
 
 ## Disturbance repair (measured, not working yet)
 
