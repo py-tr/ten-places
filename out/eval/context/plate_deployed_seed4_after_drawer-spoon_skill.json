@@ -1,0 +1,23 @@
+{
+ "summary": {
+  "skill": "plate",
+  "label": "plate_deployed_seed4_after_drawer-spoon",
+  "episodes": 1,
+  "success": 0,
+  "rate": 0.0,
+  "wilson95": [
+   0.0,
+   0.793
+  ],
+  "mean_frames": 210.0
+ },
+ "rows": [
+  {
+   "seed": 4,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0935
+  }
+ ]
+}
