@@ -175,11 +175,13 @@ primitive.
 ```
 make third-party      # the official SO-101 model (TheRobotStudio/SO-ARM100) at the pinned commit
 pip install -r requirements-lock.txt
-make test             # 160 tests
+make test             # 164 tests
 make watch SEED=3                                        # scripted controller, live 3D viewer
 make watch-agent CMD="just the plate and the cup" SEED=3 # VLM plan + learned policies, live
 make agent CMD="set the table, but skip the cup" SEED=3  # rendered to out/video/ with the plan panel
-make bench                                               # OpenVINO benchmark
+make bench                                               # OpenVINO benchmark of the five deployed policies
+make report                                              # the 50 held-out tables (hours; PyTorch row needs CUDA)
+make grid                                                # score the 10 demo runs, tile them into one video
 ```
 
 `requirements-lock.txt` pins the exact environment every number was produced with (Python 3.13, openvino 2026.3.1,

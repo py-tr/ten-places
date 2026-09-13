@@ -15,8 +15,8 @@ third-party:
 	git clone https://github.com/TheRobotStudio/SO-ARM100.git third_party/SO-ARM100
 	git -C third_party/SO-ARM100 checkout $(SO_ARM_COMMIT)
 
-.PHONY: third-party scene spike spike-table demos table-demos train spike-ov bench skills skills-v2 eval-skills \
-	state-data state-clf eval-planner agent grid eval-context ctx-demos skills-ctx voice recover
+.PHONY: third-party scene spike spike-table demos table-demos train spike-ov bench bench-handoff skills skills-v2 \
+	report state-data state-clf eval-planner agent grid eval-context ctx-demos skills-ctx voice recover
 
 test:
 	$(PY) -m pytest -q
@@ -49,7 +49,18 @@ train:
 spike-ov:
 	$(PY) scripts/spike_act_openvino.py --root $(DATA) --checkpoint $(CKPT)
 
+# Intel deliverable 3: the five deployed skill policies (out/eval/selected_checkpoints.json, plus the cup), one report
+# each in out/benchmark/<skill>_<step>.md, with the machine's OpenVINO devices listed at the top.
+DEPLOYED ?= out/train/chain_t2_drawer/drawer/checkpoints/007500/pretrained_model \
+    out/train/cutlery_t1/spoon/checkpoints/010000/pretrained_model \
+    out/train/plate_t1/plate/checkpoints/005000/pretrained_model \
+    out/train/cutlery_t1/fork/checkpoints/007500/pretrained_model \
+    out/train/skills_ctx/cup/checkpoints/015000/pretrained_model
 bench:
+	for ck in $(DEPLOYED); do $(PY) scripts/benchmark.py --checkpoint $$ck || exit 1; done
+
+# The first single hand-off policy (before the table task), kept for the precision study in docs/findings.md.
+bench-handoff:
 	$(PY) scripts/benchmark.py --checkpoint $(CKPT)
 
 # One ACT per skill (20k steps each), then spoon/fork/plate fine-tuned +40k from those weights.
@@ -60,14 +71,19 @@ skills-v2:
 	$(PY) scripts/train_skills.py --out out/train/skills_v2 --skills spoon fork plate \
 		--init-from out/train/skills_v1 --init-step 20000 --steps 40000
 
-# Full table on held-out seeds: sequencer + camera classifier, PyTorch and OpenVINO rows.
-eval-skills:
-	$(PY) scripts/eval_skills.py --runs $(SKILL_RUNS) --name skills_mixed --seeds 0 10 --videos 10
+# The reported numbers: the 50 held-out tables (seeds 0-49) with the frozen selections, as report 5 ran them — the
+# fixed sequence on PyTorch (needs CUDA) and OpenVINO INT8 weights, then the full agent on OpenVINO.
+# Tuning seeds instead: make report REPORT_SEEDS="100 150".
+REPORT_SEEDS ?= 0 50
+report:
+	$(PY) scripts/final_report.py --seeds $(REPORT_SEEDS) --rows torch ov_w8 --videos 10 --workers 4 --home-frames 20 --out out/eval/final
+	$(PY) scripts/eval_agent_table.py --seeds $(REPORT_SEEDS) --report --backend ov-w8 --workers 4 --name ov_w8_report
 
 # Context shift: each skill from every start a verified subset plan can give it, then demos from those starts.
 eval-context:
-	$(PY) scripts/eval_skill_context.py --skill cup --runs out/train/skills_v1
-	$(PY) scripts/eval_skill_context.py --skill cup --runs out/train/skills_v1 out/train/skills_ctx --name cup_ctx
+	$(PY) scripts/eval_skill_context.py --skill cup --runs out/train/skills_v1 --seeds 100 130 --name cup_v1_seeds100-129
+	$(PY) scripts/eval_skill_context.py --skill cup --runs out/train/skills_v1 out/train/skills_ctx --seeds 100 130 \
+		--name cup_ctx_seeds100-129
 
 ctx-demos:
 	$(PY) scripts/record_context_demos.py --skills cup --episodes 80 --root data/table_ctx_cup
@@ -95,8 +111,7 @@ eval-planner:
 	$(PY) scripts/eval_amend.py --set heldout
 	$(PY) scripts/eval_amend.py --set dev
 
-# Knock the plate off mid-run; the camera re-check puts it back. make recover SEED=3
-# Knock the plate off its mat mid-run. A known failure with the learned system (README "Disturbances"): the camera
+# make recover SEED=3 — knock the plate off its mat mid-run. A known failure with the learned system (README "Disturbances"): the camera
 # misses it unless it slides back toward its start, and the plate policy never re-placed a displaced plate (0/44).
 recover:
 	$(PY) scripts/run_agent.py --command "set the table" --seed $(SEED) --push "after-plate:plate:0:-0.07" \
@@ -117,6 +132,8 @@ watch:
 watch-agent:
 	$(PY) scripts/watch_live.py --command "$(CMD)" --seed $(SEED)
 
-# Intel deliverable 4: the 10 held-out seeds from eval-skills tiled into one video with PASS/FAIL stamps.
+# Intel deliverable 4: the 10 pre-registered demonstration runs (configs/demo_seeds.json, out/video/demo/seed<N>.*)
+# scored against their commands and tiled into one video with PASS/FAIL stamps.
 grid:
-	$(PY) scripts/make_grid_video.py --dir out/eval/skills_mixed --label torch_clf --out out/video/grid_10_seeds.mp4
+	$(PY) scripts/score_demo.py
+	$(PY) scripts/make_grid_video.py --dir out/video/demo --label demo --out out/video/grid_demo.mp4

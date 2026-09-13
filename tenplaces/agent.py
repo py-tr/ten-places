@@ -322,8 +322,10 @@ def run_command(policy, planner, command: str, seed: int, budgets=None, max_atte
             pool = amender.pool if amender is not None else ThreadPoolExecutor(max_workers=1, thread_name_prefix="cannot")
             later["own_pool"] = None if amender is not None else pool
             later["unsupported"] = pool.submit(planner.cannot_do, command)
+    # replanned_from: the first plan was empty and this one came from the command without its impossible part.
     event("plan", command=command, proposed=plan["proposed"], steps=plan["steps"], corrections=plan["corrections"],
-          unsupported=plan.get("unsupported", []), ms=round(plan["ms"]))
+          unsupported=plan.get("unsupported", []), ms=round(plan["ms"]),
+          **({"replanned_from": plan["replanned_from"]} if plan.get("replanned_from") else {}))
     queue, replans = list(plan["steps"]), 0
     wanted = list(plan["steps"])  # what the person currently wants: the plan, then every spoken change
     started_any = False  # the first skill starts from the episode's initial pose; later ones after go_home

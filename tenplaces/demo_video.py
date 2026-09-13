@@ -37,7 +37,8 @@ class DemoRecorder:
         self.fps, self.frames, self.t_start = fps, 0, 0.0
         self._last, self.hold_frames = None, int(hold_s * fps)
         self.state = {"command": "", "proposed": [], "steps": [], "corrections": [], "current": None,
-                      "checks": [], "planner_ms": None, "heard": [], "notes": [], "unsupported": [], "said": ""}
+                      "checks": [], "planner_ms": None, "heard": [], "notes": [], "unsupported": [], "said": "",
+                      "replanned_from": None}
         self.f_big, self.f, self.f_small = _font(26), _font(20), _font(16)
 
     @property
@@ -61,6 +62,7 @@ class DemoRecorder:
             s["proposed"] = e.get("proposed", s["proposed"])
             s["steps"], s["corrections"], s["planner_ms"] = e["steps"], e["corrections"], e.get("ms")
             s["unsupported"] = e.get("unsupported", s["unsupported"])
+            s["replanned_from"] = e.get("replanned_from") if e["kind"] == "plan" else s["replanned_from"]
         elif e["kind"] == "unsupported":  # the check that runs while the arms already move
             s["unsupported"] = e.get("items", [])
         elif e["kind"] == "amend":
@@ -150,6 +152,9 @@ class DemoRecorder:
         if s["unsupported"]:
             for line in _wrap("no skill for: " + ", ".join(s["unsupported"]), 46):
                 y = text(y, line, self.f_small, (255, 130, 130), 20)
+        if s["replanned_from"]:  # the whole command gave no plan; this one is from the part the skills can do
+            for line in _wrap(f'planned again from: "{s["replanned_from"]}"', 46):
+                y = text(y, line, self.f_small, (255, 130, 130), 20)
         for c in s["corrections"][:3]:
             for line in _wrap("verifier: " + c, 46):
                 y = text(y, line, self.f_small, (255, 170, 120), 20)
@@ -159,7 +164,10 @@ class DemoRecorder:
         y += 8
         live = getattr(self.voice, "partial", "") if self.voice is not None else ""
         if s["heard"] or live:
-            y = text(y, "Heard while working (Speechmatics)", self.f_small, head, 22)
+            # A scripted sentence (run_agent.py --say) is not speech: say so rather than credit Speechmatics.
+            scripted = type(self.voice).__name__ == "ScriptedVoice"
+            y = text(y, "Said while working (scripted, fixed time)" if scripted else "Heard while working (Speechmatics)",
+                     self.f_small, head, 22)
             for said in s["heard"][-2:]:
                 for line in _wrap(f'"{said}"', 42):
                     y = text(y, line, self.f_small, (255, 255, 255), 20)

@@ -28,7 +28,11 @@ def score(entry: dict, run: dict) -> dict:
                         for i in (e.get("unsupported") or e.get("items") or [])]
     expected = verify(entry["expected_steps"])[0]
     done = [s for s in GRADE_KEY if run["grade"].get(GRADE_KEY[s])]
-    ok = done == expected and (not entry.get("expected_unsupported") or bool(said_unsupported))
+    # Every expected refusal must be named, and nothing refused that the command did not ask for.
+    want = [w.lower() for w in entry.get("expected_unsupported", [])]
+    said = " | ".join(said_unsupported).lower()
+    refusals_ok = all(w in said for w in want) if want else not said_unsupported
+    ok = done == expected and refusals_ok
     return {"seed": entry["seed"], "mode": entry["mode"], "command": entry["command"], "heard": run["command"],
             "say": entry.get("say", ""), "plan": ev.get("plan", {}).get("steps", []), "expected": expected,
             "done": done, "unsupported": said_unsupported, "plan_s": round(ev.get("plan", {}).get("ms", 0) / 1000, 1),
