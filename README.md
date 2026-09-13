@@ -6,8 +6,9 @@ steps, learned ACT policies drive both arms from the cameras, and a camera class
 Intel CPU with OpenVINO.
 
 Built for the Intel online challenge *Bimanual VLA Manipulation with Multi-Modal Reasoning* (AI Infra Summit
-Hackathon 2026). Every number below comes from the script or result file named next to it; evaluation seeds 0–49
-are never used for training or for choosing anything.
+Hackathon 2026). Every number below comes from the script or result file named next to it. Evaluation seeds 0–49 are
+never used for training; choices are made on tuning seeds 100–149 (two early ones, made on seeds 0–29, were re-checked
+there and held — `docs/findings.md`).
 
 ## How it works
 
@@ -32,8 +33,10 @@ MuJoCo: two SO-101 arms, randomised dinner table
 **Why a VLM above small learned policies.** Language and scene understanding live in the vision-language model;
 the visuomotor policies that move the arms are small ACT models (one of the candidate policies the challenge names),
 trained here in MuJoCo with LeRobot. The split is a latency decision: at 16 ms per forward pass on the CPU (OpenVINO
-INT8 weights), a policy can run every 40 ms control step and blend overlapping action chunks, which is what lets the
-spoon hand-off complete (3/10 → 10/10 without it). A large end-to-end VLA predicts open-loop chunks — for scale,
+INT8 weights), a policy can run every 40 ms control step and blend overlapping action chunks, which keeps it
+closed-loop through contact. On the 50 tuning tables the spoon hand-off fails when the policy re-plans every 10
+actions (4/50) and completes with ensembling (43/50), as it does executing whole 50-action chunks (44/50); on the
+drawer ensembling is ahead (20/20 against 18/20 and 15/20, seeds 100–119). A large end-to-end VLA predicts open-loop chunks — for scale,
 Intel's π0.5 reference takes 294 ms per inference with stock PyTorch on a Core Ultra X7 358H at 40 W
 ([Intel](https://docs.openedgeplatform.intel.com/2026.1/OEP-articles/publications/optimizing-pi0.5-lva-model.html)).
 Measured on this i5: LeRobot's SmolVLA (450M parameters) takes 6.6 s per 50-action chunk with stock PyTorch —
@@ -117,8 +120,9 @@ What the optimisation buys:
 - **Precision chosen by task success, not output error.** INT8 weights keep full-table success (41 vs 39 of 50);
   INT8 activations in the transformer cost it (hand-off checkpoint: 7/20 against 13/20 for FP32 and 14/20 for INT8
   weights on the same seeds, `docs/findings.md`), so they are not shipped.
-- **Latency spent on quality.** At 16 ms the policy can run every control step with temporal ensembling, which is
-  what lets the spoon hand-off complete (3/10 → 10/10).
+- **Latency spent on quality.** At 16 ms the policy can run every control step with temporal ensembling: the drawer
+  20/20 against 18/20 open-loop and 15/20 re-planning every 10 actions (seeds 100–119); the spoon hand-off 43/50
+  against 4/50 re-planning every 10 actions (open-loop whole chunks: 44/50, seeds 100–149).
 - **Hybrid-core placement for concurrent workloads.** Real-time control on the P-cores, the VLM on the E-cores:
   the arms keep 25 Hz while the planner thinks. The first plan comes while the arms are still, so it runs on
   every core: median 7.1 s against 14.3 s on the E-cores, same plans (10 demo commands,

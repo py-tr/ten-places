@@ -17,9 +17,11 @@ only with selections frozen beforehand. Every number comes from the script named
   The deployed cup was first chosen on seeds 0–9 (15/30 → 29/30), inside the reporting set; this re-check on the
   tuning seeds confirms the choice.
 - **Temporal ensembling, made affordable by OpenVINO.** The spoon hand-off froze at the pause before arm A lets go
-  (3/10 re-planning every 10 actions, 4/10 with 1.7× more time). A forward pass every control step, blending
-  overlapping action chunks, carries the release through: 10/10, no retraining. Drawer: 15/20 → 20/20
-  (`scripts/eval_skill_variants.py`). This needs one network call per 40 ms step: OpenVINO INT8 weights (16 ms) fits,
+  when the policy re-planned every 10 actions. A forward pass every control step, blending overlapping action chunks,
+  carries the release through, no retraining. Tuning seeds 100–149, spoon: 4/50 re-planning every 10 actions, 43/50
+  with ensembling — and 44/50 executing whole 50-action chunks open-loop, so for the spoon the fix is not re-planning
+  mid-hand-off, not ensembling as such. Drawer, seeds 100–119: 15/20 every 10, 18/20 whole chunks, 20/20 ensembling
+  (`scripts/eval_skill_variants.py`). (First measured on seeds 0–9: spoon 3/10 → 10/10.) This needs one network call per 40 ms step: OpenVINO INT8 weights (16 ms) fits,
   PyTorch on the same CPU (39–45 ms) does not. An end-to-end VLA is out of reach here: LeRobot's SmolVLA (450M
   parameters) takes 6.6 s per 50-action chunk on this CPU in PyTorch (`scripts/bench_smolvla.py`, timing only).
 
@@ -57,6 +59,20 @@ The final row was chosen that way (41/50 on the tuning seeds) and holds on the r
 classifier-v3 row: PyTorch +15 / −0 tables (McNemar p < 0.001), OpenVINO +20 / −2 (p < 0.001), full agent 26 → 43
 (+21 / −4, PyTorch then, OpenVINO now). The agent's re-checks and retries add 3 tables and lose 1 over the fixed
 sequence (p = 0.62). Its 7 remaining losses: spoon 3, plate 2, fork 2.
+
+**Execution settings re-checked on the tuning seeds.** Spoon, plate, fork and cup had been given their execution
+setting on seeds 20–29 — a tuning split chosen when only seeds 0–9 were reported, inside today's reporting set. Re-run on seeds 100–149 with the deployed checkpoints (`eval_skill_variants.py --deployed
+--seeds 100 150`), with the rule fixed before the last results were in: keep the current setting unless another is
+better by a paired McNemar test at p < 0.05.
+
+| Skill | every 10 actions | whole 50-action chunks | ensembling | current | verdict |
+|---|---|---|---|---|---|
+| spoon | 4/50 | 44/50 | 43/50 | ensembling | keep (+3 / −2, p = 1.00) |
+| plate | 14/50 | 40/50 | 45/50 | ensembling | keep (best) |
+| fork | 42/50 | 49/50 | 49/50 | whole chunks | keep (tied best) |
+| cup | 49/50 | 50/50 | 50/50 | every 10 | keep (+1 / −0, p = 1.00) |
+
+Every setting holds, so the reported numbers stand. `--select` now refuses seeds below 100.
 
 **Drawer demos from genuinely stalled pulls (the fix that worked).** 100 new drawer demos
 (`scripts/record_chain_demos.py`): 60 start where a learned pull really stalled (release + home, then the scripted

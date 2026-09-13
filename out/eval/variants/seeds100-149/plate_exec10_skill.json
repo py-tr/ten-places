@@ -1,0 +1,366 @@
+{
+ "summary": {
+  "skill": "plate",
+  "label": "plate_exec10",
+  "episodes": 50,
+  "success": 14,
+  "rate": 0.28,
+  "wilson95": [
+   0.175,
+   0.417
+  ],
+  "mean_frames": 198.48
+ },
+ "rows": [
+  {
+   "seed": 100,
+   "skill": "plate",
+   "success": true,
+   "frames": 151,
+   "err_m": 0.0031
+  },
+  {
+   "seed": 101,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0961
+  },
+  {
+   "seed": 102,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.101
+  },
+  {
+   "seed": 103,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1009
+  },
+  {
+   "seed": 104,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0936
+  },
+  {
+   "seed": 105,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0054
+  },
+  {
+   "seed": 106,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0945
+  },
+  {
+   "seed": 107,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1114
+  },
+  {
+   "seed": 108,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0856
+  },
+  {
+   "seed": 109,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0934
+  },
+  {
+   "seed": 110,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1047
+  },
+  {
+   "seed": 111,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0991
+  },
+  {
+   "seed": 112,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0949
+  },
+  {
+   "seed": 113,
+   "skill": "plate",
+   "success": true,
+   "frames": 171,
+   "err_m": 0.0063
+  },
+  {
+   "seed": 114,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0044
+  },
+  {
+   "seed": 115,
+   "skill": "plate",
+   "success": true,
+   "frames": 141,
+   "err_m": 0.0056
+  },
+  {
+   "seed": 116,
+   "skill": "plate",
+   "success": true,
+   "frames": 141,
+   "err_m": 0.0057
+  },
+  {
+   "seed": 117,
+   "skill": "plate",
+   "success": true,
+   "frames": 161,
+   "err_m": 0.0046
+  },
+  {
+   "seed": 118,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0558
+  },
+  {
+   "seed": 119,
+   "skill": "plate",
+   "success": true,
+   "frames": 171,
+   "err_m": 0.0069
+  },
+  {
+   "seed": 120,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1066
+  },
+  {
+   "seed": 121,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0043
+  },
+  {
+   "seed": 122,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.096
+  },
+  {
+   "seed": 123,
+   "skill": "plate",
+   "success": true,
+   "frames": 161,
+   "err_m": 0.0022
+  },
+  {
+   "seed": 124,
+   "skill": "plate",
+   "success": true,
+   "frames": 171,
+   "err_m": 0.0051
+  },
+  {
+   "seed": 125,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0855
+  },
+  {
+   "seed": 126,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1409
+  },
+  {
+   "seed": 127,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1127
+  },
+  {
+   "seed": 128,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0995
+  },
+  {
+   "seed": 129,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0947
+  },
+  {
+   "seed": 130,
+   "skill": "plate",
+   "success": true,
+   "frames": 181,
+   "err_m": 0.0042
+  },
+  {
+   "seed": 131,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.003
+  },
+  {
+   "seed": 132,
+   "skill": "plate",
+   "success": true,
+   "frames": 171,
+   "err_m": 0.0058
+  },
+  {
+   "seed": 133,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1087
+  },
+  {
+   "seed": 134,
+   "skill": "plate",
+   "success": true,
+   "frames": 181,
+   "err_m": 0.0021
+  },
+  {
+   "seed": 135,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1062
+  },
+  {
+   "seed": 136,
+   "skill": "plate",
+   "success": true,
+   "frames": 211,
+   "err_m": 0.0027
+  },
+  {
+   "seed": 137,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0875
+  },
+  {
+   "seed": 138,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1057
+  },
+  {
+   "seed": 139,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0846
+  },
+  {
+   "seed": 140,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.088
+  },
+  {
+   "seed": 141,
+   "skill": "plate",
+   "success": true,
+   "frames": 191,
+   "err_m": 0.0036
+  },
+  {
+   "seed": 142,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1584
+  },
+  {
+   "seed": 143,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1456
+  },
+  {
+   "seed": 144,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1148
+  },
+  {
+   "seed": 145,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0913
+  },
+  {
+   "seed": 146,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1022
+  },
+  {
+   "seed": 147,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1071
+  },
+  {
+   "seed": 148,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0886
+  },
+  {
+   "seed": 149,
+   "skill": "plate",
+   "success": true,
+   "frames": 161,
+   "err_m": 0.0035
+  }
+ ]
+}

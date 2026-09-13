@@ -1,0 +1,366 @@
+{
+ "summary": {
+  "skill": "spoon",
+  "label": "spoon_ensemble",
+  "episodes": 50,
+  "success": 43,
+  "rate": 0.86,
+  "wilson95": [
+   0.738,
+   0.93
+  ],
+  "mean_frames": 333.66
+ },
+ "rows": [
+  {
+   "seed": 100,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0085
+  },
+  {
+   "seed": 101,
+   "skill": "spoon",
+   "success": true,
+   "frames": 321,
+   "err_m": 0.0082
+  },
+  {
+   "seed": 102,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0038
+  },
+  {
+   "seed": 103,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0045
+  },
+  {
+   "seed": 104,
+   "skill": "spoon",
+   "success": true,
+   "frames": 321,
+   "err_m": 0.002
+  },
+  {
+   "seed": 105,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0032
+  },
+  {
+   "seed": 106,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0039
+  },
+  {
+   "seed": 107,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0036
+  },
+  {
+   "seed": 108,
+   "skill": "spoon",
+   "success": true,
+   "frames": 321,
+   "err_m": 0.0016
+  },
+  {
+   "seed": 109,
+   "skill": "spoon",
+   "success": true,
+   "frames": 321,
+   "err_m": 0.004
+  },
+  {
+   "seed": 110,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0021
+  },
+  {
+   "seed": 111,
+   "skill": "spoon",
+   "success": false,
+   "frames": 450,
+   "err_m": 0.2236
+  },
+  {
+   "seed": 112,
+   "skill": "spoon",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.0066
+  },
+  {
+   "seed": 113,
+   "skill": "spoon",
+   "success": false,
+   "frames": 450,
+   "err_m": 0.2301
+  },
+  {
+   "seed": 114,
+   "skill": "spoon",
+   "success": true,
+   "frames": 331,
+   "err_m": 0.0046
+  },
+  {
+   "seed": 115,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0041
+  },
+  {
+   "seed": 116,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0011
+  },
+  {
+   "seed": 117,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0041
+  },
+  {
+   "seed": 118,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0041
+  },
+  {
+   "seed": 119,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0023
+  },
+  {
+   "seed": 120,
+   "skill": "spoon",
+   "success": true,
+   "frames": 321,
+   "err_m": 0.0033
+  },
+  {
+   "seed": 121,
+   "skill": "spoon",
+   "success": true,
+   "frames": 321,
+   "err_m": 0.004
+  },
+  {
+   "seed": 122,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0027
+  },
+  {
+   "seed": 123,
+   "skill": "spoon",
+   "success": true,
+   "frames": 321,
+   "err_m": 0.0021
+  },
+  {
+   "seed": 124,
+   "skill": "spoon",
+   "success": true,
+   "frames": 321,
+   "err_m": 0.0015
+  },
+  {
+   "seed": 125,
+   "skill": "spoon",
+   "success": true,
+   "frames": 321,
+   "err_m": 0.0033
+  },
+  {
+   "seed": 126,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0035
+  },
+  {
+   "seed": 127,
+   "skill": "spoon",
+   "success": false,
+   "frames": 450,
+   "err_m": 0.2469
+  },
+  {
+   "seed": 128,
+   "skill": "spoon",
+   "success": false,
+   "frames": 450,
+   "err_m": 0.2398
+  },
+  {
+   "seed": 129,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0029
+  },
+  {
+   "seed": 130,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0056
+  },
+  {
+   "seed": 131,
+   "skill": "spoon",
+   "success": true,
+   "frames": 321,
+   "err_m": 0.0018
+  },
+  {
+   "seed": 132,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.006
+  },
+  {
+   "seed": 133,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0043
+  },
+  {
+   "seed": 134,
+   "skill": "spoon",
+   "success": true,
+   "frames": 321,
+   "err_m": 0.0015
+  },
+  {
+   "seed": 135,
+   "skill": "spoon",
+   "success": true,
+   "frames": 321,
+   "err_m": 0.0064
+  },
+  {
+   "seed": 136,
+   "skill": "spoon",
+   "success": false,
+   "frames": 450,
+   "err_m": 0.2389
+  },
+  {
+   "seed": 137,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0045
+  },
+  {
+   "seed": 138,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0048
+  },
+  {
+   "seed": 139,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0062
+  },
+  {
+   "seed": 140,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0037
+  },
+  {
+   "seed": 141,
+   "skill": "spoon",
+   "success": true,
+   "frames": 321,
+   "err_m": 0.0025
+  },
+  {
+   "seed": 142,
+   "skill": "spoon",
+   "success": false,
+   "frames": 450,
+   "err_m": 0.2241
+  },
+  {
+   "seed": 143,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0041
+  },
+  {
+   "seed": 144,
+   "skill": "spoon",
+   "success": true,
+   "frames": 321,
+   "err_m": 0.0049
+  },
+  {
+   "seed": 145,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0016
+  },
+  {
+   "seed": 146,
+   "skill": "spoon",
+   "success": true,
+   "frames": 321,
+   "err_m": 0.006
+  },
+  {
+   "seed": 147,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.003
+  },
+  {
+   "seed": 148,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0028
+  },
+  {
+   "seed": 149,
+   "skill": "spoon",
+   "success": false,
+   "frames": 450,
+   "err_m": 0.2477
+  }
+ ]
+}
