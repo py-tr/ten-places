@@ -1,10 +1,11 @@
 {
- "command": "Lay a full setting, please.",
+ "command": "Lay a full place setting. Please.",
  "voice": {
   "source": "mic",
-  "partials": 7,
-  "ms_final_after_speech_end": 1054,
-  "s_total": 5.56
+  "audio": "out\\video\\demo\\seed1.command.wav",
+  "partials": 6,
+  "ms_final_after_speech_end": 1042,
+  "s_total": 6.07
  },
  "seed": 1,
  "backend": "ov-w8",
@@ -35,7 +36,7 @@
  },
  "events": [
   {
-   "command": "Lay a full setting, please.",
+   "command": "Lay a full place setting. Please.",
    "proposed": [
     "drawer",
     "spoon",
@@ -52,7 +53,7 @@
    ],
    "corrections": [],
    "unsupported": [],
-   "ms": 14566,
+   "ms": 16073,
    "kind": "plan",
    "t": 0.5,
    "said": "I'll open the drawer, then place the spoon, plate, fork and cup."
@@ -65,14 +66,14 @@
   },
   {
    "items": [],
-   "ms": 5155,
+   "ms": 5893,
    "kind": "unsupported",
-   "t": 1.82
+   "t": 2.42
   },
   {
    "skill": "drawer",
    "done": true,
-   "ms": 38,
+   "ms": 18,
    "kind": "check",
    "t": 12.5
   },
@@ -85,7 +86,7 @@
   {
    "skill": "spoon",
    "done": true,
-   "ms": 10,
+   "ms": 14,
    "kind": "check",
    "t": 26.06
   },
@@ -98,33 +99,33 @@
   {
    "skill": "plate",
    "done": true,
-   "ms": 13,
+   "ms": 12,
    "kind": "check",
-   "t": 33.62
+   "t": 33.22
   },
   {
    "skill": "fork",
    "attempt": 1,
    "kind": "skill_start",
-   "t": 34.74
+   "t": 34.34
   },
   {
    "skill": "fork",
    "done": true,
-   "ms": 17,
+   "ms": 7,
    "kind": "check",
-   "t": 47.18
+   "t": 46.78
   },
   {
    "skill": "cup",
    "attempt": 1,
    "kind": "skill_start",
-   "t": 48.3
+   "t": 47.9
   },
   {
    "skill": "cup",
    "done": true,
-   "ms": 6,
+   "ms": 9,
    "kind": "check",
    "t": 55.94
   },
@@ -152,13 +153,13 @@
  "grade": {
   "drawer_open": true,
   "spoon": true,
-  "spoon_err_m": 0.0043,
+  "spoon_err_m": 0.0044,
   "fork": true,
-  "fork_err_m": 0.0094,
+  "fork_err_m": 0.0102,
   "plate": true,
-  "plate_err_m": 0.0028,
+  "plate_err_m": 0.0021,
   "cup": true,
-  "cup_err_m": 0.008,
+  "cup_err_m": 0.0057,
   "subtasks_done": 5,
   "success": true,
   "failed": []
