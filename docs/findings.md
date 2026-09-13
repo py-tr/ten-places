@@ -60,6 +60,9 @@ controller re-grips and finishes), 40 are plain pulls from a closed drawer; fine
   30 → 41/50** (Wilson 69–90%); with a drawer retry 43/50. The spoon's losses were stalled drawers all along.
 - A spoon fine-tune on 190 new demos (after the learned drawer, plus drawer openings of 7.2–10.2 cm) made the spoon
   worse (20–22/50) and was not used.
+- Confirmation from the other side: feeding the broken first attempt's idle joints their training mean
+  (`LeRobotPolicy(mask_idle_std=1e-4)`, `eval_table_chain.py --mask-idle`) brought its drawer back from 0/50 to 18/20.
+  Masking the deployed skills on top of the new drawer did not help (34/50 vs 41/50), so it stays off.
 
 **Where the chain still loses.** Fork, the weakest step, is mostly downstream: of its 25 failures (PyTorch, seeds
 0–49, release + home), 15 are on seeds where the spoon failed and 4 where the plate failed (the plate starts on the
