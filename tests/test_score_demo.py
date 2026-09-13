@@ -36,3 +36,12 @@ def test_the_expected_refusal_must_be_said():
 
 def test_a_refusal_nobody_asked_for_fails():
     assert not score(entry(FULL), run(FULL, ["skip the cup"]))["success"]
+
+
+def test_a_failure_says_why():
+    r = run(["drawer", "cup"])
+    r["grade"]["plate_err_m"] = 0.079
+    r["events"] += [{"kind": "skill_start", "skill": "plate", "attempt": a} for a in (1, 2, 1, 2)]
+    s = score(entry(["plate", "cup"]), r)
+    assert not s["success"] and s["cause"] == "plate 7.9 cm off after 4 tries"
+    assert score(entry(["cup"]), run(["cup"]))["cause"] == ""

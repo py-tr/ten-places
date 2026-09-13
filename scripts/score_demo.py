@@ -13,12 +13,29 @@ import csv
 import json
 import os
 import sys
+from collections import Counter
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from tenplaces.planner import verify  # noqa: E402
 
 GRADE_KEY = {"drawer": "drawer_open", "spoon": "spoon", "plate": "plate", "fork": "fork", "cup": "cup"}
+
+
+def failure_cause(run: dict, expected: list, done: list, refusals_ok: bool) -> str:
+    """One line for a failed seed: which asked-for step is missing and how far off it ended (after how many tries),
+    what was done unasked, or a wrong refusal."""
+    tries = Counter(e["skill"] for e in run["events"] if e["kind"] == "skill_start")
+    parts = []
+    for s in expected:
+        if s not in done:
+            err = run["grade"].get(f"{s}_err_m")
+            what = "not open far enough" if s == "drawer" else f"{100 * err:.1f} cm off" if err is not None else "not done"
+            parts.append(f"{s} {what}" + (f" after {tries[s]} tries" if tries[s] > 1 else ""))
+    parts += [f"{s} done unasked" for s in done if s not in expected]
+    if not refusals_ok:
+        parts.append("wrong refusal")
+    return "; ".join(parts)
 
 
 def score(entry: dict, run: dict) -> dict:
@@ -36,7 +53,7 @@ def score(entry: dict, run: dict) -> dict:
     return {"seed": entry["seed"], "mode": entry["mode"], "command": entry["command"], "heard": run["command"],
             "say": entry.get("say", ""), "plan": ev.get("plan", {}).get("steps", []), "expected": expected,
             "done": done, "unsupported": said_unsupported, "plan_s": round(ev.get("plan", {}).get("ms", 0) / 1000, 1),
-            "success": ok}
+            "success": ok, "cause": "" if ok else failure_cause(run, expected, done, refusals_ok)}
 
 
 def main():
@@ -58,8 +75,8 @@ def main():
             os.link(video, link)
     with open(d / "demo.csv", "w", newline="") as fh:
         w = csv.writer(fh)
-        w.writerow(["seed", "success"])
-        w.writerows([r["seed"], r["success"]] for r in rows)
+        w.writerow(["seed", "success", "cause"])
+        w.writerows([r["seed"], r["success"], r["cause"]] for r in rows)
     lines = [f"# Demonstration runs: {sum(r['success'] for r in rows)}/{len(rows)} did what was asked", "",
              "| seed | how | command (heard) | plan | done | said it cannot | first plan | result |",
              "|---|---|---|---|---|---|---|---|"]
@@ -69,7 +86,7 @@ def main():
             heard += f" + said “{r['say']}”"
         lines.append(f"| {r['seed']} | {r['mode']} | {heard} | {' → '.join(r['plan']) or '–'} | "
                      f"{', '.join(r['done']) or '–'} | {', '.join(r['unsupported']) or '–'} | {r['plan_s']} s | "
-                     f"{'PASS' if r['success'] else 'FAIL'} |")
+                     f"{'PASS' if r['success'] else 'FAIL: ' + r['cause']} |")
     (d / "summary.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print("\n".join(lines))
 

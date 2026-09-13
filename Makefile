@@ -142,4 +142,5 @@ watch-agent:
 # scored against their commands and tiled into one video with PASS/FAIL stamps.
 grid:
 	$(PY) scripts/score_demo.py
-	$(PY) scripts/make_grid_video.py --dir out/video/demo --label demo --out out/video/grid_demo.mp4
+	$(PY) scripts/make_grid_video.py --dir out/video/demo --label demo --out out/video/grid_demo.mp4 \
+		--caption "requests done exactly as asked"

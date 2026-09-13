@@ -180,7 +180,7 @@ primitive.
 make third-party      # the official SO-101 model (TheRobotStudio/SO-ARM100) at the pinned commit
 pip install -r requirements-lock.txt
 make models HF_SKILLS_REPO=<user>/<repo>   # trained skills + classifier, and the OpenVINO planner (~4.4 GB)
-make test             # 164 tests
+make test             # 165 tests
 make watch SEED=3                                        # scripted controller, live 3D viewer
 make watch-agent CMD="just the plate and the cup" SEED=3 # VLM plan + learned policies, live
 make agent CMD="set the table, but skip the cup" SEED=3  # rendered to out/video/ with the plan panel

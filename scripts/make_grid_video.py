@@ -3,7 +3,8 @@
     python scripts/make_grid_video.py --dir out/eval/act_table_v1 --label best_torch_exec10 --out out/video/grid.mp4
 
 Reads <label>_seed<N>.mp4 and <label>.csv from --dir; the stamp comes from the CSV's success column and
-appears over the last second of each tile. Shorter clips hold their last frame.
+appears over the last second of each tile, with the CSV's cause column (if any) above a FAIL. Shorter clips hold
+their last frame.
 """
 import argparse
 import csv
@@ -15,14 +16,15 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
 
-def stamp(frame, text, colour, big=False):
+def stamp(frame, text, colour, big=False, line=0):
+    """big: bottom left, `line` rows up from the bottom; otherwise top left."""
     img = Image.fromarray(frame)
     draw = ImageDraw.Draw(img)
     try:
         font = ImageFont.truetype("arial.ttf", 28 if big else 16)
     except OSError:
         font = ImageFont.load_default()
-    x, y = (10, img.height - 40) if big else (6, 4)
+    x, y = (10, img.height - 40 - 38 * line) if big else (6, 4)
     box = draw.textbbox((x, y), text, font=font)
     draw.rectangle([box[0] - 4, box[1] - 2, box[2] + 4, box[3] + 2], fill=(0, 0, 0))
     draw.text((x, y), text, font=font, fill=colour)
@@ -37,12 +39,14 @@ def main():
     ap.add_argument("--cols", type=int, default=5)
     ap.add_argument("--fps", type=int, default=25)
     ap.add_argument("--speed", type=int, default=2, help="keep every Nth frame")
+    ap.add_argument("--caption", default="held-out seeds passed", help="after the count, e.g. '9/10 <caption>'")
     args = ap.parse_args()
     d = Path(args.dir)
-    outcome = {}
+    outcome, cause = {}, {}
     with open(d / f"{args.label}.csv") as f:
         for row in csv.DictReader(f):
             outcome[int(row["seed"])] = row["success"] == "True"
+            cause[int(row["seed"])] = row.get("cause") or ""
     clips = sorted(d.glob(f"{args.label}_seed*.mp4"), key=lambda p: int(re.search(r"seed(\d+)", p.name).group(1)))
     if not clips:
         raise SystemExit(f"no {args.label}_seed*.mp4 in {d}")
@@ -61,10 +65,12 @@ def main():
             if t >= n - args.fps:  # last second: outcome
                 ok = outcome.get(seed, False)
                 frame = stamp(frame, "PASS" if ok else "FAIL", (80, 230, 80) if ok else (240, 70, 70), big=True)
+                if not ok and cause.get(seed):
+                    frame = stamp(frame, cause[seed], (240, 200, 200), big=True, line=1)
             r, c = divmod(i, args.cols)
             grid[r * h:(r + 1) * h, c * w:(c + 1) * w] = frame
         if t >= n - args.fps:
-            grid = stamp(grid, f"{passed}/{len(seeds)} held-out seeds passed", (255, 255, 0), big=True)
+            grid = stamp(grid, f"{passed}/{len(seeds)} {args.caption}", (255, 255, 0), big=True)
         writer.append_data(grid)
     writer.close()
     print(args.out, f"{passed}/{len(seeds)} passed")
