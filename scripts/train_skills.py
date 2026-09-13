@@ -38,6 +38,9 @@ def main():
                     help="runs dir whose <skill>/checkpoints/<step> weights initialise training (fresh optimizer)")
     ap.add_argument("--init-step", type=int, default=20000)
     ap.add_argument("--save-freq", type=int, default=None, help="checkpoint every N steps (default: only the last)")
+    ap.add_argument("--num-workers", type=int, default=6,
+                    help="data-loading worker processes; each is a spawned Python with its own torch, so fewer workers "
+                         "keep Windows from growing the page file (the uint8 cache is fast enough with 2)")
     ap.add_argument("--amp", action="store_true", help="bf16 mixed precision")
     ap.add_argument("--augment", action="store_true", help="LeRobot image transforms (colour jitter, small shifts)")
     ap.add_argument("--lr", type=float, default=None, help="transformer learning rate (default: the policy's)")
@@ -67,7 +70,7 @@ def main():
                *(["--dataset.image_transforms.enable=true"] if args.augment else []),
                # Checkpoints are ~600 MB each (weights + optimizer state): only the last one unless asked.
                "--batch_size=32", f"--steps={args.steps}", f"--save_freq={args.save_freq or args.steps}",
-               "--log_freq=500", "--num_workers=6", f"--output_dir={run}"]
+               "--log_freq=500", f"--num_workers={args.num_workers}", f"--output_dir={run}"]
         print(f"training {skill}: {len(episodes)} episodes -> {run}", flush=True)
         with open(f"{run}.log", "w", encoding="utf-8") as log:
             code = subprocess.call(cmd, cwd=ROOT, env=env, stdout=log, stderr=subprocess.STDOUT)
