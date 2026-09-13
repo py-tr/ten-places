@@ -1,0 +1,16 @@
+{
+ "about": "The 10 demonstration seeds and their commands, fixed before any demonstration was recorded. Each seed is a different randomised table (placement, sizes, masses, friction, lighting, colours) and a different request. The video shows every one of them, pass or fail, with the steps completed.",
+ "fixed_on": "2026-09-13",
+ "seeds": [
+  {"seed": 0, "command": "Set the table.", "mode": "typed", "expected_steps": ["drawer", "spoon", "plate", "fork", "cup"]},
+  {"seed": 1, "command": "Lay a full place setting, please.", "mode": "spoken", "expected_steps": ["drawer", "spoon", "plate", "fork", "cup"]},
+  {"seed": 2, "command": "Everything but the fork.", "mode": "typed", "expected_steps": ["drawer", "spoon", "plate", "cup"]},
+  {"seed": 3, "command": "I want to eat soup.", "mode": "typed", "expected_steps": ["drawer", "spoon"]},
+  {"seed": 4, "command": "Just the plate and the cup.", "mode": "typed", "expected_steps": ["plate", "cup"]},
+  {"seed": 5, "command": "Set the table.", "mode": "typed", "say_at_s": 20, "say": "Skip the cup.", "expected_steps": ["drawer", "spoon", "plate", "fork"]},
+  {"seed": 6, "command": "Set the table and light a candle.", "mode": "typed", "expected_steps": ["drawer", "spoon", "plate", "fork", "cup"], "expected_unsupported": ["light a candle"]},
+  {"seed": 7, "command": "Only the cup, please.", "mode": "typed", "expected_steps": ["cup"]},
+  {"seed": 8, "command": "Put out the spoon and the plate.", "mode": "spoken", "expected_steps": ["drawer", "spoon", "plate"]},
+  {"seed": 9, "command": "Set the table.", "mode": "typed", "expected_steps": ["drawer", "spoon", "plate", "fork", "cup"]}
+ ]
+}

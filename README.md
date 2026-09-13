@@ -29,6 +29,15 @@ One ACT policy per skill (3 cameras + joints → 12 joint targets at 25 Hz), Ope
 MuJoCo: two SO-101 arms, randomised dinner table
 ```
 
+**Why a VLM above small learned policies.** Language and scene understanding live in the vision-language model;
+the visuomotor policies that move the arms are small ACT models (one of the candidate policies the challenge names),
+trained here in MuJoCo with LeRobot. The split is a latency decision: at 17 ms per forward pass on the CPU (OpenVINO
+INT8 weights), a policy can run every 40 ms control step and blend overlapping action chunks, which is what lets the
+spoon hand-off complete (3/10 → 10/10 without it). A large end-to-end VLA predicts open-loop chunks — for scale,
+Intel's π0.5 reference takes 294 ms per inference with stock PyTorch on a Core Ultra X7 358H at 40 W
+([Intel](https://docs.openedgeplatform.intel.com/2026.1/OEP-articles/publications/optimizing-pi0.5-lva-model.html)).
+The planner runs at the speed of a conversation (seconds), the policies at the speed of contact (25 Hz).
+
 The person can keep talking while the robot works: "stop" halts at once; "skip the fork" or "oh, and the cup too"
 changes the plan after the current step, verified like any plan. The robot answers with Speechmatics text-to-speech.
 
