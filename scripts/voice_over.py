@@ -44,7 +44,7 @@ def tts(text: str, voice: str) -> np.ndarray:
     return resample(samples.astype(np.float32) / 32768, rate)
 
 
-def trim(x: np.ndarray, pad_s: float = 0.2) -> np.ndarray:
+def trim(x: np.ndarray, pad_s: float = 0.3) -> np.ndarray:
     """Only the speech: the microphone recording starts before the person speaks and runs on after."""
     frame = int(0.02 * RATE)
     n = len(x) // frame
@@ -56,6 +56,19 @@ def trim(x: np.ndarray, pad_s: float = 0.2) -> np.ndarray:
         return x
     a, b = loud[0] * frame - int(pad_s * RATE), (loud[-1] + 1) * frame + int(pad_s * RATE)
     return x[max(0, a): min(len(x), b)]
+
+
+def fade(x: np.ndarray, s: float = 0.08) -> np.ndarray:
+    """Ramp in and out: a quiet microphone recording is raised ~10x, and its room noise must not start and stop
+    with a hard edge."""
+    n = min(int(s * RATE), len(x) // 2)
+    if n == 0:
+        return x
+    ramp = np.linspace(0.0, 1.0, n, dtype=np.float32)
+    x = x.copy()
+    x[:n] *= ramp
+    x[-n:] *= ramp[::-1]
+    return x
 
 
 def level(x: np.ndarray, peak: float = 0.8) -> np.ndarray:
@@ -90,7 +103,7 @@ def voice_over(stem: Path, entry: dict, out: Path, voice: str, lead_s: float = 0
         cmd, label, shown = trim(load_wav(mic)), "Command — spoken (microphone → Speechmatics, live)", run["command"]
     else:
         cmd, label, shown = tts(entry["command"], voice), "Command — typed (read aloud by a text-to-speech voice)", entry["command"]
-    cmd = level(cmd)
+    cmd = fade(level(cmd))
     reader = iio.get_reader(str(stem.with_suffix(".mp4")))
     first = reader.get_data(0)
     n_intro = int(np.ceil((lead_s + len(cmd) / RATE + tail_s) * FPS))
