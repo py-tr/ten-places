@@ -334,6 +334,8 @@ def main():
     ap.add_argument("--runs", nargs="+", default=["out/train/skills_v1", "out/train/skills_v2", "out/train/skills_ctx"])
     ap.add_argument("--classifier", default="models/state_classifier_v3/state_classifier.xml")
     ap.add_argument("--retry", nargs="*", default=[])
+    ap.add_argument("--mask-idle", type=float, default=None, metavar="STD",
+                    help="feed joints whose training state spread is below STD their training mean (e.g. 1e-4)")
     ap.add_argument("--exec", nargs="*", default=[], metavar="SKILL=exec10|exec50|ensemble")
     ap.add_argument("--ckpt", nargs="*", default=[], metavar="SKILL=DIR")
     ap.add_argument("--avg", nargs="*", default=[], metavar="SKILL=DIR,DIR")
@@ -370,7 +372,9 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     cfg = {"name": args.name, "out": str(out), "runs": [r for r in args.runs if Path(r).is_dir()],
            "exec_settings": exec_settings, "checkpoints": checkpoints, "avg": parse_kv(args.avg, lambda v: v.split(",")),
-           "kwargs": {"device": "cuda", "n_action_steps": 10}, "classifier": args.classifier, "threshold": args.threshold,
+           "kwargs": {"device": "cuda", "n_action_steps": 10,
+                      **({"mask_idle_std": args.mask_idle} if args.mask_idle is not None else {})},
+           "classifier": args.classifier, "threshold": args.threshold,
            "retry": list(args.retry), "budgets": parse_kv(args.budget, int), "settle": args.settle,
            "min_frames": args.min_frames, "home_frames": args.home_frames, "home_hold": args.home_hold,
            "release": args.release, "oracle_ref": args.oracle_ref, "frames": args.frames, "videos": list(args.videos),
