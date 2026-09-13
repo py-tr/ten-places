@@ -137,8 +137,20 @@ primitive.
 - The drawer is a tray under a fixed lid; the cutlery is only reachable once arm A has pulled it open.
 - The stock finger collision meshes fill the gap between the jaws; they are replaced by box pads, with gripper force
   limited to a realistic ~17 N.
-- Randomised per seed: drawer, cutlery, plate, cup and placemat positions, object sizes and masses, friction, light
-  direction and intensity, table and floor colour.
+- Randomised per seed, uniformly (`tenplaces/scene_table.py`, `sample()`; positions in the table frame; object sizes
+  are fixed):
+
+  | What | Range |
+  |---|---|
+  | Drawer (closed tray centre) | x −15 to 0 mm, y 70 to 100 mm |
+  | Spoon and fork in the tray | ±5 mm across; along: spoon 0 to 4 mm, fork 32 to 36 mm |
+  | Plate start | x 150 to 190 mm, y 70 to 100 mm |
+  | Cup start | x 190 to 205 mm, y −150 to −135 mm |
+  | Placemat (the plate's target) | x 110 to 125 mm, y −15 to 15 mm |
+  | Friction, every contact | 0.7 to 1.3 |
+  | Mass: cutlery / plate / cup | 25–60 g / 80–160 g / 40–90 g |
+  | Light | direction tilted up to ±0.5 in x and y from straight down; diffuse 0.4 to 0.9 |
+  | Colours | table RGB 0.2–0.8 per channel, floor 0.1–0.5 |
 
 ## Training
 

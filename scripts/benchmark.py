@@ -92,6 +92,9 @@ def main():
     ck = Path(args.checkpoint)
     name = args.name or f"{ck.parents[2].name}_{ck.parent.name}"
     core = ov.Core()
+    # Which OpenVINO devices this machine has: on a Core Ultra the list shows GPU and NPU, and --device picks one.
+    available = {d: core.get_property(d, "FULL_DEVICE_NAME") for d in core.available_devices}
+    print(f"[openvino] devices on this machine: {available}; benchmarking on {args.device}", flush=True)
     dev_name = core.get_property(args.device, "FULL_DEVICE_NAME")
     if args.device == "GPU" and "Intel" not in dev_name:
         sys.exit(f"OpenVINO 'GPU' here is {dev_name!r}, not Intel graphics; refusing to report it as an Intel result.")
@@ -137,13 +140,15 @@ def main():
                     sweep.append({"core_type": core_type, "hyper_threading": ht, "error": str(e)[:80]})
 
     env = {"cpu": core.get_property("CPU", "FULL_DEVICE_NAME"), "device": dev_name, "openvino": ov.__version__,
-           "torch": torch.__version__, "python": platform.python_version(), "os": platform.platform(),
-           "checkpoint": str(ck)}
+           "available_devices": available, "torch": torch.__version__, "python": platform.python_version(),
+           "os": platform.platform(), "checkpoint": str(ck)}
     out = OUT / "benchmark"
     out.mkdir(parents=True, exist_ok=True)
     (out / f"{name}.json").write_text(json.dumps({"env": env, "rows": rows, "cpu_sweep": sweep}, indent=1))
     lines = [f"# Benchmark — {name}", "", f"CPU: {env['cpu']} · OpenVINO {env['openvino']} · PyTorch {env['torch']}",
-             "", "| variant | precision | device | latency median / p95 (ms) | throughput (inf/s) | IR size | task success |",
+             "", "OpenVINO devices on this machine: "
+             + ", ".join(f"{d} ({n}{'' if 'Intel' in n else ' — not Intel, not benchmarked'})" for d, n in available.items())
+             + f" · measured on {args.device}", "", "| variant | precision | device | latency median / p95 (ms) | throughput (inf/s) | IR size | task success |",
              "|---|---|---|---|---|---|---|"]
     for r in rows:
         thr = f"{r['throughput_ips']:.0f}" if r["throughput_ips"] else "–"
