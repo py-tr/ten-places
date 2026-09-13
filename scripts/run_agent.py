@@ -82,10 +82,13 @@ def main():
 
         t = time.perf_counter()
         show = lambda text: print(f"  … {text}", flush=True)  # noqa: E731 - partial transcripts as they arrive
-        command, partials, ms = transcribe_mic(on_partial=show) if args.mic else transcribe_file(args.audio, on_partial=show)
+        # With --video the microphone recording is kept next to it (<video>.command.wav, for scripts/voice_over.py).
+        mic_wav = Path(args.video).with_suffix(".command.wav") if args.mic and args.video else None
+        command, partials, ms = (transcribe_mic(on_partial=show, save_to=mic_wav) if args.mic
+                                 else transcribe_file(args.audio, on_partial=show))
         if not command:
             sys.exit("no speech recognised")
-        spoken = {"source": "mic" if args.mic else str(args.audio), "partials": len(partials),
+        spoken = {"source": "mic" if args.mic else str(args.audio), "audio": str(mic_wav or args.audio), "partials": len(partials),
                   "ms_final_after_speech_end": round(ms) if ms == ms else None,
                   "s_total": round(time.perf_counter() - t, 2)}
         print(f"speechmatics: {command!r} (final {ms:.0f} ms after the speech ended)", flush=True)

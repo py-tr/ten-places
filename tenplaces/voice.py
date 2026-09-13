@@ -109,8 +109,14 @@ class MicSource:
         # An audio interface shows its inputs as one multi-channel device ("Analogue 1 + 2"); the microphone can be
         # on any of them, so capture two and keep the louder.
         self.channels = max(1, min(2, int(info["max_input_channels"])))
+        self.captured = []  # everything the microphone delivered, mono int16 (transcribe_mic(save_to=...))
         self.stream = sd.RawInputStream(samplerate=self.rate, channels=self.channels, dtype="int16", device=device,
-                                        callback=lambda data, frames, t, status: self.q.put(self._mono(bytes(data))))
+                                        callback=lambda data, frames, t, status: self._capture(bytes(data)))
+
+    def _capture(self, data: bytes):
+        mono = self._mono(data)
+        self.captured.append(mono)
+        self.q.put(mono)
 
     def _mono(self, data: bytes) -> bytes:
         if self.channels == 1:
@@ -163,11 +169,18 @@ class MicSource:
         return out  # b"" once done and drained: the client then ends the stream
 
 
-def transcribe_mic(language: str = "en", on_partial=None, max_s: float = 10.0, silence_s: float = 0.8, device=None):
-    """Speak a command into the default microphone. Returns (final_text, partials, ms_after_speech_end)."""
+def transcribe_mic(language: str = "en", on_partial=None, max_s: float = 10.0, silence_s: float = 0.8, device=None,
+                   save_to=None):
+    """Speak a command into the default microphone. Returns (final_text, partials, ms_after_speech_end).
+    save_to: also write what the microphone heard as a WAV (the demo video's voice-over uses it)."""
     with MicSource(max_s, silence_s, device) as mic:
         print(f"listening on {mic.name} ({mic.rate} Hz, {mic.channels} ch) — speak, then pause", flush=True)
         result = asyncio.run(_stream(mic, mic.rate, language, on_partial, lambda: mic.t_speech_end))
+        if save_to is not None:
+            import soundfile as sf
+
+            Path(save_to).parent.mkdir(parents=True, exist_ok=True)
+            sf.write(str(save_to), np.frombuffer(b"".join(mic.captured), np.int16), mic.rate, subtype="PCM_16")
         if not mic.heard:
             print(f"heard nothing above the noise floor in {mic.max_s:.0f} s (loudest {mic.peak:.0f} RMS, speech needs "
                   f"> {getattr(mic, 'threshold', 300):.0f}): check the input, its gain and Windows' default microphone",
