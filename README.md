@@ -58,6 +58,7 @@ submission video shows the first 10 seeds as a grid with pass/fail per seed.
 
 | Component | Result | Evidence |
 |---|---|---|
+| Demonstration runs: 10 tables, 10 requests fixed before recording (2 spoken, 1 changed mid-run), full agent on OpenVINO | 9/10 done exactly as asked; seed 4's plate missed four times, each miss caught by the camera | `scripts/score_demo.py`, `out/video/demo/summary.md` |
 | Planner: unseen commands → correct verified plan | 10/10; 8/8 on a later set, incl. naming what no skill can do ("dim the lights") | `scripts/eval_planner.py` |
 | Mid-run spoken changes understood | 8/10 on sentences written before the run | `scripts/eval_amend.py --set fresh` |
 | Camera classifier on learned-policy states | false "drawer done" 3/363, false "spoon done" 1/671 | `docs/findings.md` |

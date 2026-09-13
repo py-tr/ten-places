@@ -1,0 +1,183 @@
+{
+ "command": "Just the plate and the cup.",
+ "voice": null,
+ "seed": 4,
+ "backend": "ov-w8",
+ "cores": "split",
+ "sources": {
+  "drawer": "out\\train\\chain_t2_drawer\\drawer\\checkpoints\\007500\\pretrained_model",
+  "spoon": "out\\train\\cutlery_t1\\spoon\\checkpoints\\010000\\pretrained_model",
+  "plate": "out\\train\\plate_t1\\plate\\checkpoints\\005000\\pretrained_model",
+  "fork": "out\\train\\cutlery_t1\\fork\\checkpoints\\007500\\pretrained_model",
+  "cup": "out\\train\\skills_ctx\\cup\\checkpoints\\015000\\pretrained_model"
+ },
+ "exec_settings": {
+  "spoon": {
+   "temporal_coeff": 0.01
+  },
+  "drawer": {
+   "temporal_coeff": 0.01
+  },
+  "plate": {
+   "temporal_coeff": 0.01
+  },
+  "fork": {
+   "n_action_steps": 50
+  },
+  "cup": {
+   "n_action_steps": 10
+  }
+ },
+ "events": [
+  {
+   "command": "Just the plate and the cup.",
+   "proposed": [
+    "plate",
+    "cup"
+   ],
+   "steps": [
+    "drawer",
+    "plate",
+    "cup"
+   ],
+   "corrections": [
+    "added 'drawer' before 'plate': the closed drawer's tray reaches the placemat's edge"
+   ],
+   "unsupported": [],
+   "ms": 14001,
+   "kind": "plan",
+   "t": 0.5,
+   "said": "I'll open the drawer, then place the plate and cup. The drawer comes first \u2014 its tray reaches the placemat."
+  },
+  {
+   "skill": "drawer",
+   "attempt": 1,
+   "kind": "skill_start",
+   "t": 0.5
+  },
+  {
+   "items": [],
+   "ms": 6052,
+   "kind": "unsupported",
+   "t": 2.42
+  },
+  {
+   "skill": "drawer",
+   "done": true,
+   "ms": 22,
+   "kind": "check",
+   "t": 12.5
+  },
+  {
+   "skill": "plate",
+   "attempt": 1,
+   "kind": "skill_start",
+   "t": 13.62
+  },
+  {
+   "skill": "plate",
+   "done": false,
+   "ms": 10,
+   "kind": "check",
+   "t": 22.02
+  },
+  {
+   "skill": "plate",
+   "attempt": 2,
+   "kind": "skill_start",
+   "t": 23.14,
+   "said": "Trying the plate again."
+  },
+  {
+   "skill": "plate",
+   "done": false,
+   "ms": 10,
+   "kind": "check",
+   "t": 31.54
+  },
+  {
+   "reason": "plate not confirmed",
+   "steps": [
+    "plate",
+    "cup"
+   ],
+   "corrections": [],
+   "ms": 0,
+   "kind": "replan",
+   "t": 31.54,
+   "said": "The plate isn't in place. New plan: place the plate and cup."
+  },
+  {
+   "skill": "plate",
+   "attempt": 1,
+   "kind": "skill_start",
+   "t": 32.66
+  },
+  {
+   "skill": "plate",
+   "done": false,
+   "ms": 10,
+   "kind": "check",
+   "t": 41.06
+  },
+  {
+   "skill": "plate",
+   "attempt": 2,
+   "kind": "skill_start",
+   "t": 42.18,
+   "said": "Trying the plate again."
+  },
+  {
+   "skill": "plate",
+   "done": false,
+   "ms": 9,
+   "kind": "check",
+   "t": 50.58
+  },
+  {
+   "skill": "cup",
+   "attempt": 1,
+   "kind": "skill_start",
+   "t": 51.7
+  },
+  {
+   "skill": "cup",
+   "done": true,
+   "ms": 13,
+   "kind": "check",
+   "t": 57.74
+  },
+  {
+   "done": [
+    "drawer",
+    "cup"
+   ],
+   "stopped": false,
+   "graded": [
+    "drawer_open",
+    "cup"
+   ],
+   "kind": "finished",
+   "t": 57.74,
+   "said": "Done \u2014 but the plate isn't in place."
+  }
+ ],
+ "grade": {
+  "drawer_open": true,
+  "spoon": false,
+  "spoon_err_m": 0.2357,
+  "fork": false,
+  "fork_err_m": 0.181,
+  "plate": false,
+  "plate_err_m": 0.079,
+  "cup": true,
+  "cup_err_m": 0.0049,
+  "subtasks_done": 2,
+  "success": false,
+  "failed": [
+   "spoon",
+   "fork",
+   "plate"
+  ]
+ }
+}

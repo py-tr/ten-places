@@ -1,0 +1,146 @@
+{
+ "command": "Everything but the fork.",
+ "voice": null,
+ "seed": 2,
+ "backend": "ov-w8",
+ "cores": "split",
+ "sources": {
+  "drawer": "out\\train\\chain_t2_drawer\\drawer\\checkpoints\\007500\\pretrained_model",
+  "spoon": "out\\train\\cutlery_t1\\spoon\\checkpoints\\010000\\pretrained_model",
+  "plate": "out\\train\\plate_t1\\plate\\checkpoints\\005000\\pretrained_model",
+  "fork": "out\\train\\cutlery_t1\\fork\\checkpoints\\007500\\pretrained_model",
+  "cup": "out\\train\\skills_ctx\\cup\\checkpoints\\015000\\pretrained_model"
+ },
+ "exec_settings": {
+  "spoon": {
+   "temporal_coeff": 0.01
+  },
+  "drawer": {
+   "temporal_coeff": 0.01
+  },
+  "plate": {
+   "temporal_coeff": 0.01
+  },
+  "fork": {
+   "n_action_steps": 50
+  },
+  "cup": {
+   "n_action_steps": 10
+  }
+ },
+ "events": [
+  {
+   "command": "Everything but the fork.",
+   "proposed": [
+    "drawer",
+    "spoon",
+    "plate",
+    "cup"
+   ],
+   "steps": [
+    "drawer",
+    "spoon",
+    "plate",
+    "cup"
+   ],
+   "corrections": [],
+   "unsupported": [],
+   "ms": 16282,
+   "kind": "plan",
+   "t": 0.5,
+   "said": "I'll open the drawer, then place the spoon, plate and cup."
+  },
+  {
+   "skill": "drawer",
+   "attempt": 1,
+   "kind": "skill_start",
+   "t": 0.5
+  },
+  {
+   "items": [],
+   "ms": 5765,
+   "kind": "unsupported",
+   "t": 2.18
+  },
+  {
+   "skill": "drawer",
+   "done": true,
+   "ms": 19,
+   "kind": "check",
+   "t": 12.5
+  },
+  {
+   "skill": "spoon",
+   "attempt": 1,
+   "kind": "skill_start",
+   "t": 13.62
+  },
+  {
+   "skill": "spoon",
+   "done": true,
+   "ms": 5,
+   "kind": "check",
+   "t": 26.46
+  },
+  {
+   "skill": "plate",
+   "attempt": 1,
+   "kind": "skill_start",
+   "t": 27.58
+  },
+  {
+   "skill": "plate",
+   "done": true,
+   "ms": 13,
+   "kind": "check",
+   "t": 33.22
+  },
+  {
+   "skill": "cup",
+   "attempt": 1,
+   "kind": "skill_start",
+   "t": 34.34
+  },
+  {
+   "skill": "cup",
+   "done": true,
+   "ms": 11,
+   "kind": "check",
+   "t": 40.78
+  },
+  {
+   "done": [
+    "drawer",
+    "spoon",
+    "plate",
+    "cup"
+   ],
+   "stopped": false,
+   "graded": [
+    "drawer_open",
+    "spoon",
+    "plate",
+    "cup"
+   ],
+   "kind": "finished",
+   "t": 40.78,
+   "said": "The table is set."
+  }
+ ],
+ "grade": {
+  "drawer_open": true,
+  "spoon": true,
+  "spoon_err_m": 0.0026,
+  "fork": false,
+  "fork_err_m": 0.183,
+  "plate": true,
+  "plate_err_m": 0.0046,
+  "cup": true,
+  "cup_err_m": 0.0039,
+  "subtasks_done": 4,
+  "success": false,
+  "failed": [
+   "fork"
+  ]
+ }
+}
