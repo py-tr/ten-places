@@ -1,0 +1,1102 @@
+{
+ "summary": {
+  "classifier": "models/state_classifier_v3/state_classifier.xml",
+  "threshold": 0.5,
+  "fresh_false_done": 0,
+  "prefixed_exact": 50,
+  "n": 50,
+  "fresh_max_p": {
+   "drawer": 0.0033,
+   "spoon": 0.0004,
+   "plate": 0.0011,
+   "fork": 0.0023,
+   "cup": 0.0004
+  },
+  "prefixed_done_min_p": {
+   "drawer": 0.9895,
+   "spoon": 0.9988,
+   "plate": 0.9973,
+   "fork": 0.9932,
+   "cup": 0.9998
+  },
+  "prefixed_not_done_max_p": {
+   "drawer": 0.0038,
+   "spoon": 0.0303,
+   "plate": 0.0005,
+   "fork": 0.0013,
+   "cup": 0.001
+  }
+ },
+ "rows": [
+  {
+   "seed": 100,
+   "fresh": {
+    "drawer": 0.0033,
+    "spoon": 0.0003,
+    "plate": 0.0002,
+    "fork": 0.0003,
+    "cup": 0.0004
+   },
+   "prefix": [
+    "drawer"
+   ],
+   "prefixed": {
+    "drawer": 0.9999,
+    "spoon": 0.0002,
+    "plate": 0.0001,
+    "fork": 0.0001,
+    "cup": 0.0004
+   }
+  },
+  {
+   "seed": 101,
+   "fresh": {
+    "drawer": 0.0001,
+    "spoon": 0.0,
+    "plate": 0.0001,
+    "fork": 0.0001,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "drawer",
+    "spoon"
+   ],
+   "prefixed": {
+    "drawer": 1.0,
+    "spoon": 0.9999,
+    "plate": 0.0,
+    "fork": 0.0001,
+    "cup": 0.0002
+   }
+  },
+  {
+   "seed": 102,
+   "fresh": {
+    "drawer": 0.0002,
+    "spoon": 0.0001,
+    "plate": 0.0002,
+    "fork": 0.0001,
+    "cup": 0.0003
+   },
+   "prefix": [
+    "drawer",
+    "plate"
+   ],
+   "prefixed": {
+    "drawer": 1.0,
+    "spoon": 0.0001,
+    "plate": 1.0,
+    "fork": 0.0,
+    "cup": 0.0001
+   }
+  },
+  {
+   "seed": 103,
+   "fresh": {
+    "drawer": 0.0002,
+    "spoon": 0.0001,
+    "plate": 0.0004,
+    "fork": 0.0002,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "drawer",
+    "spoon",
+    "plate"
+   ],
+   "prefixed": {
+    "drawer": 0.9993,
+    "spoon": 0.9997,
+    "plate": 0.9991,
+    "fork": 0.0002,
+    "cup": 0.0003
+   }
+  },
+  {
+   "seed": 104,
+   "fresh": {
+    "drawer": 0.0003,
+    "spoon": 0.0001,
+    "plate": 0.0002,
+    "fork": 0.0001,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "drawer",
+    "plate",
+    "fork"
+   ],
+   "prefixed": {
+    "drawer": 0.9999,
+    "spoon": 0.0002,
+    "plate": 1.0,
+    "fork": 0.9999,
+    "cup": 0.0004
+   }
+  },
+  {
+   "seed": 105,
+   "fresh": {
+    "drawer": 0.0002,
+    "spoon": 0.0001,
+    "plate": 0.0001,
+    "fork": 0.0002,
+    "cup": 0.0003
+   },
+   "prefix": [
+    "cup"
+   ],
+   "prefixed": {
+    "drawer": 0.0006,
+    "spoon": 0.0005,
+    "plate": 0.0003,
+    "fork": 0.0006,
+    "cup": 1.0
+   }
+  },
+  {
+   "seed": 106,
+   "fresh": {
+    "drawer": 0.0009,
+    "spoon": 0.0003,
+    "plate": 0.0003,
+    "fork": 0.0004,
+    "cup": 0.0004
+   },
+   "prefix": [
+    "drawer",
+    "spoon",
+    "plate",
+    "fork"
+   ],
+   "prefixed": {
+    "drawer": 1.0,
+    "spoon": 1.0,
+    "plate": 1.0,
+    "fork": 0.9999,
+    "cup": 0.0009
+   }
+  },
+  {
+   "seed": 107,
+   "fresh": {
+    "drawer": 0.0005,
+    "spoon": 0.0001,
+    "plate": 0.0003,
+    "fork": 0.0002,
+    "cup": 0.0004
+   },
+   "prefix": [
+    "drawer",
+    "cup"
+   ],
+   "prefixed": {
+    "drawer": 0.9988,
+    "spoon": 0.0141,
+    "plate": 0.0001,
+    "fork": 0.0003,
+    "cup": 1.0
+   }
+  },
+  {
+   "seed": 108,
+   "fresh": {
+    "drawer": 0.0002,
+    "spoon": 0.0,
+    "plate": 0.0001,
+    "fork": 0.0001,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "drawer",
+    "spoon",
+    "cup"
+   ],
+   "prefixed": {
+    "drawer": 0.9996,
+    "spoon": 0.9994,
+    "plate": 0.0001,
+    "fork": 0.0005,
+    "cup": 1.0
+   }
+  },
+  {
+   "seed": 109,
+   "fresh": {
+    "drawer": 0.0007,
+    "spoon": 0.0001,
+    "plate": 0.0005,
+    "fork": 0.0004,
+    "cup": 0.0004
+   },
+   "prefix": [
+    "drawer",
+    "plate",
+    "cup"
+   ],
+   "prefixed": {
+    "drawer": 0.9999,
+    "spoon": 0.0001,
+    "plate": 0.9999,
+    "fork": 0.0004,
+    "cup": 1.0
+   }
+  },
+  {
+   "seed": 110,
+   "fresh": {
+    "drawer": 0.0005,
+    "spoon": 0.0002,
+    "plate": 0.0004,
+    "fork": 0.0002,
+    "cup": 0.0003
+   },
+   "prefix": [
+    "drawer"
+   ],
+   "prefixed": {
+    "drawer": 0.9999,
+    "spoon": 0.0007,
+    "plate": 0.0001,
+    "fork": 0.0001,
+    "cup": 0.0003
+   }
+  },
+  {
+   "seed": 111,
+   "fresh": {
+    "drawer": 0.001,
+    "spoon": 0.0001,
+    "plate": 0.0001,
+    "fork": 0.0002,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "drawer",
+    "spoon"
+   ],
+   "prefixed": {
+    "drawer": 0.9998,
+    "spoon": 0.9999,
+    "plate": 0.0,
+    "fork": 0.0002,
+    "cup": 0.0003
+   }
+  },
+  {
+   "seed": 112,
+   "fresh": {
+    "drawer": 0.0,
+    "spoon": 0.0,
+    "plate": 0.0001,
+    "fork": 0.0001,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "drawer",
+    "plate"
+   ],
+   "prefixed": {
+    "drawer": 0.9999,
+    "spoon": 0.0001,
+    "plate": 1.0,
+    "fork": 0.0001,
+    "cup": 0.0002
+   }
+  },
+  {
+   "seed": 113,
+   "fresh": {
+    "drawer": 0.0001,
+    "spoon": 0.0,
+    "plate": 0.0001,
+    "fork": 0.0001,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "drawer",
+    "spoon",
+    "plate"
+   ],
+   "prefixed": {
+    "drawer": 1.0,
+    "spoon": 1.0,
+    "plate": 1.0,
+    "fork": 0.0,
+    "cup": 0.0002
+   }
+  },
+  {
+   "seed": 114,
+   "fresh": {
+    "drawer": 0.0014,
+    "spoon": 0.0001,
+    "plate": 0.0001,
+    "fork": 0.0002,
+    "cup": 0.0004
+   },
+   "prefix": [
+    "drawer",
+    "plate",
+    "fork"
+   ],
+   "prefixed": {
+    "drawer": 0.9998,
+    "spoon": 0.0001,
+    "plate": 1.0,
+    "fork": 0.9932,
+    "cup": 0.0008
+   }
+  },
+  {
+   "seed": 115,
+   "fresh": {
+    "drawer": 0.0006,
+    "spoon": 0.0001,
+    "plate": 0.0003,
+    "fork": 0.0002,
+    "cup": 0.0003
+   },
+   "prefix": [
+    "cup"
+   ],
+   "prefixed": {
+    "drawer": 0.0011,
+    "spoon": 0.0013,
+    "plate": 0.0003,
+    "fork": 0.0011,
+    "cup": 1.0
+   }
+  },
+  {
+   "seed": 116,
+   "fresh": {
+    "drawer": 0.001,
+    "spoon": 0.0001,
+    "plate": 0.0001,
+    "fork": 0.0001,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "drawer",
+    "spoon",
+    "plate",
+    "fork"
+   ],
+   "prefixed": {
+    "drawer": 1.0,
+    "spoon": 1.0,
+    "plate": 0.9999,
+    "fork": 0.9959,
+    "cup": 0.0006
+   }
+  },
+  {
+   "seed": 117,
+   "fresh": {
+    "drawer": 0.0007,
+    "spoon": 0.0001,
+    "plate": 0.0001,
+    "fork": 0.0001,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "drawer",
+    "cup"
+   ],
+   "prefixed": {
+    "drawer": 0.999,
+    "spoon": 0.0006,
+    "plate": 0.0003,
+    "fork": 0.0006,
+    "cup": 1.0
+   }
+  },
+  {
+   "seed": 118,
+   "fresh": {
+    "drawer": 0.0002,
+    "spoon": 0.0001,
+    "plate": 0.0001,
+    "fork": 0.0001,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "drawer",
+    "spoon",
+    "cup"
+   ],
+   "prefixed": {
+    "drawer": 0.9995,
+    "spoon": 0.9996,
+    "plate": 0.0001,
+    "fork": 0.0006,
+    "cup": 1.0
+   }
+  },
+  {
+   "seed": 119,
+   "fresh": {
+    "drawer": 0.0001,
+    "spoon": 0.0,
+    "plate": 0.0002,
+    "fork": 0.0001,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "drawer",
+    "plate",
+    "cup"
+   ],
+   "prefixed": {
+    "drawer": 0.9996,
+    "spoon": 0.002,
+    "plate": 0.9973,
+    "fork": 0.0007,
+    "cup": 0.9999
+   }
+  },
+  {
+   "seed": 120,
+   "fresh": {
+    "drawer": 0.0004,
+    "spoon": 0.0001,
+    "plate": 0.0001,
+    "fork": 0.0001,
+    "cup": 0.0003
+   },
+   "prefix": [
+    "drawer"
+   ],
+   "prefixed": {
+    "drawer": 0.9999,
+    "spoon": 0.0002,
+    "plate": 0.0002,
+    "fork": 0.0001,
+    "cup": 0.0004
+   }
+  },
+  {
+   "seed": 121,
+   "fresh": {
+    "drawer": 0.0015,
+    "spoon": 0.0001,
+    "plate": 0.0001,
+    "fork": 0.0002,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "drawer",
+    "spoon"
+   ],
+   "prefixed": {
+    "drawer": 1.0,
+    "spoon": 0.9999,
+    "plate": 0.0,
+    "fork": 0.0001,
+    "cup": 0.0002
+   }
+  },
+  {
+   "seed": 122,
+   "fresh": {
+    "drawer": 0.0002,
+    "spoon": 0.0,
+    "plate": 0.0001,
+    "fork": 0.0001,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "drawer",
+    "plate"
+   ],
+   "prefixed": {
+    "drawer": 1.0,
+    "spoon": 0.0001,
+    "plate": 0.9999,
+    "fork": 0.0001,
+    "cup": 0.0002
+   }
+  },
+  {
+   "seed": 123,
+   "fresh": {
+    "drawer": 0.0006,
+    "spoon": 0.0002,
+    "plate": 0.0002,
+    "fork": 0.0002,
+    "cup": 0.0003
+   },
+   "prefix": [
+    "drawer",
+    "spoon",
+    "plate"
+   ],
+   "prefixed": {
+    "drawer": 1.0,
+    "spoon": 1.0,
+    "plate": 0.9999,
+    "fork": 0.0,
+    "cup": 0.0002
+   }
+  },
+  {
+   "seed": 124,
+   "fresh": {
+    "drawer": 0.0012,
+    "spoon": 0.0001,
+    "plate": 0.0002,
+    "fork": 0.0002,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "drawer",
+    "plate",
+    "fork"
+   ],
+   "prefixed": {
+    "drawer": 0.9998,
+    "spoon": 0.0004,
+    "plate": 1.0,
+    "fork": 0.9997,
+    "cup": 0.0003
+   }
+  },
+  {
+   "seed": 125,
+   "fresh": {
+    "drawer": 0.0,
+    "spoon": 0.0,
+    "plate": 0.0001,
+    "fork": 0.0001,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "cup"
+   ],
+   "prefixed": {
+    "drawer": 0.0002,
+    "spoon": 0.0003,
+    "plate": 0.0004,
+    "fork": 0.0007,
+    "cup": 0.9999
+   }
+  },
+  {
+   "seed": 126,
+   "fresh": {
+    "drawer": 0.0014,
+    "spoon": 0.0001,
+    "plate": 0.0002,
+    "fork": 0.0002,
+    "cup": 0.0003
+   },
+   "prefix": [
+    "drawer",
+    "spoon",
+    "plate",
+    "fork"
+   ],
+   "prefixed": {
+    "drawer": 1.0,
+    "spoon": 1.0,
+    "plate": 1.0,
+    "fork": 0.9987,
+    "cup": 0.0008
+   }
+  },
+  {
+   "seed": 127,
+   "fresh": {
+    "drawer": 0.0004,
+    "spoon": 0.0001,
+    "plate": 0.0002,
+    "fork": 0.0002,
+    "cup": 0.0003
+   },
+   "prefix": [
+    "drawer",
+    "cup"
+   ],
+   "prefixed": {
+    "drawer": 0.9895,
+    "spoon": 0.0012,
+    "plate": 0.0002,
+    "fork": 0.0008,
+    "cup": 0.9999
+   }
+  },
+  {
+   "seed": 128,
+   "fresh": {
+    "drawer": 0.0012,
+    "spoon": 0.0001,
+    "plate": 0.0001,
+    "fork": 0.0002,
+    "cup": 0.0003
+   },
+   "prefix": [
+    "drawer",
+    "spoon",
+    "cup"
+   ],
+   "prefixed": {
+    "drawer": 0.9995,
+    "spoon": 0.9998,
+    "plate": 0.0002,
+    "fork": 0.0008,
+    "cup": 0.9999
+   }
+  },
+  {
+   "seed": 129,
+   "fresh": {
+    "drawer": 0.0002,
+    "spoon": 0.0001,
+    "plate": 0.0002,
+    "fork": 0.0001,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "drawer",
+    "plate",
+    "cup"
+   ],
+   "prefixed": {
+    "drawer": 0.9998,
+    "spoon": 0.0002,
+    "plate": 1.0,
+    "fork": 0.0005,
+    "cup": 1.0
+   }
+  },
+  {
+   "seed": 130,
+   "fresh": {
+    "drawer": 0.0002,
+    "spoon": 0.0001,
+    "plate": 0.0003,
+    "fork": 0.0002,
+    "cup": 0.0004
+   },
+   "prefix": [
+    "drawer"
+   ],
+   "prefixed": {
+    "drawer": 0.9998,
+    "spoon": 0.0003,
+    "plate": 0.0002,
+    "fork": 0.0002,
+    "cup": 0.0004
+   }
+  },
+  {
+   "seed": 131,
+   "fresh": {
+    "drawer": 0.0006,
+    "spoon": 0.0001,
+    "plate": 0.0011,
+    "fork": 0.0023,
+    "cup": 0.0004
+   },
+   "prefix": [
+    "drawer",
+    "spoon"
+   ],
+   "prefixed": {
+    "drawer": 0.9999,
+    "spoon": 0.9998,
+    "plate": 0.0001,
+    "fork": 0.0001,
+    "cup": 0.0003
+   }
+  },
+  {
+   "seed": 132,
+   "fresh": {
+    "drawer": 0.0013,
+    "spoon": 0.0001,
+    "plate": 0.0,
+    "fork": 0.0001,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "drawer",
+    "plate"
+   ],
+   "prefixed": {
+    "drawer": 1.0,
+    "spoon": 0.0004,
+    "plate": 0.9999,
+    "fork": 0.0001,
+    "cup": 0.0003
+   }
+  },
+  {
+   "seed": 133,
+   "fresh": {
+    "drawer": 0.0004,
+    "spoon": 0.0001,
+    "plate": 0.0001,
+    "fork": 0.0002,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "drawer",
+    "spoon",
+    "plate"
+   ],
+   "prefixed": {
+    "drawer": 1.0,
+    "spoon": 1.0,
+    "plate": 0.9999,
+    "fork": 0.0,
+    "cup": 0.0002
+   }
+  },
+  {
+   "seed": 134,
+   "fresh": {
+    "drawer": 0.0002,
+    "spoon": 0.0001,
+    "plate": 0.0001,
+    "fork": 0.0001,
+    "cup": 0.0003
+   },
+   "prefix": [
+    "drawer",
+    "plate",
+    "fork"
+   ],
+   "prefixed": {
+    "drawer": 0.9998,
+    "spoon": 0.0005,
+    "plate": 1.0,
+    "fork": 0.9997,
+    "cup": 0.0006
+   }
+  },
+  {
+   "seed": 135,
+   "fresh": {
+    "drawer": 0.0004,
+    "spoon": 0.0001,
+    "plate": 0.0001,
+    "fork": 0.0001,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "cup"
+   ],
+   "prefixed": {
+    "drawer": 0.0009,
+    "spoon": 0.0013,
+    "plate": 0.0005,
+    "fork": 0.0013,
+    "cup": 0.9999
+   }
+  },
+  {
+   "seed": 136,
+   "fresh": {
+    "drawer": 0.001,
+    "spoon": 0.0001,
+    "plate": 0.0001,
+    "fork": 0.0001,
+    "cup": 0.0003
+   },
+   "prefix": [
+    "drawer",
+    "spoon",
+    "plate",
+    "fork"
+   ],
+   "prefixed": {
+    "drawer": 1.0,
+    "spoon": 1.0,
+    "plate": 1.0,
+    "fork": 0.998,
+    "cup": 0.001
+   }
+  },
+  {
+   "seed": 137,
+   "fresh": {
+    "drawer": 0.0008,
+    "spoon": 0.0001,
+    "plate": 0.0001,
+    "fork": 0.0001,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "drawer",
+    "cup"
+   ],
+   "prefixed": {
+    "drawer": 0.999,
+    "spoon": 0.0046,
+    "plate": 0.0003,
+    "fork": 0.0006,
+    "cup": 1.0
+   }
+  },
+  {
+   "seed": 138,
+   "fresh": {
+    "drawer": 0.0001,
+    "spoon": 0.0001,
+    "plate": 0.0003,
+    "fork": 0.0001,
+    "cup": 0.0003
+   },
+   "prefix": [
+    "drawer",
+    "spoon",
+    "cup"
+   ],
+   "prefixed": {
+    "drawer": 0.9996,
+    "spoon": 0.9999,
+    "plate": 0.0001,
+    "fork": 0.0005,
+    "cup": 1.0
+   }
+  },
+  {
+   "seed": 139,
+   "fresh": {
+    "drawer": 0.0007,
+    "spoon": 0.0001,
+    "plate": 0.0002,
+    "fork": 0.0002,
+    "cup": 0.0003
+   },
+   "prefix": [
+    "drawer",
+    "plate",
+    "cup"
+   ],
+   "prefixed": {
+    "drawer": 0.9998,
+    "spoon": 0.0007,
+    "plate": 1.0,
+    "fork": 0.0004,
+    "cup": 1.0
+   }
+  },
+  {
+   "seed": 140,
+   "fresh": {
+    "drawer": 0.0013,
+    "spoon": 0.0001,
+    "plate": 0.0001,
+    "fork": 0.0002,
+    "cup": 0.0003
+   },
+   "prefix": [
+    "drawer"
+   ],
+   "prefixed": {
+    "drawer": 0.9998,
+    "spoon": 0.0004,
+    "plate": 0.0001,
+    "fork": 0.0001,
+    "cup": 0.0003
+   }
+  },
+  {
+   "seed": 141,
+   "fresh": {
+    "drawer": 0.001,
+    "spoon": 0.0001,
+    "plate": 0.0001,
+    "fork": 0.0001,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "drawer",
+    "spoon"
+   ],
+   "prefixed": {
+    "drawer": 0.9999,
+    "spoon": 0.9988,
+    "plate": 0.0,
+    "fork": 0.0001,
+    "cup": 0.0003
+   }
+  },
+  {
+   "seed": 142,
+   "fresh": {
+    "drawer": 0.0005,
+    "spoon": 0.0001,
+    "plate": 0.0001,
+    "fork": 0.0001,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "drawer",
+    "plate"
+   ],
+   "prefixed": {
+    "drawer": 1.0,
+    "spoon": 0.0,
+    "plate": 1.0,
+    "fork": 0.0001,
+    "cup": 0.0002
+   }
+  },
+  {
+   "seed": 143,
+   "fresh": {
+    "drawer": 0.0003,
+    "spoon": 0.0001,
+    "plate": 0.0001,
+    "fork": 0.0001,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "drawer",
+    "spoon",
+    "plate"
+   ],
+   "prefixed": {
+    "drawer": 1.0,
+    "spoon": 1.0,
+    "plate": 0.999,
+    "fork": 0.0,
+    "cup": 0.0002
+   }
+  },
+  {
+   "seed": 144,
+   "fresh": {
+    "drawer": 0.0007,
+    "spoon": 0.0002,
+    "plate": 0.0002,
+    "fork": 0.0003,
+    "cup": 0.0004
+   },
+   "prefix": [
+    "drawer",
+    "plate",
+    "fork"
+   ],
+   "prefixed": {
+    "drawer": 0.9998,
+    "spoon": 0.0002,
+    "plate": 1.0,
+    "fork": 0.9995,
+    "cup": 0.0005
+   }
+  },
+  {
+   "seed": 145,
+   "fresh": {
+    "drawer": 0.0031,
+    "spoon": 0.0003,
+    "plate": 0.0001,
+    "fork": 0.0002,
+    "cup": 0.0004
+   },
+   "prefix": [
+    "cup"
+   ],
+   "prefixed": {
+    "drawer": 0.0038,
+    "spoon": 0.0028,
+    "plate": 0.0001,
+    "fork": 0.0007,
+    "cup": 1.0
+   }
+  },
+  {
+   "seed": 146,
+   "fresh": {
+    "drawer": 0.0012,
+    "spoon": 0.0002,
+    "plate": 0.0005,
+    "fork": 0.0003,
+    "cup": 0.0004
+   },
+   "prefix": [
+    "drawer",
+    "spoon",
+    "plate",
+    "fork"
+   ],
+   "prefixed": {
+    "drawer": 1.0,
+    "spoon": 0.9999,
+    "plate": 1.0,
+    "fork": 0.9999,
+    "cup": 0.0008
+   }
+  },
+  {
+   "seed": 147,
+   "fresh": {
+    "drawer": 0.0002,
+    "spoon": 0.0001,
+    "plate": 0.0003,
+    "fork": 0.0002,
+    "cup": 0.0003
+   },
+   "prefix": [
+    "drawer",
+    "cup"
+   ],
+   "prefixed": {
+    "drawer": 0.9981,
+    "spoon": 0.0303,
+    "plate": 0.0001,
+    "fork": 0.0004,
+    "cup": 1.0
+   }
+  },
+  {
+   "seed": 148,
+   "fresh": {
+    "drawer": 0.0011,
+    "spoon": 0.0004,
+    "plate": 0.0003,
+    "fork": 0.0006,
+    "cup": 0.0003
+   },
+   "prefix": [
+    "drawer",
+    "spoon",
+    "cup"
+   ],
+   "prefixed": {
+    "drawer": 0.9993,
+    "spoon": 0.9993,
+    "plate": 0.0003,
+    "fork": 0.0007,
+    "cup": 0.9998
+   }
+  },
+  {
+   "seed": 149,
+   "fresh": {
+    "drawer": 0.0014,
+    "spoon": 0.0001,
+    "plate": 0.0001,
+    "fork": 0.0001,
+    "cup": 0.0002
+   },
+   "prefix": [
+    "drawer",
+    "plate",
+    "cup"
+   ],
+   "prefixed": {
+    "drawer": 0.9996,
+    "spoon": 0.0004,
+    "plate": 1.0,
+    "fork": 0.0004,
+    "cup": 0.9999
+   }
+  }
+ ]
+}

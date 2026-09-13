@@ -57,11 +57,12 @@ def _init(spec: dict, classifier_xml: str | None, threads: int):
         torch.backends.cuda.matmul.allow_tf32 = False
         torch.backends.cudnn.allow_tf32 = False
     _W["policy"] = build_policy(spec)
-    _W["checker"] = None
+    _W["checker"], _W["probs"] = None, None
     if classifier_xml:
         from .state_classifier import OVStateClassifier
 
-        _W["checker"] = OVStateClassifier(classifier_xml, ov_config={"INFERENCE_NUM_THREADS": threads}).is_done
+        clf = OVStateClassifier(classifier_xml, ov_config={"INFERENCE_NUM_THREADS": threads})
+        _W["checker"], _W["probs"] = clf.is_done, clf.probs
 
 
 def _skill_job(job):
@@ -116,29 +117,35 @@ def _agent_job(job):
 
     from .agent import run_command
 
-    seed, steps, budgets, disturb = job
+    seed, steps, budgets, disturb, *rest = job
+    look_first = rest[0] if rest else None  # the first look (run_command look_first); None: off
 
     def check(skill, image):
         t = time.perf_counter()
         return _W["checker"](skill, image), 1000 * (time.perf_counter() - t)
 
+    if look_first is not None:
+        check.probs = _W.get("probs")
     try:
         events, grade = run_command(_W["policy"], FixedPlanner(steps), "set the table", seed, budgets=budgets,
-                                    checker=check, log=lambda *_: None, linger_s=0.0, disturb=disturb)
+                                    checker=check, log=lambda *_: None, linger_s=0.0, disturb=disturb,
+                                    look_first=look_first)
     except Exception as e:
-        return _failed_row(seed, e, retries=0, replans=0, regressed=0, pushed=0, regressed_skills=[])
+        return _failed_row(seed, e, retries=0, replans=0, regressed=0, pushed=0, regressed_skills=[], seen=[])
     kinds = [e["kind"] for e in events]
     return {**grade, "seed": seed, "retries": sum(e["kind"] == "skill_start" and e.get("attempt", 1) > 1 for e in events),
             "replans": kinds.count("replan"), "regressed": kinds.count("regressed"), "pushed": kinds.count("pushed"),
-            "regressed_skills": [e.get("skill") for e in events if e["kind"] == "regressed"]}
+            "regressed_skills": [e.get("skill") for e in events if e["kind"] == "regressed"],
+            "seen": next((e.get("steps", []) for e in events if e["kind"] == "seen_done"), [])}
 
 
 def run_agent_parallel(spec: dict, seeds, steps=("drawer", "spoon", "plate", "fork", "cup"), workers: int = 4,
                        classifier_xml: str = "models/state_classifier_v3/state_classifier.xml", threads: int = 1,
-                       budgets: dict | None = None, disturb=()) -> list[dict]:
+                       budgets: dict | None = None, disturb=(), look_first: float | None = None) -> list[dict]:
     """Every seed through tenplaces.agent.run_command with a fixed plan; rows (grade + retry counts) by seed.
-    disturb: tenplaces.agent.parse_push entries applied to every episode (e.g. the plate slid off its mat)."""
-    jobs = [(int(s), list(steps), budgets, list(disturb)) for s in sorted(int(x) for x in seeds)]
+    disturb: tenplaces.agent.parse_push entries applied to every episode (e.g. the plate slid off its mat).
+    look_first: the first look's probability bar (None: off); the row's "seen" lists what it skipped."""
+    jobs = [(int(s), list(steps), budgets, list(disturb), look_first) for s in sorted(int(x) for x in seeds)]
     with _pool(spec, classifier_xml, workers, threads) as pool:
         rows = list(pool.map(_agent_job, jobs))
     return sorted(rows, key=lambda r: r["seed"])

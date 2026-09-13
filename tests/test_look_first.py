@@ -58,6 +58,16 @@ def test_the_robot_says_what_it_saw():
     assert phrase_for({"kind": "seen_done", "steps": []}) is None
 
 
+def test_the_parallel_agent_job_carries_the_first_look():
+    from tenplaces import parallel_eval
+
+    parallel_eval._W.update(policy=StillPolicy(), checker=lambda skill, image: True,
+                            probs=lambda image: np.asarray([0.99, 0.0, 0.0, 0.0, 0.97]))
+    row = parallel_eval._agent_job((0, FULL, None, [], 0.95))
+    assert row["seen"] == ["drawer", "cup"]
+    assert parallel_eval._agent_job((0, FULL, None, []))["seen"] == []  # old job tuples: off
+
+
 def test_a_prepared_table_is_scored_on_the_whole_result():
     entry = {"seed": 0, "mode": "typed", "command": "c", "expected_steps": ["cup"], "prepared": ["plate"]}
     grade = {"drawer_open": True, "spoon": False, "plate": True, "fork": False, "cup": True}

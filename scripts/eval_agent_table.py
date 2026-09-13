@@ -37,6 +37,8 @@ def main():
                     help="disturb every episode, e.g. after-plate:plate:0:-0.07 (see scripts/run_agent.py)")
     ap.add_argument("--ckpt", action="append", default=[], metavar="SKILL=DIR",
                     help="a candidate checkpoint for one skill; the other skills keep out/eval/selected_checkpoints.json")
+    ap.add_argument("--look-first", type=float, default=None, metavar="P",
+                    help="the first look: steps the classifier already sees done with probability >= P are skipped")
     args = ap.parse_args()
     if args.seeds[0] < 100 and not args.report:
         sys.exit("tuning seeds are 100-149; pass --report to run the reporting seeds (once, with frozen selections)")
@@ -55,12 +57,15 @@ def main():
 
     disturb = [parse_push(p) for p in args.push]
     rows = run_agent_parallel(spec, range(*args.seeds), workers=args.workers, classifier_xml=args.classifier,
-                              disturb=disturb)
+                              disturb=disturb, look_first=args.look_first)
     n, k = len(rows), sum(r["success"] for r in rows)
     s = {"seeds": args.seeds, "backend": args.backend, "full": f"{k}/{n}", "wilson95": wilson(k, n),
          "mean_steps": sum(r["subtasks_done"] for r in rows) / n, "per_step": {c: sum(bool(r[c]) for r in rows) for c in KEYS},
          "retries": sum(r["retries"] for r in rows), "replans": sum(r["replans"] for r in rows),
          "regressed": sum(r["regressed"] for r in rows)}
+    if args.look_first is not None:  # tables where the first look skipped anything (on fresh tables: none)
+        s["look_first"] = args.look_first
+        s["tables_with_a_skip"] = sum(bool(r.get("seen")) for r in rows)
     if disturb:  # how often the push landed, was noticed, and was put right by the end
         pushed = [r for r in rows if r["pushed"]]
         bodies = {b for _, b, _, _ in disturb}
