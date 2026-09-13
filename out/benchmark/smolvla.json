@@ -1,0 +1,21 @@
+{
+ "checkpoint": "models/smolvla_base",
+ "params_m": 450,
+ "cameras": 3,
+ "image_shape": [
+  3,
+  256,
+  256
+ ],
+ "chunk": [
+  50,
+  6
+ ],
+ "denoise_steps": 10,
+ "torch_threads": 14,
+ "median_ms": 6622.8,
+ "p90_ms": 7821.9,
+ "repeats": 10,
+ "cpu": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+ "torch": "2.11.0+cu128"
+}

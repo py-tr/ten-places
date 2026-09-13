@@ -36,6 +36,10 @@ INT8 weights), a policy can run every 40 ms control step and blend overlapping a
 spoon hand-off complete (3/10 → 10/10 without it). A large end-to-end VLA predicts open-loop chunks — for scale,
 Intel's π0.5 reference takes 294 ms per inference with stock PyTorch on a Core Ultra X7 358H at 40 W
 ([Intel](https://docs.openedgeplatform.intel.com/2026.1/OEP-articles/publications/optimizing-pi0.5-lva-model.html)).
+Measured on this i5: LeRobot's SmolVLA (450M parameters) takes 6.6 s per 50-action chunk with stock PyTorch —
+against 40 ms for our ACT policy in PyTorch and 16 ms with OpenVINO INT8 weights (`scripts/bench_smolvla.py`,
+`out/benchmark/smolvla.md`; timing only: the public base checkpoint, not trained on this task, not exported to
+OpenVINO).
 The planner runs at the speed of a conversation (seconds), the policies at the speed of contact (25 Hz).
 
 The person can keep talking while the robot works: "stop" halts at once; "skip the fork" or "oh, and the cup too"
