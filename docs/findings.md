@@ -83,6 +83,11 @@ same start as a tray set there.
 - **Plan first, check later.** Asking for the plan and then for what no skill can do, both before moving, took
   18.7 s median to the first motion. Now the plan alone starts the arms (13.5 s on the E-cores, seed 3, "I want to
   eat soup.") and the text-only check answers 4.5 s later on the planner's worker thread.
+- **First plan on every core.** The arms are still until the first plan arrives, so a second planner pipeline on
+  every core (`VLMPlanner(idle_config={})`) makes it; the E-core pipeline keeps what runs while the arms move.
+  10 demo commands on their own tables: median 14.3 → 7.1 s, same plan 10/10 (`scripts/bench_planner_placement.py`);
+  in the full agent, with the control models loaded, seed 3's plan took 9.0 s instead of 13.5 s. Cost: a second
+  copy of the model in memory (~3 GB).
 - **A dangling "and" emptied the plan.** "Set the table and light a candle." makes the 4B model return no steps;
   the re-plan without the impossible part used "Set the table and .", which it also read as incomplete, so the
   robot did nothing. Found on demo seed 6's pre-registered command; the re-plan now drops the dangling join

@@ -113,9 +113,10 @@ What the optimisation buys:
 - **Latency spent on quality.** At 16 ms the policy can run every control step with temporal ensembling, which is
   what lets the spoon hand-off complete (3/10 → 10/10).
 - **Hybrid-core placement for concurrent workloads.** Real-time control on the P-cores, the VLM on the E-cores:
-  the arms keep 25 Hz while the planner thinks. A plan takes 6–8 s with the whole CPU and about 13 s on the
-  E-cores; the arms start as soon as it arrives, and the check for impossible parts ("light a candle") answers
-  a few seconds later while they already move.
+  the arms keep 25 Hz while the planner thinks. The first plan comes while the arms are still, so it runs on
+  every core: median 7.1 s against 14.3 s on the E-cores, same plans (10 demo commands,
+  `scripts/bench_planner_placement.py`). Everything asked while the arms move — the check for impossible parts
+  ("light a candle"), spoken changes — stays on the E-cores.
 - **Energy.** INT8 weights use 2.5× less energy per inference than PyTorch on the same CPU (1.43 vs 3.50 J above
   idle); at the robot's 25 Hz, P-core placement draws 7 W less than default scheduling.
 - Every model in the loop runs on OpenVINO: the policies (INT8 weights), the planner (Qwen3-VL-4B INT4, OpenVINO
@@ -150,7 +151,7 @@ primitive.
 ```
 make third-party      # the official SO-101 model (TheRobotStudio/SO-ARM100) at the pinned commit
 pip install -r requirements-lock.txt
-make test             # 152 tests
+make test             # 160 tests
 make watch SEED=3                                        # scripted controller, live 3D viewer
 make watch-agent CMD="just the plate and the cup" SEED=3 # VLM plan + learned policies, live
 make agent CMD="set the table, but skip the cup" SEED=3  # rendered to out/video/ with the plan panel

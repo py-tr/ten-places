@@ -1,0 +1,86 @@
+{
+ "summary": {
+  "median_e_cores_s": 14.3,
+  "median_all_cores_s": 7.1,
+  "same_plan": 10,
+  "n": 10,
+  "e_cores_config": {
+   "SCHEDULING_CORE_TYPE": "ECORE_ONLY",
+   "INFERENCE_NUM_THREADS": 8,
+   "ENABLE_CPU_PINNING": true
+  },
+  "all_cores_config": "OpenVINO defaults"
+ },
+ "rows": [
+  {
+   "seed": 0,
+   "command": "Set the table.",
+   "e_cores_ms": 20727,
+   "all_cores_ms": 10125,
+   "same_plan": true
+  },
+  {
+   "seed": 1,
+   "command": "Lay a full place setting, please.",
+   "e_cores_ms": 14189,
+   "all_cores_ms": 7642,
+   "same_plan": true
+  },
+  {
+   "seed": 2,
+   "command": "Everything but the fork.",
+   "e_cores_ms": 12310,
+   "all_cores_ms": 6023,
+   "same_plan": true
+  },
+  {
+   "seed": 3,
+   "command": "I want to eat soup.",
+   "e_cores_ms": 12636,
+   "all_cores_ms": 6365,
+   "same_plan": true
+  },
+  {
+   "seed": 4,
+   "command": "Just the plate and the cup.",
+   "e_cores_ms": 12103,
+   "all_cores_ms": 5992,
+   "same_plan": true
+  },
+  {
+   "seed": 5,
+   "command": "Set the table.",
+   "e_cores_ms": 21787,
+   "all_cores_ms": 11865,
+   "same_plan": true
+  },
+  {
+   "seed": 6,
+   "command": "Set the table and light a candle.",
+   "e_cores_ms": 14357,
+   "all_cores_ms": 6717,
+   "same_plan": true
+  },
+  {
+   "seed": 7,
+   "command": "Only the cup, please.",
+   "e_cores_ms": 10487,
+   "all_cores_ms": 5250,
+   "same_plan": true
+  },
+  {
+   "seed": 8,
+   "command": "Put out the spoon and the plate.",
+   "e_cores_ms": 19134,
+   "all_cores_ms": 8434,
+   "same_plan": true
+  },
+  {
+   "seed": 9,
+   "command": "Set the table.",
+   "e_cores_ms": 17941,
+   "all_cores_ms": 7527,
+   "same_plan": true
+  }
+ ]
+}
