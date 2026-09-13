@@ -209,8 +209,9 @@ default (`--cores default` turns it off).
 
 - 7 of 50 held-out tables are not set completely; the losses are spread over the spoon hand-off (3), the plate (2)
   and the fork (2).
-- The robot does not yet repair a table knocked by someone else: the camera misses a plate slid off its mat, and the
-  plate policy never learned to re-place one (`docs/findings.md`).
+- A plate knocked off its mat is noticed 27 times out of 75 and put back twice by the deployed robot. An experimental
+  classifier and plate fine-tune reach 77/80 noticed and 30/80 put back — below the bar set before the attempt (60/80),
+  so they are not shipped (`docs/findings.md`).
 - Learned rollouts are repeatable only up to rendering (a new OpenGL context can shift a few pixels by one intensity
   level), so results are reported over 50 seeds with confidence intervals.
 - Measured on a desktop Intel CPU without iGPU or NPU (no Core Ultra was available); on a Core Ultra,

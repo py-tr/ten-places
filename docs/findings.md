@@ -137,16 +137,28 @@ Quantising the transformer's activations is what costs task success; INT8 weight
 checkpoint scored 19/20 on both FP32 and INT8 weights, `scripts/eval_checkpoints.py`.) The deployed table policies
 run INT8 weights (15.5–16 ms on an idle machine, README).
 
-## Disturbance repair (measured, not working yet)
+## Disturbance repair (one attempt, measured, not shipped)
 
 The agent re-checks every finished step before the next one and at the end; a step that no longer holds goes back to
-the front of the queue. With the learned system this does not yet recover a knocked table:
-- Plate slid 7 cm off its mat after a scripted placement (seeds 120–139): the camera notices only a slide back toward
-  the plate's start (20/20); toward the spoon, and both along x, 0/20. The classifier learned "the plate has left its
-  start", never having seen a plate knocked off the mat. The slide toward the spoon also knocks the spoon off (19/20).
-- Learned plate policy re-placing a displaced plate: 0/44 (`scripts/eval_agent_table.py --push "after-plate:plate:0:-0.07"`).
+the front of the queue. Measured with the real agent: the plate pushed 7 cm right after it is placed, in each of four
+directions, tuning seeds 120–139, OpenVINO (`scripts/eval_agent_table.py --push after-plate:plate:DX:DY`):
 
-The fix is data: classifier runs with objects slid after placement, and plate demonstrations from displaced starts.
+| System | Knock noticed | Plate put back | put back: +x / −x / +y / −y |
+|---|---|---|---|
+| Deployed (classifier v3, plate_t1) | 27/75 | 2/75 | 2 / 0 / 0 / 0 |
+| Attempt (classifier v4, plate_t2) | 77/80 | 30/80 | 8 / 0 / 8 / 14 |
+
+- Detection: classifier v4 adds 200 scripted runs in which a placed plate or cup is knocked 4–9 cm (seeds 4400–4599,
+  `record_state_data.py --slide-frac`); v3 had only seen a plate off its target before it was placed. On a scripted
+  placement knocked 7 cm, v4 notices 20/20 in every direction (v3: 18, 19, 20, 8; `scripts/eval_slid_detection.py`)
+  and reads the first look as cleanly as v3 (0/50 fresh tables wrongly "done", 50/50 half-done tables exact).
+- Repair: the deployed plate fine-tuned 7.5k steps on its own statistics with 100 demonstrations of the scripted
+  controller putting a knocked plate back (`record_context_demos.py --displace plate`). The scripted controller
+  itself failed 69 of the 169 random knocks tried, mostly toward arm A (−x) — the direction the learned plate never
+  recovers.
+- Gates written down before any result, one attempt: the plate alone ≥ 29/30 from both starts (30/30, 30/30); no
+  regression on the 50 tuning tables (41/50, as deployed; v4 alone 40/50); ≥ 60 of 80 knocked plates put back —
+  30/80 missed it. So neither the classifier nor the plate is deployed; the next step is repair data toward arm A.
 
 ## Repeatability
 

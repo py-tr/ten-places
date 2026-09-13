@@ -1,0 +1,605 @@
+{
+ "summary": {
+  "seeds": [
+   120,
+   140
+  ],
+  "backend": "ov-w8",
+  "full": "0/20",
+  "wilson95": [
+   -0.0,
+   0.161
+  ],
+  "mean_steps": 2.75,
+  "per_step": {
+   "drawer_open": 20,
+   "spoon": 18,
+   "plate": 0,
+   "fork": 0,
+   "cup": 17
+  },
+  "retries": 38,
+  "replans": 14,
+  "regressed": 29,
+  "push": [
+   "after-plate:plate:0:0.07"
+  ],
+  "episodes_pushed": 19,
+  "noticed": 17,
+  "repaired": {
+   "plate": "0/19"
+  }
+ },
+ "spec": {
+  "kind": "skills",
+  "runs": [
+   "out/train/skills_v1",
+   "out/train/skills_v2",
+   "out/train/skills_ctx"
+  ],
+  "exec_settings": {
+   "spoon": {
+    "temporal_coeff": 0.01
+   },
+   "drawer": {
+    "temporal_coeff": 0.01
+   },
+   "plate": {
+    "temporal_coeff": 0.01
+   },
+   "fork": {
+    "n_action_steps": 50
+   },
+   "cup": {
+    "n_action_steps": 10
+   }
+  },
+  "checkpoints": {
+   "drawer": "out/train/chain_t2_drawer/drawer/checkpoints/007500/pretrained_model",
+   "fork": "out/train/cutlery_t1/fork/checkpoints/007500/pretrained_model",
+   "plate": "out/train/plate_t1/plate/checkpoints/005000/pretrained_model",
+   "spoon": "out/train/cutlery_t1/spoon/checkpoints/010000/pretrained_model"
+  },
+  "kwargs": {
+   "backend": "ov-w8",
+   "n_action_steps": 10,
+   "ov_config": {
+    "INFERENCE_NUM_THREADS": 2
+   },
+   "calib_cache": "data/table_v1_skill_cache"
+  }
+ },
+ "rows": [
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.0034,
+   "fork": false,
+   "fork_err_m": 0.0067,
+   "plate": false,
+   "plate_err_m": 0.054,
+   "cup": true,
+   "cup_err_m": 0.0049,
+   "subtasks_done": 3,
+   "success": false,
+   "failed": [
+    "fork",
+    "plate"
+   ],
+   "seed": 120,
+   "retries": 0,
+   "replans": 0,
+   "regressed": 1,
+   "pushed": 1,
+   "regressed_skills": [
+    "plate"
+   ],
+   "seen": []
+  },
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.0038,
+   "fork": false,
+   "fork_err_m": 0.0375,
+   "plate": false,
+   "plate_err_m": 0.0681,
+   "cup": true,
+   "cup_err_m": 0.0038,
+   "subtasks_done": 3,
+   "success": false,
+   "failed": [
+    "fork",
+    "plate"
+   ],
+   "seed": 121,
+   "retries": 4,
+   "replans": 1,
+   "regressed": 2,
+   "pushed": 1,
+   "regressed_skills": [
+    "plate",
+    "fork"
+   ],
+   "seen": []
+  },
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.0027,
+   "fork": false,
+   "fork_err_m": 0.012,
+   "plate": false,
+   "plate_err_m": 0.0585,
+   "cup": true,
+   "cup_err_m": 0.005,
+   "subtasks_done": 3,
+   "success": false,
+   "failed": [
+    "fork",
+    "plate"
+   ],
+   "seed": 122,
+   "retries": 3,
+   "replans": 1,
+   "regressed": 1,
+   "pushed": 1,
+   "regressed_skills": [
+    "plate"
+   ],
+   "seen": []
+  },
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.0025,
+   "fork": false,
+   "fork_err_m": 0.049,
+   "plate": false,
+   "plate_err_m": 0.0606,
+   "cup": true,
+   "cup_err_m": 0.0016,
+   "subtasks_done": 3,
+   "success": false,
+   "failed": [
+    "fork",
+    "plate"
+   ],
+   "seed": 123,
+   "retries": 3,
+   "replans": 1,
+   "regressed": 2,
+   "pushed": 1,
+   "regressed_skills": [
+    "plate",
+    "fork"
+   ],
+   "seen": []
+  },
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.0012,
+   "fork": false,
+   "fork_err_m": 0.0174,
+   "plate": false,
+   "plate_err_m": 0.0584,
+   "cup": true,
+   "cup_err_m": 0.0046,
+   "subtasks_done": 3,
+   "success": false,
+   "failed": [
+    "fork",
+    "plate"
+   ],
+   "seed": 124,
+   "retries": 0,
+   "replans": 0,
+   "regressed": 1,
+   "pushed": 1,
+   "regressed_skills": [
+    "plate"
+   ],
+   "seen": []
+  },
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.0037,
+   "fork": false,
+   "fork_err_m": 0.0025,
+   "plate": false,
+   "plate_err_m": 0.0538,
+   "cup": true,
+   "cup_err_m": 0.008,
+   "subtasks_done": 3,
+   "success": false,
+   "failed": [
+    "fork",
+    "plate"
+   ],
+   "seed": 125,
+   "retries": 0,
+   "replans": 0,
+   "regressed": 0,
+   "pushed": 1,
+   "regressed_skills": [],
+   "seen": []
+  },
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.0031,
+   "fork": false,
+   "fork_err_m": 0.0258,
+   "plate": false,
+   "plate_err_m": 0.0414,
+   "cup": true,
+   "cup_err_m": 0.0062,
+   "subtasks_done": 3,
+   "success": false,
+   "failed": [
+    "fork",
+    "plate"
+   ],
+   "seed": 126,
+   "retries": 0,
+   "replans": 0,
+   "regressed": 2,
+   "pushed": 1,
+   "regressed_skills": [
+    "plate",
+    "fork"
+   ],
+   "seen": []
+  },
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.0047,
+   "fork": false,
+   "fork_err_m": 0.0266,
+   "plate": false,
+   "plate_err_m": 0.0616,
+   "cup": true,
+   "cup_err_m": 0.0075,
+   "subtasks_done": 3,
+   "success": false,
+   "failed": [
+    "fork",
+    "plate"
+   ],
+   "seed": 127,
+   "retries": 3,
+   "replans": 1,
+   "regressed": 2,
+   "pushed": 1,
+   "regressed_skills": [
+    "plate",
+    "fork"
+   ],
+   "seen": []
+  },
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.0032,
+   "fork": false,
+   "fork_err_m": 0.0162,
+   "plate": false,
+   "plate_err_m": 0.0617,
+   "cup": true,
+   "cup_err_m": 0.0053,
+   "subtasks_done": 3,
+   "success": false,
+   "failed": [
+    "fork",
+    "plate"
+   ],
+   "seed": 128,
+   "retries": 2,
+   "replans": 1,
+   "regressed": 2,
+   "pushed": 1,
+   "regressed_skills": [
+    "plate",
+    "fork"
+   ],
+   "seen": []
+  },
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.0035,
+   "fork": false,
+   "fork_err_m": 0.0038,
+   "plate": false,
+   "plate_err_m": 0.047,
+   "cup": false,
+   "cup_err_m": 0.0931,
+   "subtasks_done": 2,
+   "success": false,
+   "failed": [
+    "fork",
+    "plate",
+    "cup"
+   ],
+   "seed": 129,
+   "retries": 3,
+   "replans": 1,
+   "regressed": 2,
+   "pushed": 1,
+   "regressed_skills": [
+    "plate",
+    "fork"
+   ],
+   "seen": []
+  },
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.005,
+   "fork": false,
+   "fork_err_m": 0.0861,
+   "plate": false,
+   "plate_err_m": 0.1045,
+   "cup": true,
+   "cup_err_m": 0.0105,
+   "subtasks_done": 3,
+   "success": false,
+   "failed": [
+    "fork",
+    "plate"
+   ],
+   "seed": 130,
+   "retries": 2,
+   "replans": 1,
+   "regressed": 2,
+   "pushed": 1,
+   "regressed_skills": [
+    "plate",
+    "fork"
+   ],
+   "seen": []
+  },
+  {
+   "drawer_open": true,
+   "spoon": false,
+   "spoon_err_m": 0.2375,
+   "fork": false,
+   "fork_err_m": 0.0128,
+   "plate": false,
+   "plate_err_m": 0.0464,
+   "cup": true,
+   "cup_err_m": 0.0058,
+   "subtasks_done": 2,
+   "success": false,
+   "failed": [
+    "spoon",
+    "fork",
+    "plate"
+   ],
+   "seed": 131,
+   "retries": 2,
+   "replans": 1,
+   "regressed": 1,
+   "pushed": 1,
+   "regressed_skills": [
+    "plate"
+   ],
+   "seen": []
+  },
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.0054,
+   "fork": false,
+   "fork_err_m": 0.084,
+   "plate": false,
+   "plate_err_m": 0.1555,
+   "cup": false,
+   "cup_err_m": 0.0917,
+   "subtasks_done": 2,
+   "success": false,
+   "failed": [
+    "fork",
+    "plate",
+    "cup"
+   ],
+   "seed": 132,
+   "retries": 4,
+   "replans": 1,
+   "regressed": 2,
+   "pushed": 1,
+   "regressed_skills": [
+    "spoon",
+    "plate"
+   ],
+   "seen": []
+  },
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.0045,
+   "fork": false,
+   "fork_err_m": 0.0253,
+   "plate": false,
+   "plate_err_m": 0.0491,
+   "cup": true,
+   "cup_err_m": 0.0052,
+   "subtasks_done": 3,
+   "success": false,
+   "failed": [
+    "fork",
+    "plate"
+   ],
+   "seed": 133,
+   "retries": 2,
+   "replans": 1,
+   "regressed": 2,
+   "pushed": 1,
+   "regressed_skills": [
+    "plate",
+    "fork"
+   ],
+   "seen": []
+  },
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.0014,
+   "fork": false,
+   "fork_err_m": 0.0225,
+   "plate": false,
+   "plate_err_m": 0.0629,
+   "cup": true,
+   "cup_err_m": 0.0046,
+   "subtasks_done": 3,
+   "success": false,
+   "failed": [
+    "fork",
+    "plate"
+   ],
+   "seed": 134,
+   "retries": 0,
+   "replans": 0,
+   "regressed": 2,
+   "pushed": 1,
+   "regressed_skills": [
+    "plate",
+    "fork"
+   ],
+   "seen": []
+  },
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.006,
+   "fork": false,
+   "fork_err_m": 0.0215,
+   "plate": false,
+   "plate_err_m": 0.0541,
+   "cup": true,
+   "cup_err_m": 0.0039,
+   "subtasks_done": 3,
+   "success": false,
+   "failed": [
+    "fork",
+    "plate"
+   ],
+   "seed": 135,
+   "retries": 1,
+   "replans": 0,
+   "regressed": 0,
+   "pushed": 1,
+   "regressed_skills": [],
+   "seen": []
+  },
+  {
+   "drawer_open": true,
+   "spoon": false,
+   "spoon_err_m": 0.2399,
+   "fork": false,
+   "fork_err_m": 0.0366,
+   "plate": false,
+   "plate_err_m": 0.1918,
+   "cup": true,
+   "cup_err_m": 0.0075,
+   "subtasks_done": 2,
+   "success": false,
+   "failed": [
+    "spoon",
+    "fork",
+    "plate"
+   ],
+   "seed": 136,
+   "retries": 2,
+   "replans": 1,
+   "regressed": 1,
+   "pushed": 1,
+   "regressed_skills": [
+    "plate"
+   ],
+   "seen": []
+  },
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.0045,
+   "fork": false,
+   "fork_err_m": 0.0265,
+   "plate": false,
+   "plate_err_m": 0.0593,
+   "cup": true,
+   "cup_err_m": 0.006,
+   "subtasks_done": 3,
+   "success": false,
+   "failed": [
+    "fork",
+    "plate"
+   ],
+   "seed": 137,
+   "retries": 2,
+   "replans": 1,
+   "regressed": 2,
+   "pushed": 1,
+   "regressed_skills": [
+    "plate",
+    "fork"
+   ],
+   "seen": []
+  },
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.0043,
+   "fork": false,
+   "fork_err_m": 0.0107,
+   "plate": false,
+   "plate_err_m": 0.0526,
+   "cup": true,
+   "cup_err_m": 0.0008,
+   "subtasks_done": 3,
+   "success": false,
+   "failed": [
+    "fork",
+    "plate"
+   ],
+   "seed": 138,
+   "retries": 1,
+   "replans": 1,
+   "regressed": 2,
+   "pushed": 1,
+   "regressed_skills": [
+    "plate",
+    "fork"
+   ],
+   "seen": []
+  },
+  {
+   "drawer_open": true,
+   "spoon": true,
+   "spoon_err_m": 0.0067,
+   "fork": false,
+   "fork_err_m": 0.0925,
+   "plate": false,
+   "plate_err_m": 0.1116,
+   "cup": false,
+   "cup_err_m": 0.0622,
+   "subtasks_done": 2,
+   "success": false,
+   "failed": [
+    "fork",
+    "plate",
+    "cup"
+   ],
+   "seed": 139,
+   "retries": 4,
+   "replans": 1,
+   "regressed": 0,
+   "pushed": 0,
+   "regressed_skills": [],
+   "seen": []
+  }
+ ]
+}
