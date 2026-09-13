@@ -46,15 +46,24 @@ def main():
     ap.add_argument("--lr", type=float, default=None, help="transformer learning rate (default: the policy's)")
     ap.add_argument("--drop-optimizer", action="store_true",
                     help="delete the checkpoints' optimizer state (~400 MB each); evaluation and --init-from don't need it")
+    ap.add_argument("--parent-stats-ok", action="store_true",
+                    help="the demo set carries its parent's statistics (use_parent_stats.py kept meta/stats.own.json) "
+                         "and the parent checkpoint already runs on them: train despite a near-zero spread")
     args = ap.parse_args()
     manifest = json.loads((ROOT / args.data / "tenplaces_manifest.json").read_text())
     # A joint that never moves in the demo set (the idle arm) has a spread of ~0; MEAN_STD normalisation then divides
     # its numerical wobble by ~eps and the policy breaks (a drawer fine-tune: 0/50 against 44/50). Refuse, and say how.
+    # The failure came from statistics that changed under a checkpoint; a fine-tune on its parent's own statistics
+    # keeps the normalisation the parent was trained and evaluated with, so it may go ahead when asked explicitly.
     stats = json.loads((ROOT / args.data / "meta" / "stats.json").read_text())
     tiny = {k: [i for i, s in enumerate(stats[k]["std"]) if s < 1e-4] for k in ("action", "observation.state")}
     if any(tiny.values()):
-        sys.exit(f"{args.data}: near-zero spread in {tiny} (a joint that never moves). Fine-tune with the parent's "
-                 f"statistics: python scripts/use_parent_stats.py --data {args.data} --parent-data <parent's dataset>")
+        inherited = (ROOT / args.data / "meta" / "stats.own.json").exists()
+        if not (args.parent_stats_ok and inherited):
+            sys.exit(f"{args.data}: near-zero spread in {tiny} (a joint that never moves). Fine-tune with the parent's "
+                     f"statistics: python scripts/use_parent_stats.py --data {args.data} --parent-data <parent's dataset>")
+        print(f"{args.data}: near-zero spread in {tiny}, inherited from the parent checkpoint's own statistics "
+              f"(--parent-stats-ok): training", flush=True)
     skills = args.skills or list(manifest["skills"])
     env = {**os.environ, "TENPLACES_CACHE": args.cache, "PYTHONIOENCODING": "utf-8"}
     if args.amp:
