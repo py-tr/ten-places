@@ -83,11 +83,12 @@ def main():
         t = time.perf_counter()
         show = lambda text: print(f"  … {text}", flush=True)  # noqa: E731 - partial transcripts as they arrive
         command, partials, ms = transcribe_mic(on_partial=show) if args.mic else transcribe_file(args.audio, on_partial=show)
-        spoken = {"source": "mic" if args.mic else str(args.audio), "partials": len(partials),
-                  "ms_final_after_speech_end": round(ms), "s_total": round(time.perf_counter() - t, 2)}
-        print(f"speechmatics: {command!r} (final {ms:.0f} ms after the speech ended)", flush=True)
         if not command:
             sys.exit("no speech recognised")
+        spoken = {"source": "mic" if args.mic else str(args.audio), "partials": len(partials),
+                  "ms_final_after_speech_end": round(ms) if ms == ms else None,
+                  "s_total": round(time.perf_counter() - t, 2)}
+        print(f"speechmatics: {command!r} (final {ms:.0f} ms after the speech ended)", flush=True)
 
     voice = None
     if args.listen:
