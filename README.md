@@ -83,12 +83,14 @@ same frozen configuration, each run once (`out/eval/agent_table/ov_w8_fresh200-2
 | … widened ×2.0 | 33/50 (52–78%) |
 | Fixed sequence, plate and cup sizes ±10%, cutlery length ±10% (training used one size of each) | 25/50 (37–63%) |
 | Fixed sequence, plate and cup sizes ±20%, cutlery length ±10% | 17/50 (22–48%) |
+| Fixed sequence, only the cup's size ±20% | 18/50 (24–50%) |
 
 The agent replicates its 43/50; here its re-checks, retries and re-queued steps add 10 tables and lose none (McNemar
 p = 0.002). Widening the ranges cost nothing measurable (paired with the normal ranges: 14 tables better, 6 worse,
 p = 0.12; at ×2.0, 10 better and 10 worse). Object sizes are where it breaks: every skill learned one size of each object, and paired with the
 trained sizes ±10% loses 12 tables and gains 4 (p = 0.08), ±20% loses 18 and gains 2 (p < 0.001) — mostly the cup,
-placed about as often as usual within 5% of its trained size and rarely beyond 10%. The grader is size-proof (an
+placed about as often as usual within 5% of its trained size and rarely beyond 10%. With only the cup's size
+varied, 18/50: the cup alone carries nearly all of it. The grader is size-proof (an
 object set on its target passes on all 50 tables at ±20%). Over both held-out sets the full agent sets 86 of 100 tables. The submission video shows the first 10
 seeds as a grid with pass/fail per seed. (The first look, on in `run_agent.py`, is off in these rows; on fresh tables
 it skips nothing — `docs/findings.md`.)
@@ -222,7 +224,7 @@ primitive.
 make third-party      # the official SO-101 model (TheRobotStudio/SO-ARM100) at the pinned commit
 pip install -r requirements-lock.txt
 make models HF_SKILLS_REPO=<user>/<repo>   # trained skills + classifier, and the OpenVINO planner (~4.4 GB)
-make test             # 181 tests
+make test             # 182 tests
 make watch SEED=3                                        # scripted controller, live 3D viewer
 make watch-agent CMD="just the plate and the cup" SEED=3 # VLM plan + learned policies, live
 make agent CMD="set the table, but skip the cup" SEED=3  # rendered to out/video/ with the plan panel

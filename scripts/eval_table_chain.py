@@ -131,6 +131,9 @@ def build(cfg: dict):
     for skill, paths in cfg["avg"].items():
         exec_kw = cfg["exec_settings"].get(skill, {})
         sp.policies[skill] = AvgPolicy([LeRobotPolicy(p, **{**cfg["kwargs"], **exec_kw}) for p in paths])
+    # --retry-exec: the same checkpoint under another execution setting, for the skill's second attempt
+    sp.alternates = {s: LeRobotPolicy(sp.sources[s], **{**cfg["kwargs"], **EXEC[v]})
+                     for s, v in cfg.get("retry_exec", {}).items()}
     return sp
 
 
@@ -219,8 +222,9 @@ def run_one(seed: int) -> dict:
             img[:144, :192] = o["images"]["top"]
             video.append(img)
 
-    def run_skill(skill, obs, camera_end=None):
-        policy.reset()
+    def run_skill(skill, obs, camera_end=None, pol=None):
+        pol = pol or policy
+        pol.reset()
         onehot = np.zeros(len(SKILLS), dtype=np.float32)
         onehot[SKILL_NAMES.index(skill)] = 1.0
         text = SKILL_TEXT[skill]
@@ -229,7 +233,7 @@ def run_one(seed: int) -> dict:
         for i in range(budgets[skill]):
             obs["task"], obs["env_state"], obs["skill"] = text, onehot, skill
             t = time.perf_counter()
-            a = np.asarray(policy.select_action(obs), dtype=np.float64)
+            a = np.asarray(pol.select_action(obs), dtype=np.float64)
             lat.append(time.perf_counter() - t)
             obs = ep.step(a)
             on_frame(obs)
@@ -237,7 +241,7 @@ def run_one(seed: int) -> dict:
                 ended, done_at = "camera", i
                 for _ in range(cfg["settle"]):
                     obs["task"], obs["env_state"], obs["skill"] = text, onehot, skill
-                    obs = ep.step(np.asarray(policy.select_action(obs), dtype=np.float64))
+                    obs = ep.step(np.asarray(pol.select_action(obs), dtype=np.float64))
                     on_frame(obs)
                 break
         frames_used = (done_at + 1 + cfg["settle"]) if done_at is not None else budgets[skill]
@@ -257,7 +261,10 @@ def run_one(seed: int) -> dict:
                               until=cfg["home_until"])
             start = snapshot(ep)
             shot(f"{skill}{attempt}_start")
-            obs, info = run_skill(skill, obs, camera_end=True if (attempt > 1 and cfg["retry_camera_end"]) else None)
+            alt = policy.alternates.get(skill) if attempt > 1 else None
+            obs, info = run_skill(skill, obs, camera_end=True if (attempt > 1 and cfg["retry_camera_end"]) else None,
+                                  pol=alt)
+            info["exec"] = cfg["retry_exec"][skill] if alt is not None else "deployed"
             end = snapshot(ep)
             shot(f"{skill}{attempt}_end")
             g = grade_table(ep.m, ep.d, ep.params)
@@ -289,7 +296,7 @@ def run_one(seed: int) -> dict:
 def summarize(rows, cfg) -> str:
     n, k = len(rows), sum(r["success"] for r in rows)
     lines = [f"# {cfg['name']}: seeds {rows[0]['seed']}-{rows[-1]['seed']} ({n}), backend torch/cuda", "",
-             f"levers: retry={cfg['retry']} exec={cfg['exec_settings']} ckpt={cfg['checkpoints']} avg={cfg['avg']} "
+             f"levers: retry={cfg['retry']} retry_exec={cfg.get('retry_exec', {})} exec={cfg['exec_settings']} ckpt={cfg['checkpoints']} avg={cfg['avg']} "
              f"budgets={cfg['budgets']} settle={cfg['settle']} home_frames={cfg['home_frames']} home_hold={cfg['home_hold']} "
              f"release={cfg['release']} threshold={cfg['threshold']} camera_ends={CAMERA_ENDS} "
              f"home_until={cfg.get('home_until', 0)} retry_camera_end={cfg.get('retry_camera_end', False)} "
@@ -338,6 +345,8 @@ def main():
                     help="feed joints whose training state spread is below STD their training mean (e.g. 1e-4)")
     ap.add_argument("--exec", nargs="*", default=[], metavar="SKILL=exec10|exec50|ensemble")
     ap.add_argument("--ckpt", nargs="*", default=[], metavar="SKILL=DIR")
+    ap.add_argument("--retry-exec", nargs="*", default=[], metavar="SKILL=exec10|exec50|ensemble",
+                    help="a retried skill's second attempt runs the same checkpoint with this execution setting")
     ap.add_argument("--avg", nargs="*", default=[], metavar="SKILL=DIR,DIR")
     ap.add_argument("--budget", nargs="*", default=[], metavar="SKILL=N")
     ap.add_argument("--settle", type=int, default=30)
@@ -375,7 +384,8 @@ def main():
            "kwargs": {"device": "cuda", "n_action_steps": 10,
                       **({"mask_idle_std": args.mask_idle} if args.mask_idle is not None else {})},
            "classifier": args.classifier, "threshold": args.threshold,
-           "retry": list(args.retry), "budgets": parse_kv(args.budget, int), "settle": args.settle,
+           "retry": list(args.retry), "retry_exec": parse_kv(args.retry_exec),
+           "budgets": parse_kv(args.budget, int), "settle": args.settle,
            "min_frames": args.min_frames, "home_frames": args.home_frames, "home_hold": args.home_hold,
            "release": args.release, "oracle_ref": args.oracle_ref, "frames": args.frames, "videos": list(args.videos),
            "home_until": args.home_until, "retry_camera_end": args.retry_camera_end,

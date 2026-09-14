@@ -139,7 +139,9 @@ each run once (`final_report.py` refuses the tuning range and allows 200+ for th
   tables, by the cup's size: within ±5% 9/11 placed, 5–10% off 9/12, more than 10% smaller 1/11, more than 10%
   larger 4/13. The plate fails when more than 10% smaller (0/5) and holds when larger (12/13); longer cutlery
   (+5–10%) costs the fork (5/9). The grader is not the cause: a cup or a plate set exactly on its target passes on
-  all 50 tables at ±20%, as at the trained sizes. Each skill learned one size of each object.
+  all 50 tables at ±20%, as at the trained sizes. Each skill learned one size of each object. With only the cup's
+  size varied ±20% (`TENPLACES_SHAPE_ONLY=cup`, the same cups as in the every-object row): 18/50 (2 better, 17 worse,
+  p < 0.001), the cup placed 23/50 — nearly the whole loss of the every-object row (17/50).
 - One attempt to teach the cup other sizes, gates written before any result (tuning seeds 100–149): 100 scripted
   demonstrations with the cup ×0.77–1.25 (40 at the trained size), the deployed cup fine-tuned 7.5k steps on its own
   statistics. It got worse at every size — cup alone at the trained size 37/50 against 48/50, at ±20% cup sizes 24/50
