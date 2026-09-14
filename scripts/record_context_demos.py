@@ -30,7 +30,9 @@ from lerobot.datasets.lerobot_dataset import LeRobotDataset  # noqa: E402
 
 from tenplaces import scene_table  # noqa: E402
 from tenplaces.env import CAMERAS, FPS, JOINTS  # noqa: E402
-from tenplaces.env_table import IMAGE_HW, SKILLS, record_skill_oracle  # noqa: E402
+from tenplaces.control import IKFailure  # noqa: E402
+from tenplaces.env_table import IMAGE_HW, SKILLS, policy_outcome, record_skill_oracle  # noqa: E402
+from tenplaces.evaluate_table import DEFAULT_BUDGETS  # noqa: E402
 from tenplaces.evaluate_skill import KEY, SKILL_NAMES, verified_prefixes  # noqa: E402
 
 
@@ -70,8 +72,25 @@ def main():
                     help="cup size (radius and height) drawn per episode, uniformly — the policies had seen one cup")
     ap.add_argument("--cup-trained-frac", type=float, default=0.33,
                     help="with --cup-scale: share of episodes kept at the trained size, so it cannot regress")
+    ap.add_argument("--takeover-on-stall", action="store_true",
+                    help="plate/cup: the takeover policy runs until it stalls (env_table.record_skill_oracle until_stall; "
+                         "at most the --takeover-frames MAX); only stalled attempts are kept, so the demonstrations "
+                         "start from the policy's own failed grasps")
+    ap.add_argument("--takeover-temporal-coeff", type=float, default=None,
+                    help="run the takeover policy with temporal ensembling (the deployed plate: 0.01) instead of 10-action chunks")
+    ap.add_argument("--plate-x-max", type=float, default=None, help="only seeds whose plate starts at x <= this")
+    ap.add_argument("--stop-at", default=None, metavar="HH:MM",
+                    help="stop drawing seeds at this local time (next occurrence) and finalise what was kept")
     ap.add_argument("--overwrite", action="store_true")
     args = ap.parse_args()
+    stop_at = None
+    if args.stop_at:
+        import datetime as dt
+
+        now = dt.datetime.now()
+        hh, mm = map(int, args.stop_at.split(":"))
+        t = now.replace(hour=hh, minute=mm, second=0, microsecond=0)
+        stop_at = (t if t > now else t + dt.timedelta(days=1)).timestamp()
     if len(args.episodes) != len(args.skills):
         sys.exit("--episodes needs one count per skill")
     if args.displace and args.skills != [args.displace]:
@@ -85,7 +104,8 @@ def main():
     if args.takeover_policy:
         from tenplaces.lerobot_policy import LeRobotPolicy
 
-        policy = LeRobotPolicy(args.takeover_policy, device="cuda", n_action_steps=10)
+        policy = LeRobotPolicy(args.takeover_policy, device="cuda", n_action_steps=10,
+                               temporal_coeff=args.takeover_temporal_coeff)
 
     ds = LeRobotDataset.create(repo_id=args.repo_id, fps=FPS, features=features(), root=root,
                                robot_type="bimanual_so101_sim", use_videos=False, image_writer_threads=args.writer_threads)
@@ -100,7 +120,12 @@ def main():
         onehot[SKILL_NAMES.index(skill)] = 1.0
         kept = 0
         while kept < n:
-            if args.plate_y_max is not None and scene_table.sample(seed).plate_xy[1] > args.plate_y_max:
+            if stop_at is not None and time.time() >= stop_at:
+                print(f"{skill}: stopped at {args.stop_at} with {kept}/{n}", flush=True)
+                break
+            plate_xy = scene_table.sample(seed).plate_xy
+            if ((args.plate_y_max is not None and plate_xy[1] > args.plate_y_max)
+                    or (args.plate_x_max is not None and plate_xy[0] > args.plate_x_max)):
                 seed += 1
                 continue
             before = starts[int(rng.integers(len(starts)))]
@@ -112,16 +137,34 @@ def main():
             k = 0
             if policy is not None and rng.random() < args.takeover_frac:
                 k = int(rng.integers(args.takeover_frames[0], args.takeover_frames[1] + 1))
+                if args.takeover_on_stall:
+                    k = args.takeover_frames[1]  # an upper bound: the stall ends the policy's run
+                    # Only tables the policy fails on without ever lifting the object: a first, unrecorded pass
+                    # runs it for its whole budget (a slip-like dip also happens during grasps that succeed).
+                    try:
+                        g_pol, lifted_pol = policy_outcome(seed, skill, before, policy, DEFAULT_BUDGETS[skill])
+                    except IKFailure as e:
+                        g_pol, lifted_pol = {KEY[skill]: True, "error": str(e)}, False
+                    if g_pol[KEY[skill]] or lifted_pol:
+                        skipped.append({"seed": seed, "skill": skill, "before": before, "policy_ok": bool(g_pol[KEY[skill]]),
+                                        "policy_lifted": lifted_pol, "error": g_pol.get("error")})
+                        seed += 1
+                        continue
             opening = float(rng.uniform(*args.drawer_open)) if args.drawer_open else None
             cup_scale = None
             if args.cup_scale:
                 cup_scale = 1.0 if size_rng.random() < args.cup_trained_frac else float(size_rng.uniform(*args.cup_scale))
             frames, result = record_skill_oracle(seed, skill, before, policy=policy if k else None, policy_frames=k,
                                                  drawer_open=opening, displace_body=skill if knock else None,
-                                                 displace_xy=knock or (0.0, 0.0), cup_scale=cup_scale)
-            if result["error"] or not result[KEY[skill]] or not all(result[KEY[b]] for b in before):
+                                                 displace_xy=knock or (0.0, 0.0), cup_scale=cup_scale,
+                                                 until_stall=bool(k and args.takeover_on_stall))
+            if k and args.takeover_on_stall:
+                k = result["policy_frames_run"]
+            no_stall = bool(k and args.takeover_on_stall and (not result["stalled"] or result["lifted"]))
+            if no_stall or result["error"] or not result[KEY[skill]] or not all(result[KEY[b]] for b in before):
                 skipped.append({"seed": seed, "skill": skill, "before": before, "takeover_frames": k,
-                                "cup_scale": cup_scale, "failed": result["failed"], "error": result["error"]})
+                                "cup_scale": cup_scale, "failed": result["failed"], "error": result["error"],
+                                "stalled": result["stalled"], "lifted": result["lifted"], "no_stall": no_stall})
             else:
                 for f in frames:
                     frame = {"observation.state": f["state"], "action": f["action"],
@@ -133,7 +176,7 @@ def main():
                 by_skill[skill].append(ep_index)
                 episodes.append({"episode": ep_index, "skill": skill, "before": before, "seed": seed,
                                  "frames": len(frames), "takeover_frames": k, "drawer_open": opening,
-                                 "displaced_xy": knock, "cup_scale": cup_scale})
+                                 "displaced_xy": knock, "cup_scale": cup_scale, "stalled": result["stalled"]})
                 ep_index += 1
                 kept += 1
                 if kept % 10 == 0:
@@ -143,7 +186,8 @@ def main():
             seed += 1
     ds.finalize()
     manifest = {"repo_id": args.repo_id, "root": str(root), "fps": FPS, "image_hw": IMAGE_HW,
-                "plate_y_max": args.plate_y_max, "takeover_policy": args.takeover_policy,
+                "plate_y_max": args.plate_y_max, "plate_x_max": args.plate_x_max, "takeover_policy": args.takeover_policy,
+                "takeover_on_stall": args.takeover_on_stall, "takeover_temporal_coeff": args.takeover_temporal_coeff,
                 "skills": {s: {"instruction": text[s], "episodes": by_skill[s]} for s in args.skills},
                 "episodes": episodes, "skipped_oracle_failures": skipped, "wall_seconds": round(time.time() - t0, 1)}
     (root / "tenplaces_manifest.json").write_text(json.dumps(manifest, indent=1))

@@ -121,7 +121,7 @@ def displace(m, d, body: str, dx: float, dy: float):
 
 def record_skill_oracle(seed: int, skill: str, before=(), image_hw=IMAGE_HW, policy=None, policy_frames: int = 0,
                         drawer_open: float | None = None, displace_body: str | None = None, displace_xy=(0.0, 0.0),
-                        cup_scale: float | None = None):
+                        cup_scale: float | None = None, until_stall: bool = False):
     """Scripted run of the skills in `before` (not recorded), then `skill` alone, recorded at FPS.
 
     Both arms are at home between skills (oracle.table.run_plan), so the recording starts from the same pose
@@ -137,6 +137,10 @@ def record_skill_oracle(seed: int, skill: str, before=(), image_hw=IMAGE_HW, pol
     displace_body: after the prefix (which placed it), knock that object by `displace_xy` m and let it settle,
     unrecorded — the recorded skill then puts a displaced object back (disturbance-repair demonstrations).
     cup_scale: this table with the cup that size (radius and height; scene_table.TableParams.cup_scale).
+    until_stall (plate/cup): the policy runs until its grasp fails — gripper commanded closed and either the object
+    slipped back to the table after rising, or arm B's joints within STALL_RAD for STALL_FRAMES frames with the
+    object on the table — or `policy_frames`; result["stalled"] is "slip", "still" or False, result["lifted"] whether the policy had lifted the object LIFTED_Z first (a takeover from a good grasp
+    would demonstrate opening the jaw mid-carry; the caller drops those).
     """
     from .control import IKFailure
     from .grader_table import grade_table
@@ -163,22 +167,38 @@ def record_skill_oracle(seed: int, skill: str, before=(), image_hw=IMAGE_HW, pol
         if displace_body is not None:
             displace(ep.m, ep.d, displace_body, *displace_xy)
             ep.ctl.hold(0.5)  # settle; not recorded
+        stalled = lifted = False
+        ran = 0
         if policy is not None and policy_frames > 0:
             onehot = np.zeros(len(SKILLS), dtype=np.float32)
             onehot[[s for s, _, _ in SKILLS].index(skill)] = 1.0
             text = dict((s, t) for s, _, t in SKILLS)[skill]
             policy.reset()
             obs = ep.observation()
+            arm_b, z_peak = [], 0.0
             for _ in range(policy_frames):
                 obs["task"], obs["env_state"], obs["skill"] = text, onehot, skill
                 obs = ep.step(np.asarray(policy.select_action(obs), dtype=np.float64))
+                ran += 1
+                if until_stall:  # gripper closed and either the object slipped back or arm B holds still
+                    z = float(ep.d.body(skill).xpos[2])
+                    lifted |= z >= LIFTED_Z
+                    z_peak = max(z_peak, z)
+                    arm_b.append(ep.state()[6:11].copy())
+                    closed = ep.command()[11] < 0
+                    slipped = z_peak >= SLIP_RISE and z < SLIP_BACK
+                    still = (z < STALL_Z and len(arm_b) >= STALL_FRAMES
+                             and np.ptp(np.array(arm_b[-STALL_FRAMES:]), axis=0).max() < STALL_RAD)
+                    if not lifted and closed and (slipped or still):
+                        stalled = "slip" if slipped else "still"
+                        break
         ep.ctl.steps = 0
         recording[0] = True
         table.run_plan(ep.ctl, ep.params, [skill])
     except IKFailure as e:
         error = str(e)
     result = grade_table(ep.m, ep.d, ep.params)
-    result["error"] = error
+    result.update(error=error, stalled=stalled, lifted=lifted, policy_frames_run=ran)
     ep.close()
     actions = cmds[1:] + cmds[-1:]
     for f, a in zip(frames, actions):
@@ -186,6 +206,34 @@ def record_skill_oracle(seed: int, skill: str, before=(), image_hw=IMAGE_HW, pol
     return frames, result
 
 
+def policy_outcome(seed: int, skill: str, before, policy, frames: int, image_hw=IMAGE_HW):
+    """The learned policy alone on this table (scripted `before`, unrecorded) for `frames` steps: (grade, lifted) —
+    the grade at the end, and whether the object was ever LIFTED_Z up. Picks the tables a policy fails on."""
+    from .grader_table import grade_table
+
+    ep = TableEpisode(seed, render=True, image_hw=image_hw)
+    try:
+        if before:
+            table.run_plan(ep.ctl, ep.params, list(before))
+        onehot = np.zeros(len(SKILLS), dtype=np.float32)
+        onehot[[s for s, _, _ in SKILLS].index(skill)] = 1.0
+        text = dict((s, t) for s, _, t in SKILLS)[skill]
+        policy.reset()
+        obs, lifted = ep.observation(), False
+        for _ in range(frames):
+            obs["task"], obs["env_state"], obs["skill"] = text, onehot, skill
+            obs = ep.step(np.asarray(policy.select_action(obs), dtype=np.float64))
+            lifted |= float(ep.d.body(skill).xpos[2]) >= LIFTED_Z
+        return grade_table(ep.m, ep.d, ep.params), lifted
+    finally:
+        ep.close()
+
+
+# Failed rim grasp (record_skill_oracle until_stall). The deployed plate on the stall tables loops: a shallow pinch
+# raises the plate 1-2.5 cm, it slips out ~20 frames later, the same grasp again (period ~55-60 frames). Trigger on
+# the first slip (object rose SLIP_RISE, back below SLIP_BACK, gripper still closed) or on an arm held still.
+STALL_FRAMES, STALL_RAD, STALL_Z, LIFTED_Z = 12, 0.01, 0.005, 0.03
+SLIP_RISE, SLIP_BACK = 0.005, 0.002
 RELEASED = 0.35  # the gripper command every demonstrated skill starts from once that arm has let go (oracle runs)
 
 
