@@ -130,7 +130,8 @@ each run once (`final_report.py` refuses the tuning range and allows 200+ for th
   harder set.
 - Robustness outside the training ranges: friction, the three masses, light and colours widened ×1.5 about their
   centres (placements unchanged, so the tables pair seed by seed): 41/50 against 33/50 at the normal ranges, 14 tables
-  better and 6 worse (p = 0.12) — no measurable loss. The classifier and the policies both see the widened scenes.
+  better and 6 worse (p = 0.12) — no measurable loss. The classifier and the policies both see the widened scenes. Widened ×2.0: 33/50, 10
+  tables better and 10 worse (p = 1.0).
 - Object sizes, which training never varied (`TENPLACES_SHAPE`: plate radius, cup radius and height ×(1 ± shape),
   cutlery length ±min(shape, 10%) for the 16 cm tray; everything else identical to the paired table): ±10%
   25/50 (4 better, 12 worse, p = 0.08), ±20% 17/50 (2 better, 18 worse, p < 0.001), against 33/50 at the trained
@@ -215,7 +216,8 @@ multiple of 64 stay INT8): 23 MB instead of 33 MB per policy. The full agent on 
 deployed policies in INT4: 0/50 full tables against 41/50 with INT8 weights — the drawer (50), spoon (44), plate (45)
 and fork (48) hold, the cup fails on every table. On the same half-set tables the cup's first actions differ from
 INT8's by up to 0.05 rad, a steady drift in arm B's shoulder pan and wrist rather than noise — enough to miss a small
-cup and its 2.5 cm target (`eval_agent_table.py --backend ov-w4`). Task success, not model size, decides where the
+cup and its 2.5 cm target (`eval_agent_table.py --backend ov-w4`). Nor is it faster here: in one benchmark run INT4 took 16.8–21.3 ms per
+inference against 16.8–19.3 ms for INT8 weights (`out/benchmark/opt_out_0914/`). Task success, not model size, decides where the
 ladder stops. (The later 75k hand-off
 checkpoint scored 19/20 on both FP32 and INT8 weights, `scripts/eval_checkpoints.py`.) The deployed table policies
 run INT8 weights (15.5–16 ms on an idle machine, README).
@@ -253,3 +255,12 @@ fresh OpenGL context can render a few pixels one intensity level differently; th
 reported over 50 seeds with Wilson intervals. How much: two agent runs of the identical system on seeds 100–149 set
 41 and 39 tables and disagree on 10 of the 50 (the first-look gate above) — a difference of two tables between runs
 is not a result; paired comparisons with McNemar tests are.
+
+Timing is a separate matter. Started from a console with no visible window, a process can be classed as background
+by Windows 11 and throttled (EcoQoS): on 2026-09-14 the benchmarks came out 4–8× slower on PyTorch and ~1.3× on
+OpenVINO, with the CPU otherwise idle and at full clock. In one process, a 14-thread PyTorch matmul ran 227 GFLOP/s
+as launched and 646 GFLOP/s after opting out. The robot and the benchmark scripts now opt out at start
+(`tenplaces.cores.no_power_throttling`). Success rates are unaffected — the simulation waits for every action. The
+README's latency table is the clean run of 2026-09-13; a re-run with the opt-out (`out/benchmark/opt_out_0914/`)
+matches it on the P-cores within about 10%, while the E-cores-only rows and the E-core planner ran about 1.5–2×
+slower that day, not explained.

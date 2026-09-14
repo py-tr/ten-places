@@ -1,0 +1,98 @@
+{
+ "env": {
+  "cpu": "13th Gen Intel(R) Core(TM) i5-13600KF",
+  "device": "13th Gen Intel(R) Core(TM) i5-13600KF",
+  "openvino": "2026.3.1-22476-759c5a6ab8c-releases/2026/3",
+  "available_devices": {
+   "CPU": "13th Gen Intel(R) Core(TM) i5-13600KF",
+   "GPU": "NVIDIA GeForce RTX 4060 Ti (dGPU)"
+  },
+  "torch": "2.11.0+cu128",
+  "python": "3.13.1",
+  "os": "Windows-11-10.0.22631-SP0",
+  "checkpoint": "out\\train\\skills_ctx\\cup\\checkpoints\\015000\\pretrained_model"
+ },
+ "rows": [
+  {
+   "variant": "pytorch",
+   "precision": "FP32 (PyTorch eager)",
+   "device": "CPU",
+   "latency_ms_median": 63.210899475961924,
+   "latency_ms_p95": 78.93565981648861,
+   "throughput_ips": null,
+   "ir_mb": null,
+   "success": null
+  },
+  {
+   "variant": "fp32",
+   "precision": "FP32",
+   "device": "CPU",
+   "latency_ms_median": 24.957249872386456,
+   "latency_ms_p95": 41.93515004590154,
+   "throughput_ips": 75.90817809354226,
+   "infer_requests": 6,
+   "ir_mb": 130.5,
+   "success": null
+  },
+  {
+   "variant": "w8",
+   "precision": "INT8 weights only",
+   "device": "CPU",
+   "latency_ms_median": 18.739799968898296,
+   "latency_ms_p95": 26.22826537117362,
+   "throughput_ips": 92.77981747611959,
+   "infer_requests": 6,
+   "ir_mb": 33.0,
+   "success": null
+  },
+  {
+   "variant": "w4",
+   "precision": "INT4 weights (groups of 64), not deployed",
+   "device": "CPU",
+   "latency_ms_median": 21.315450314432383,
+   "latency_ms_p95": 29.883499676361655,
+   "throughput_ips": 92.12725003447888,
+   "infer_requests": 6,
+   "ir_mb": 23.0,
+   "success": null
+  }
+ ],
+ "cpu_sweep": [
+  {
+   "core_type": "ANY_CORE",
+   "hyper_threading": true,
+   "latency_ms_median": 23.221150040626526,
+   "latency_ms_p95": 28.54938060045242
+  },
+  {
+   "core_type": "ANY_CORE",
+   "hyper_threading": false,
+   "latency_ms_median": 20.584299694746733,
+   "latency_ms_p95": 30.920794885605574
+  },
+  {
+   "core_type": "PCORE_ONLY",
+   "hyper_threading": true,
+   "latency_ms_median": 23.13575055450201,
+   "latency_ms_p95": 25.75182495638728
+  },
+  {
+   "core_type": "PCORE_ONLY",
+   "hyper_threading": false,
+   "latency_ms_median": 19.708349835127592,
+   "latency_ms_p95": 27.124915365129706
+  },
+  {
+   "core_type": "ECORE_ONLY",
+   "hyper_threading": true,
+   "latency_ms_median": 56.11025029793382,
+   "latency_ms_p95": 69.02279988862574
+  },
+  {
+   "core_type": "ECORE_ONLY",
+   "hyper_threading": false,
+   "latency_ms_median": 56.159949861466885,
+   "latency_ms_p95": 65.47108977101743
+  }
+ ]
+}

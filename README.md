@@ -80,12 +80,13 @@ same frozen configuration, each run once (`out/eval/agent_table/ov_w8_fresh200-2
 | **Full agent on OpenVINO** | **43/50 (74–93%)** |
 | Fixed five-step sequence, OpenVINO | 33/50 (52–78%) |
 | Fixed sequence, friction, masses, light and colours widened ×1.5 beyond the training ranges | 41/50 (69–90%) |
+| … widened ×2.0 | 33/50 (52–78%) |
 | Fixed sequence, plate and cup sizes ±10%, cutlery length ±10% (training used one size of each) | 25/50 (37–63%) |
 | Fixed sequence, plate and cup sizes ±20%, cutlery length ±10% | 17/50 (22–48%) |
 
 The agent replicates its 43/50; here its re-checks, retries and re-queued steps add 10 tables and lose none (McNemar
 p = 0.002). Widening the ranges cost nothing measurable (paired with the normal ranges: 14 tables better, 6 worse,
-p = 0.12). Object sizes are where it breaks: every skill learned one size of each object, and paired with the
+p = 0.12; at ×2.0, 10 better and 10 worse). Object sizes are where it breaks: every skill learned one size of each object, and paired with the
 trained sizes ±10% loses 12 tables and gains 4 (p = 0.08), ±20% loses 18 and gains 2 (p < 0.001) — mostly the cup,
 placed about as often as usual within 5% of its trained size and rarely beyond 10%. The grader is size-proof (an
 object set on its target passes on all 50 tables at ±20%). Over both held-out sets the full agent sets 86 of 100 tables. The submission video shows the first 10
@@ -153,14 +154,17 @@ What the optimisation buys:
   INT8 activations in the transformer cost it (hand-off checkpoint: 7/20 against 13/20 for FP32 and 14/20 for INT8
   weights on the same seeds, `docs/findings.md`), so they are not shipped. INT4 weights (23 MB instead of 33) keep
   four skills but break the cup — its actions drift ~0.05 rad — so the full table fails every time (0/50 against
-  41/50 on the tuning seeds): the ladder stops at INT8 weights.
+  41/50 on the tuning seeds), and in the same benchmark run they are no faster than INT8 weights on this CPU
+  (16.8–21.3 ms against 16.8–19.3 ms, `out/benchmark/opt_out_0914/`): the ladder stops at INT8 weights.
 - **Latency spent on quality.** At 16 ms the policy can run every control step with temporal ensembling: the drawer
   20/20 against 18/20 open-loop and 15/20 re-planning every 10 actions (seeds 100–119); the spoon hand-off 43/50
   against 4/50 re-planning every 10 actions (open-loop whole chunks: 44/50, seeds 100–149).
 - **Hybrid-core placement for concurrent workloads.** Real-time control on the P-cores, the VLM on the E-cores:
   the arms keep 25 Hz while the planner thinks. The first plan comes while the arms are still, so it runs on
   every core: median 7.1 s against 14.3 s on the E-cores, same plans (10 demo commands,
-  `scripts/bench_planner_placement.py`). Everything asked while the arms move — the check for impossible parts
+  `scripts/bench_planner_placement.py`); OpenVINO GenAI's own metrics for that plan: 3.45 s to the first token (image
+  encoding and prefill of 452 tokens), then 8.4 tokens/s for its 34 (`out/benchmark/opt_out_0914/planner_placement.md`).
+  Everything asked while the arms move — the check for impossible parts
   ("light a candle"), spoken changes — stays on the E-cores.
 - **Energy.** INT8 weights use 2.4× less energy per inference than PyTorch at its default 14 threads on the same
   CPU (1.43 vs 3.50 J above idle); at the robot's 25 Hz, P-core placement draws 7 W less than default scheduling.
@@ -218,7 +222,7 @@ primitive.
 make third-party      # the official SO-101 model (TheRobotStudio/SO-ARM100) at the pinned commit
 pip install -r requirements-lock.txt
 make models HF_SKILLS_REPO=<user>/<repo>   # trained skills + classifier, and the OpenVINO planner (~4.4 GB)
-make test             # 179 tests
+make test             # 181 tests
 make watch SEED=3                                        # scripted controller, live 3D viewer
 make watch-agent CMD="just the plate and the cup" SEED=3 # VLM plan + learned policies, live
 make agent CMD="set the table, but skip the cup" SEED=3  # rendered to out/video/ with the plan panel

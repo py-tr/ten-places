@@ -37,7 +37,7 @@ def verified_prefixes(skill: str):
 
 
 def run_skill_episode(policy, skill: str, seed: int, checker=None, budget=None, check_every=10, min_frames=40,
-                      settle_frames=30, before=None, drawer_open=None, cup_scale=None):
+                      settle_frames=30, before=None, drawer_open=None, cup_scale=None, grader_ends=False):
     """before: skills the scripted controller performs first (default: every earlier skill in canonical order;
     a verified subset plan can start a skill from fewer, e.g. the cup with the plate never moved).
     drawer_open: how far the scripted drawer is pulled (default: the scene's 0.09 m) — the learned drawer opens
@@ -61,32 +61,36 @@ def run_skill_episode(policy, skill: str, seed: int, checker=None, budget=None, 
     onehot = np.zeros(len(SKILLS), dtype=np.float32)
     onehot[SKILL_NAMES.index(skill)] = 1.0
     text = dict((s, t) for s, _, t in SKILLS)[skill]
-    frames, camera_done = 0, False
+    frames, ended_by = 0, "budget"
     for i in range(budget or DEFAULT_BUDGETS[skill]):
         obs["task"], obs["env_state"], obs["skill"] = text, onehot, skill
         obs = ep.step(np.asarray(policy.select_action(obs), dtype=np.float64))
         frames = i + 1
-        if (checker is not None and CAMERA_ENDS[skill] and i >= min_frames and i % check_every == 0
-                and checker(skill, obs["images"]["top"])):
+        due = CAMERA_ENDS[skill] and i >= min_frames and i % check_every == 0
+        if due and grader_ends:  # diagnostic: the simulator, not the camera, says when the skill is done
+            done = bool(grade_table(ep.m, ep.d, ep.params)[KEY[skill]])
+        else:
+            done = due and checker is not None and checker(skill, obs["images"]["top"])
+        if done:
             # "Done" is seen as soon as the object is in place, often while it is still held: let the policy
             # finish the release and retreat that ends every demo before moving on.
             for _ in range(max(settle_frames, SETTLE[skill])):
                 obs["task"], obs["env_state"], obs["skill"] = text, onehot, skill
                 obs = ep.step(np.asarray(policy.select_action(obs), dtype=np.float64))
             frames += settle_frames
-            camera_done = True
+            ended_by = "grader" if grader_ends else "camera"
             break
     g = grade_table(ep.m, ep.d, ep.params)
     ep.close()
     # camera_done: the classifier ended the skill (a failure with it set is a false "done"); else the budget ran out
     return {"seed": seed, "skill": skill, "success": bool(g[KEY[skill]]), "frames": frames,
-            "err_m": g.get(f"{skill}_err_m"), "camera_done": camera_done}
+            "err_m": g.get(f"{skill}_err_m"), "camera_done": ended_by == "camera", "ended_by": ended_by}
 
 
 def evaluate_skill(policy, skill: str, seeds, out_dir: Path | None = None, checker=None, label=None, before=None,
-                   budget=None, drawer_open=None, cup_scales=None):
+                   budget=None, drawer_open=None, cup_scales=None, grader_ends=False):
     rows = [run_skill_episode(policy, skill, s, checker=checker, before=before, budget=budget, drawer_open=drawer_open,
-                              cup_scale=(cup_scales or {}).get(s))
+                              cup_scale=(cup_scales or {}).get(s), grader_ends=grader_ends)
             for s in seeds]
     k = sum(r["success"] for r in rows)
     summary = {"skill": skill, "label": label or skill, "episodes": len(rows), "success": k,
