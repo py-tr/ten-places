@@ -5,6 +5,13 @@ spoon and the fork from one arm to the other, move the plate, set the cup. A sma
 steps, learned ACT policies drive both arms from the cameras, and a camera classifier checks every step — all on an
 Intel CPU with OpenVINO.
 
+**86 of 100 held-out tables set completely** (two sets of 50 randomised tables, frozen configuration, each run once).
+Every grasp is friction contact with a ~17 N gripper — no weld or attach constraint anywhere — and at run time the
+robot sees only its cameras and its joint angles, never the simulator's object poses. It is a hierarchical VLA: a
+vision-language model plans from the top camera and the command, and small ACT policies act from three cameras at
+25 Hz. The skills themselves are not language-conditioned — a single policy given the skill as an input learned to
+ignore it (`docs/findings.md`) — so language reaches the arms through the plan.
+
 Built for the Intel online challenge *Bimanual VLA Manipulation with Multi-Modal Reasoning* (AI Infra Summit
 Hackathon 2026). Every number below comes from the script or result file named next to it. Evaluation seeds 0–49 are
 never used for training; choices are made on tuning seeds 100–149 (two early ones, made on seeds 0–29, were re-checked
@@ -77,7 +84,12 @@ same frozen configuration, each run once (`out/eval/agent_table/ov_w8_fresh200-2
 The agent replicates its 43/50; here its re-checks, retries and re-queued steps add 10 tables and lose none (McNemar
 p = 0.002). Widening the ranges cost nothing measurable (paired with the normal ranges: 14 tables better, 6 worse,
 p = 0.12). Over both held-out sets the full agent sets 86 of 100 tables. The submission video shows the first 10
-seeds as a grid with pass/fail per seed.
+seeds as a grid with pass/fail per seed. (The first look, on in `run_agent.py`, is off in these rows; on fresh tables
+it skips nothing — `docs/findings.md`.)
+
+**Placement accuracy**, full agent over the 100 held-out tables (the simulator's measurement): median error spoon
+0.33 cm, plate 0.41 cm, cup 0.44 cm, fork 0.78 cm; every placed object within the 2.5 cm tolerance (largest 2.45 cm);
+184 of 200 hand-offs completed.
 
 | Component | Result | Evidence |
 |---|---|---|
