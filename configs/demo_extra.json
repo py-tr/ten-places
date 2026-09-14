@@ -1,0 +1,7 @@
+{
+ "about": "Beyond the 10 demonstration seeds: the first look. Before the robot starts, the scripted controller does some steps (someone else half-set the table); the robot must see that, skip those steps and finish the rest. Fixed before recording, like configs/demo_seeds.json; a held-out seed, not tuned on.",
+ "fixed_on": "2026-09-14",
+ "seeds": [
+  {"seed": 10, "command": "Set the table.", "mode": "typed", "prepared": ["drawer", "plate"], "expected_steps": ["spoon", "fork", "cup"]}
+ ]
+}

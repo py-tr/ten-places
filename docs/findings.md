@@ -120,6 +120,17 @@ same start as a tray set there.
   ("Set the table."): dev set 4/5 → 5/5, the other sets unchanged, and seed 6 sets the full table and names the
   candle (`scripts/eval_planner.py`, `tests/test_planner.py`).
 
+## The first look: what is already done is not planned again
+
+Before planning, the camera classifier reads the table once; steps it sees done with probability ≥ 0.95 are passed
+to the planner as done (`run_command(look_first=0.95)`), said aloud and shown on the panel; the re-check guards them
+like any done step. Gates on tuning seeds 100–149 (`scripts/eval_initial_state.py`): fresh tables — highest
+probability for any step 0.003 (v3), none read as done; tables half-set by the scripted controller (ten prefixes) —
+50/50 read exactly, lowest probability for a done step 0.990. The agent on the 50 fresh tuning tables with and
+without it: the look skipped nothing on any table (41/50 without, 39/50 with — the 10 tables that differ, 4 one way
+and 6 the other, are run-to-run noise, since nothing the robot did changed; McNemar p = 0.75). On by default in
+`run_agent.py`; the reported evaluations run without it.
+
 ## OpenVINO precision study
 
 One hand-off checkpoint (40k steps), 20 held-out seeds, task success re-measured in closed loop for every precision
@@ -165,4 +176,6 @@ directions, tuning seeds 120–139, OpenVINO (`scripts/eval_agent_table.py --pus
 MuJoCo replays identical actions bit-for-bit, and the policies are deterministic (no sampling at inference), but a
 fresh OpenGL context can render a few pixels one intensity level differently; the closed loop amplifies that
 (seed 128: drawer 6.40 vs 6.30 cm). Seed-level comparisons between runs are therefore partly noise, and results are
-reported over 50 seeds with Wilson intervals.
+reported over 50 seeds with Wilson intervals. How much: two agent runs of the identical system on seeds 100–149 set
+41 and 39 tables and disagree on 10 of the 50 (the first-look gate above) — a difference of two tables between runs
+is not a result; paired comparisons with McNemar tests are.

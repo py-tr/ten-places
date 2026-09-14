@@ -14,7 +14,7 @@ there and held — `docs/findings.md`).
 
 ```
 "Set the table, but skip the cup."          (typed, or spoken → Speechmatics real-time STT)
-        │
+        │   first look: the camera classifier reads the table; steps already done are not planned again
         ▼
 Qwen3-VL-4B INT4 on OpenVINO GenAI  ── top-camera image + command → JSON plan (schema-constrained)
         │
@@ -70,6 +70,7 @@ submission video shows the first 10 seeds as a grid with pass/fail per seed.
 |---|---|---|
 | Demonstration runs: 10 tables, 10 requests fixed before recording (2 spoken, 1 changed mid-run by a scripted sentence), full agent on OpenVINO | 9/10 done exactly as asked; seed 4's plate missed four times, each miss caught by the camera | `scripts/score_demo.py`, `out/video/demo/summary.md` |
 | Planner: unseen commands → correct verified plan | 8/8 on the set written before it was scored, incl. naming what no skill can do ("dim the lights"); 10/10, 5/5 and 4/6 on the three sets used while writing the prompts | `scripts/eval_planner.py` |
+| First look: steps already done are skipped | fresh tables: none read as done (50/50); half-set tables: read exactly 50/50; agent on 50 fresh tables: skipped nothing | `scripts/eval_initial_state.py`, `eval_agent_table.py --look-first` |
 | Mid-run spoken changes understood | 8/10 on sentences written before the run | `scripts/eval_amend.py --set fresh` |
 | Camera classifier on learned-policy states | false "drawer done" 3/363, false "spoon done" 1/671 | `docs/findings.md` |
 | Scripted demonstrator (training data) | 60/60 full tables, 72/72 verified subset plans | `make spike-table` |
@@ -180,7 +181,7 @@ primitive.
 make third-party      # the official SO-101 model (TheRobotStudio/SO-ARM100) at the pinned commit
 pip install -r requirements-lock.txt
 make models HF_SKILLS_REPO=<user>/<repo>   # trained skills + classifier, and the OpenVINO planner (~4.4 GB)
-make test             # 165 tests
+make test             # 171 tests
 make watch SEED=3                                        # scripted controller, live 3D viewer
 make watch-agent CMD="just the plate and the cup" SEED=3 # VLM plan + learned policies, live
 make agent CMD="set the table, but skip the cup" SEED=3  # rendered to out/video/ with the plan panel

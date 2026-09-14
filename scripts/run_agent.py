@@ -44,8 +44,10 @@ def main():
     ap.add_argument("--push", action="append", default=[], metavar="T:BODY:DX:DY[:DUR]",
                     help="slide BODY (plate, cup, spoon, fork) by DX, DY metres over DUR s (default 0.25) at "
                          "simulated time T, e.g. 20:plate:0:-0.07; finished steps are re-checked and redone")
-    ap.add_argument("--look-first", type=float, default=None, metavar="P",
-                    help="first look: steps the camera classifier already sees done with probability >= P are skipped")
+    ap.add_argument("--look-first", type=float, default=0.95, metavar="P",
+                    help="first look: steps the camera classifier already sees done with probability >= P are skipped "
+                         "(on fresh tuning tables it skipped nothing: docs/findings.md)")
+    ap.add_argument("--no-look-first", action="store_true", help="plan without the first look")
     ap.add_argument("--prepared", nargs="*", default=[], metavar="SKILL",
                     help="steps the scripted controller does before the robot starts (a table someone half-set)")
     ap.add_argument("--cores", default="split", choices=["default", "split"],
@@ -133,7 +135,8 @@ def main():
 
         pushes = [parse_push(p) for p in args.push]  # "after-plate:...": 1 s after the plate is confirmed
         events, grade = run_command(policy, planner, command, args.seed, checker=checker, voice=voice,
-                                    linger_s=args.linger, disturb=pushes, look_first=args.look_first,
+                                    linger_s=args.linger, disturb=pushes,
+                                    look_first=None if args.no_look_first else args.look_first,
                                     prepare=args.prepared, on_frame=rec.on_frame if rec else None, on_event=on_event)
     finally:
         if rec:
