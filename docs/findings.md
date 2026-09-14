@@ -104,6 +104,19 @@ fork's spot); 6 are the fork's own. The drawer pull sometimes stalls at 5–6.5 
 --retry`, seeds 100–149): a tray dragged there under high friction, with the arm still hung on the handle, is not the
 same start as a tray set there.
 
+## A second held-out set, and tables outside the training ranges
+
+After the report, 50 fresh seeds (200–249) that no step of the work had touched, with the same frozen configuration,
+each run once (`final_report.py` refuses the tuning range and allows 200+ for this; `scene_table.sample(stress)`):
+- Full agent on OpenVINO: 43/50 (74–93%) — the reporting seeds' 43/50 again. Over both held-out sets: 86/100.
+- Fixed five-step sequence on OpenVINO: 33/50 (52–78%), against 41/50 on seeds 0–49 — a different, harder-looking
+  set, and part of the gap is run-to-run noise (below). Here the agent adds 10 tables and loses none over the fixed
+  sequence (McNemar p = 0.002; on seeds 0–49: +3 / −1). The re-checks and re-queued steps earn their place on the
+  harder set.
+- Robustness outside the training ranges: friction, the three masses, light and colours widened ×1.5 about their
+  centres (placements unchanged, so the tables pair seed by seed): 41/50 against 33/50 at the normal ranges, 14 tables
+  better and 6 worse (p = 0.12) — no measurable loss. The classifier and the policies both see the widened scenes.
+
 ## Planner
 
 - **Plan first, check later.** Asking for the plan and then for what no skill can do, both before moving, took

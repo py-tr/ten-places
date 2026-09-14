@@ -63,8 +63,21 @@ Task success does not depend on inference speed: the simulation waits for each a
 CPU rows differ only in the numbers the networks compute.
 
 OpenVINO INT8 and PyTorch are indistinguishable per seed (5 tables differ one way, 3 the other; McNemar p = 0.73).
-The configuration was chosen on 50 separate tuning tables (seeds 100–149), where it set 41/50 with PyTorch. The
-submission video shows the first 10 seeds as a grid with pass/fail per seed.
+The configuration was chosen on 50 separate tuning tables (seeds 100–149), where it set 41/50 with PyTorch.
+
+**A second held-out set, and tables outside the training ranges** — 50 fresh seeds (200–249) never used before, the
+same frozen configuration, each run once (`out/eval/agent_table/ov_w8_fresh200-249.json`, `out/eval/stress_*/`):
+
+| Run on seeds 200–249 | Full tables (95% CI) |
+|---|---|
+| **Full agent on OpenVINO** | **43/50 (74–93%)** |
+| Fixed five-step sequence, OpenVINO | 33/50 (52–78%) |
+| Fixed sequence, friction, masses, light and colours widened ×1.5 beyond the training ranges | 41/50 (69–90%) |
+
+The agent replicates its 43/50; here its re-checks, retries and re-queued steps add 10 tables and lose none (McNemar
+p = 0.002). Widening the ranges cost nothing measurable (paired with the normal ranges: 14 tables better, 6 worse,
+p = 0.12). Over both held-out sets the full agent sets 86 of 100 tables. The submission video shows the first 10
+seeds as a grid with pass/fail per seed.
 
 | Component | Result | Evidence |
 |---|---|---|
