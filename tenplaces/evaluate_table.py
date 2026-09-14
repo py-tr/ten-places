@@ -36,13 +36,14 @@ for _item in filter(None, os.environ.get("TENPLACES_CAMERA_ENDS", "").split(",")
     CAMERA_ENDS[_skill] = _value == "1"
 SETTLE = {s: 30 for s in DEFAULT_BUDGETS}
 # One more attempt, from home, when the camera still says "not done" at the end of a skill. Tuning seeds 100-149
-# (scripts/eval_table_chain.py --retry): plate 3/7, fork 5/24, cup 1/4 retries recovered, none lost; drawer 1/21 and
-# spoon 0/23 — a stalled drawer and a spoon left in a short drawer are policy limits, not transients, so those two
-# are not retried (the agent uses the same table, tenplaces/agent.py).
-RETRY = {"drawer": False, "spoon": False, "plate": True, "fork": True, "cup": True}
+# (scripts/eval_table_chain.py --retry): plate 3/7, fork 5/24, cup 1/4 retries recovered, none lost; spoon 0/23 (a
+# spoon left in a short drawer is not a transient): not retried. Drawer: a whole-budget re-pull recovered 1/21; the
+# camera-ended re-pull (RETRY_CAMERA_END) rescued 3 tables of 100 on seeds 100-199, spoon 6/7 after it: retried.
+# The agent uses the same table (tenplaces/agent.py).
+RETRY = {"drawer": True, "spoon": False, "plate": True, "fork": True, "cup": True}
 # A retry or re-run of a budget-ended skill (the drawer) ends at the camera's "done" + settle instead of running its
-# whole budget again from a half-open start (the camera-ended drawer re-pull, with RETRY["drawer"]). Off: as before.
-RETRY_CAMERA_END = False
+# whole budget again from a half-open start (the camera-ended drawer re-pull).
+RETRY_CAMERA_END = True
 # Experiments only: TENPLACES_DRAWER_REPULL=1 turns the re-pull on (RETRY["drawer"] and RETRY_CAMERA_END), for spawned
 # evaluation workers, which inherit the environment, not the parent's objects.
 if os.environ.get("TENPLACES_DRAWER_REPULL") == "1":

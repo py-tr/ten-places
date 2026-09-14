@@ -17,6 +17,11 @@ def test_on_a_retry_or_rerun_ends_at_the_camera(monkeypatch):
     assert et.ends_on_camera("drawer", 1, rerun=True)
 
 
+def test_shipped_with_the_repull():
+    assert et.RETRY["drawer"] and et.RETRY_CAMERA_END  # lever 4 passed its gate (3 of 100 tables rescued)
+    assert not et.RETRY["spoon"]
+
+
 def test_camera_ended_skills_unchanged(monkeypatch):
     for flag in (False, True):
         monkeypatch.setattr(et, "RETRY_CAMERA_END", flag)
