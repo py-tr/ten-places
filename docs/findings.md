@@ -138,8 +138,14 @@ each run once (`final_report.py` refuses the tuning range and allows 200+ for th
   tables, by the cup's size: within ±5% 9/11 placed, 5–10% off 9/12, more than 10% smaller 1/11, more than 10%
   larger 4/13. The plate fails when more than 10% smaller (0/5) and holds when larger (12/13); longer cutlery
   (+5–10%) costs the fork (5/9). The grader is not the cause: a cup or a plate set exactly on its target passes on
-  all 50 tables at ±20%, as at the trained sizes. Each skill learned one size of each object; demonstrations with
-  sizes varied would be the fix, not done in this window.
+  all 50 tables at ±20%, as at the trained sizes. Each skill learned one size of each object.
+- One attempt to teach the cup other sizes, gates written before any result (tuning seeds 100–149): 100 scripted
+  demonstrations with the cup ×0.77–1.25 (40 at the trained size), the deployed cup fine-tuned 7.5k steps on its own
+  statistics. It got worse at every size — cup alone at the trained size 37/50 against 48/50, at ±20% cup sizes 24/50
+  against 29/50, the fixed sequence 22/50 full tables against 42/50 — so it is not shipped. Before it could
+  demonstrate the larger cups at all, the scripted controller needed a higher approach (×1.2: 3/20 placed, then
+  20/20). The deployed cup's misses at other sizes are all "never picked up", none a false "done" from the camera.
+  Untested: the fine-tune used the knock attempt's recipe (augmentation, AMP, lr 2e-5), not the deployed cup's own.
 
 Where the 14 lost tables of the 100 went (full agent, OpenVINO, `out/eval/agent_table/ov_w8_report5.json` and
 `ov_w8_fresh200-249.json`; a table counts at its first step, in task order, that is still undone at the end):

@@ -248,8 +248,9 @@ default (`--cores default` turns it off).
 - 14 of 100 held-out tables are not set completely: cutlery that never leaves the tray (the spoon 6, the fork 3),
   the plate off its mat (4), the fork 2.8 cm from its spot (1) — `docs/findings.md`.
 - Object sizes were never varied in training, and the skills do not carry over to other sizes: plate and cup ±10%
-  cost 8 of 33 fixed-sequence tables, ±20% cost 16, the cup most. Demonstrations with varied sizes are the fix; not
-  done in this window.
+  cost 8 of 33 fixed-sequence tables, ±20% cost 16, the cup most. One attempt to fine-tune the cup on 100
+  demonstrations with varied sizes made it worse at every size (fixed sequence on the tuning seeds: 22/50 against
+  42/50), so it is not shipped (`docs/findings.md`).
 - The first look skips what is already done, but a table half-set out of the order the skills were trained in (the
   plate already out before the spoon) can make a later skill fail; the verifier flags such orders.
 - A plate knocked off its mat is noticed 27 times out of 75 and put back twice by the deployed robot. An experimental
