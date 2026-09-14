@@ -130,6 +130,16 @@ def verify(steps, done=()):
     return ordered, notes
 
 
+def _perf(res) -> dict | None:
+    """OpenVINO GenAI's own metrics for one answer: time to first token, per output token, tokens/s, token counts."""
+    try:
+        m = res.perf_metrics
+        return {"ttft_ms": m.get_ttft().mean, "tpot_ms": m.get_tpot().mean, "tokens_per_s": m.get_throughput().mean,
+                "input_tokens": m.get_num_input_tokens(), "output_tokens": m.get_num_generated_tokens()}
+    except (AttributeError, RuntimeError):
+        return None
+
+
 class VLMPlanner:
     def __init__(self, model_dir: str | Path = "models/Qwen3-VL-4B-Instruct-int4-ov", device: str = "CPU",
                  warmup: bool = True, ov_config: dict | None = None, idle_config: dict | None = None):
@@ -166,6 +176,7 @@ class VLMPlanner:
         t = time.perf_counter()
         res = pipe.generate(prompt, generation_config=cfg, **extra)
         ms = 1000 * (time.perf_counter() - t)
+        self.last_perf = _perf(res)
         text = res.texts[0]
         try:
             return json.loads(text), text, ms
