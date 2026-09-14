@@ -163,7 +163,15 @@ machine):
 | INT8 image encoder (weights + activations), transformer float | 20.2 ms | 12/20 (0.39–0.78) |
 | INT8 everything (weights + activations) | 13.8 ms | 7/20 (0.18–0.57) |
 
-Quantising the transformer's activations is what costs task success; INT8 weights keep it. (The later 75k hand-off
+Quantising the transformer's activations is what costs task success; INT8 weights keep it.
+
+**The fourth rung, INT4 weights** (`nncf` INT4_ASYM, groups of 64; the three input projections whose size is not a
+multiple of 64 stay INT8): 23 MB instead of 33 MB per policy. The full agent on tuning seeds 100–149 with the five
+deployed policies in INT4: 0/50 full tables against 41/50 with INT8 weights — the drawer (50), spoon (44), plate (45)
+and fork (48) hold, the cup fails on every table. On the same half-set tables the cup's first actions differ from
+INT8's by up to 0.05 rad, a steady drift in arm B's shoulder pan and wrist rather than noise — enough to miss a small
+cup and its 2.5 cm target (`eval_agent_table.py --backend ov-w4`). Task success, not model size, decides where the
+ladder stops. (The later 75k hand-off
 checkpoint scored 19/20 on both FP32 and INT8 weights, `scripts/eval_checkpoints.py`.) The deployed table policies
 run INT8 weights (15.5–16 ms on an idle machine, README).
 

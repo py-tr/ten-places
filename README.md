@@ -133,7 +133,9 @@ run and is not shipped.
 What the optimisation buys:
 - **Precision chosen by task success, not output error.** INT8 weights keep full-table success (41 vs 39 of 50);
   INT8 activations in the transformer cost it (hand-off checkpoint: 7/20 against 13/20 for FP32 and 14/20 for INT8
-  weights on the same seeds, `docs/findings.md`), so they are not shipped.
+  weights on the same seeds, `docs/findings.md`), so they are not shipped. INT4 weights (23 MB instead of 33) keep
+  four skills but break the cup — its actions drift ~0.05 rad — so the full table fails every time (0/50 against
+  41/50 on the tuning seeds): the ladder stops at INT8 weights.
 - **Latency spent on quality.** At 16 ms the policy can run every control step with temporal ensembling: the drawer
   20/20 against 18/20 open-loop and 15/20 re-planning every 10 actions (seeds 100–119); the spoon hand-off 43/50
   against 4/50 re-planning every 10 actions (open-loop whole chunks: 44/50, seeds 100–149).
