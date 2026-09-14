@@ -1,0 +1,226 @@
+{
+ "summary": {
+  "skill": "cup",
+  "label": "cup_smolvla005000_seeds100-129_after_drawer-spoon",
+  "episodes": 30,
+  "success": 7,
+  "rate": 0.23333333333333334,
+  "wilson95": [
+   0.118,
+   0.409
+  ],
+  "mean_frames": 184.33333333333334
+ },
+ "rows": [
+  {
+   "seed": 100,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.0772
+  },
+  {
+   "seed": 101,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.0896
+  },
+  {
+   "seed": 102,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.0857
+  },
+  {
+   "seed": 103,
+   "skill": "cup",
+   "success": false,
+   "frames": 141,
+   "err_m": 0.0211
+  },
+  {
+   "seed": 104,
+   "skill": "cup",
+   "success": false,
+   "frames": 161,
+   "err_m": 0.0107
+  },
+  {
+   "seed": 105,
+   "skill": "cup",
+   "success": false,
+   "frames": 161,
+   "err_m": 0.0529
+  },
+  {
+   "seed": 106,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.0869
+  },
+  {
+   "seed": 107,
+   "skill": "cup",
+   "success": false,
+   "frames": 141,
+   "err_m": 0.0228
+  },
+  {
+   "seed": 108,
+   "skill": "cup",
+   "success": true,
+   "frames": 171,
+   "err_m": 0.014
+  },
+  {
+   "seed": 109,
+   "skill": "cup",
+   "success": false,
+   "frames": 161,
+   "err_m": 0.044
+  },
+  {
+   "seed": 110,
+   "skill": "cup",
+   "success": true,
+   "frames": 171,
+   "err_m": 0.0148
+  },
+  {
+   "seed": 111,
+   "skill": "cup",
+   "success": true,
+   "frames": 151,
+   "err_m": 0.0067
+  },
+  {
+   "seed": 112,
+   "skill": "cup",
+   "success": true,
+   "frames": 141,
+   "err_m": 0.0145
+  },
+  {
+   "seed": 113,
+   "skill": "cup",
+   "success": false,
+   "frames": 151,
+   "err_m": 0.0767
+  },
+  {
+   "seed": 114,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.0789
+  },
+  {
+   "seed": 115,
+   "skill": "cup",
+   "success": false,
+   "frames": 161,
+   "err_m": 0.0187
+  },
+  {
+   "seed": 116,
+   "skill": "cup",
+   "success": false,
+   "frames": 161,
+   "err_m": 0.039
+  },
+  {
+   "seed": 117,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.1058
+  },
+  {
+   "seed": 118,
+   "skill": "cup",
+   "success": false,
+   "frames": 171,
+   "err_m": 0.026
+  },
+  {
+   "seed": 119,
+   "skill": "cup",
+   "success": false,
+   "frames": 151,
+   "err_m": 0.0351
+  },
+  {
+   "seed": 120,
+   "skill": "cup",
+   "success": false,
+   "frames": 161,
+   "err_m": 0.0162
+  },
+  {
+   "seed": 121,
+   "skill": "cup",
+   "success": true,
+   "frames": 171,
+   "err_m": 0.0158
+  },
+  {
+   "seed": 122,
+   "skill": "cup",
+   "success": false,
+   "frames": 171,
+   "err_m": 0.0313
+  },
+  {
+   "seed": 123,
+   "skill": "cup",
+   "success": true,
+   "frames": 181,
+   "err_m": 0.0208
+  },
+  {
+   "seed": 124,
+   "skill": "cup",
+   "success": true,
+   "frames": 161,
+   "err_m": 0.0199
+  },
+  {
+   "seed": 125,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.1183
+  },
+  {
+   "seed": 126,
+   "skill": "cup",
+   "success": false,
+   "frames": 191,
+   "err_m": 0.071
+  },
+  {
+   "seed": 127,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.0814
+  },
+  {
+   "seed": 128,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.0811
+  },
+  {
+   "seed": 129,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.132
+  }
+ ]
+}

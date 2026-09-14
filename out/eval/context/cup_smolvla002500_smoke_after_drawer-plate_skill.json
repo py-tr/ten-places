@@ -1,0 +1,37 @@
+{
+ "summary": {
+  "skill": "cup",
+  "label": "cup_smolvla002500_smoke_after_drawer-plate",
+  "episodes": 3,
+  "success": 1,
+  "rate": 0.3333333333333333,
+  "wilson95": [
+   0.061,
+   0.792
+  ],
+  "mean_frames": 213.66666666666666
+ },
+ "rows": [
+  {
+   "seed": 100,
+   "skill": "cup",
+   "success": true,
+   "frames": 181,
+   "err_m": 0.021
+  },
+  {
+   "seed": 101,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.1233
+  },
+  {
+   "seed": 102,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.1159
+  }
+ ]
+}

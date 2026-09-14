@@ -25,6 +25,21 @@ only with selections frozen beforehand. Every number comes from the script named
   PyTorch on the same CPU (39–45 ms) does not. An end-to-end VLA is out of reach here: LeRobot's SmolVLA (450M
   parameters) takes 6.6 s per 50-action chunk on this CPU in PyTorch (`scripts/bench_smolvla.py`, timing only).
 
+- **A VLA baseline, measured.** SmolVLA (450M parameters; expert trained, vision encoder frozen, bf16) fine-tuned
+  5k steps on the same 100 full-table cup demonstrations the first ACT cup learned from (`scripts/train_smolvla.py`),
+  scored from all seven starts on tuning seeds 100–129 with the same evaluation and chunking (10 actions per chunk):
+
+  | Cup, 30 tables per start | Plate already moved (4 starts) | Plate not moved (3 starts) | All |
+  |---|---|---|---|
+  | SmolVLA, 5k steps | 44/120 | 19/90 | 63/210 |
+  | ACT, same data (skills_v1, 20k steps) | 113/120 | 54/90 | 167/210 |
+  | ACT, deployed (plus demonstrations from every start) | 118/120 | 80/90 | 198/210 |
+
+  LeRobot's own recipe trains SmolVLA 20k steps; at 2.5k it placed 2 of 21, at 5k 63 of 210, so it was still
+  learning — the comparison is at a quarter of that budget. On this CPU one SmolVLA chunk takes 6.6 s in PyTorch
+  against 16 ms for ACT with OpenVINO. Both numbers point the same way: the language lives in the VLM planner, and
+  small policies act.
+
 ## Making skills that work alone work in a chain
 
 Each skill scored ~90–100% started by the scripted controller, yet the chain of learned skills set 0 of 10 tables.

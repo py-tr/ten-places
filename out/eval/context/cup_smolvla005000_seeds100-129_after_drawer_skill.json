@@ -1,0 +1,226 @@
+{
+ "summary": {
+  "skill": "cup",
+  "label": "cup_smolvla005000_seeds100-129_after_drawer",
+  "episodes": 30,
+  "success": 8,
+  "rate": 0.26666666666666666,
+  "wilson95": [
+   0.142,
+   0.444
+  ],
+  "mean_frames": 196.5
+ },
+ "rows": [
+  {
+   "seed": 100,
+   "skill": "cup",
+   "success": false,
+   "frames": 131,
+   "err_m": 0.037
+  },
+  {
+   "seed": 101,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.0957
+  },
+  {
+   "seed": 102,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.1006
+  },
+  {
+   "seed": 103,
+   "skill": "cup",
+   "success": true,
+   "frames": 171,
+   "err_m": 0.0197
+  },
+  {
+   "seed": 104,
+   "skill": "cup",
+   "success": false,
+   "frames": 151,
+   "err_m": 0.0314
+  },
+  {
+   "seed": 105,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.0959
+  },
+  {
+   "seed": 106,
+   "skill": "cup",
+   "success": true,
+   "frames": 151,
+   "err_m": 0.022
+  },
+  {
+   "seed": 107,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.066
+  },
+  {
+   "seed": 108,
+   "skill": "cup",
+   "success": false,
+   "frames": 151,
+   "err_m": 0.0272
+  },
+  {
+   "seed": 109,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.1023
+  },
+  {
+   "seed": 110,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.1043
+  },
+  {
+   "seed": 111,
+   "skill": "cup",
+   "success": true,
+   "frames": 151,
+   "err_m": 0.0173
+  },
+  {
+   "seed": 112,
+   "skill": "cup",
+   "success": true,
+   "frames": 161,
+   "err_m": 0.0064
+  },
+  {
+   "seed": 113,
+   "skill": "cup",
+   "success": false,
+   "frames": 171,
+   "err_m": 0.0414
+  },
+  {
+   "seed": 114,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.0735
+  },
+  {
+   "seed": 115,
+   "skill": "cup",
+   "success": false,
+   "frames": 201,
+   "err_m": 0.029
+  },
+  {
+   "seed": 116,
+   "skill": "cup",
+   "success": true,
+   "frames": 161,
+   "err_m": 0.0123
+  },
+  {
+   "seed": 117,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.1082
+  },
+  {
+   "seed": 118,
+   "skill": "cup",
+   "success": true,
+   "frames": 181,
+   "err_m": 0.0013
+  },
+  {
+   "seed": 119,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.1163
+  },
+  {
+   "seed": 120,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.0852
+  },
+  {
+   "seed": 121,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.0998
+  },
+  {
+   "seed": 122,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.0782
+  },
+  {
+   "seed": 123,
+   "skill": "cup",
+   "success": true,
+   "frames": 161,
+   "err_m": 0.0209
+  },
+  {
+   "seed": 124,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.0821
+  },
+  {
+   "seed": 125,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.1776
+  },
+  {
+   "seed": 126,
+   "skill": "cup",
+   "success": true,
+   "frames": 201,
+   "err_m": 0.0248
+  },
+  {
+   "seed": 127,
+   "skill": "cup",
+   "success": false,
+   "frames": 131,
+   "err_m": 0.0224
+  },
+  {
+   "seed": 128,
+   "skill": "cup",
+   "success": false,
+   "frames": 171,
+   "err_m": 0.0436
+  },
+  {
+   "seed": 129,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.1785
+  }
+ ]
+}

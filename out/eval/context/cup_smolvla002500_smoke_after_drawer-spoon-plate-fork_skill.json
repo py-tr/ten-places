@@ -1,0 +1,37 @@
+{
+ "summary": {
+  "skill": "cup",
+  "label": "cup_smolvla002500_smoke_after_drawer-spoon-plate-fork",
+  "episodes": 3,
+  "success": 0,
+  "rate": 0.0,
+  "wilson95": [
+   0.0,
+   0.562
+  ],
+  "mean_frames": 203.66666666666666
+ },
+ "rows": [
+  {
+   "seed": 100,
+   "skill": "cup",
+   "success": false,
+   "frames": 151,
+   "err_m": 0.0075
+  },
+  {
+   "seed": 101,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.1052
+  },
+  {
+   "seed": 102,
+   "skill": "cup",
+   "success": false,
+   "frames": 230,
+   "err_m": 0.1013
+  }
+ ]
+}
