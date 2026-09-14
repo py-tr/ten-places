@@ -132,6 +132,18 @@ each run once (`final_report.py` refuses the tuning range and allows 200+ for th
   centres (placements unchanged, so the tables pair seed by seed): 41/50 against 33/50 at the normal ranges, 14 tables
   better and 6 worse (p = 0.12) — no measurable loss. The classifier and the policies both see the widened scenes.
 
+Where the 14 lost tables of the 100 went (full agent, OpenVINO, `out/eval/agent_table/ov_w8_report5.json` and
+`ov_w8_fresh200-249.json`; a table counts at its first step, in task order, that is still undone at the end):
+
+| Step | Tables | Seeds | Final distance from target |
+|---|---|---|---|
+| spoon | 6 | 24, 36, 37, 214, 220, 223 | 22–25 cm: the spoon never leaves the tray, even after the re-queue |
+| plate | 4 | 4, 12, 204, 226 | 7–10 cm |
+| fork | 4 | 18, 19, 240 · 233 | 17–20 cm (not carried) · 2.8 cm (placed just outside the 2.5 cm tolerance) |
+
+No table is lost at the drawer, and the cup fails only on a table already lost (seed 4). Picking cutlery out of the
+tray is the largest single loss: 9 of the 14.
+
 ## Planner
 
 - **Plan first, check later.** Asking for the plan and then for what no skill can do, both before moving, took
@@ -147,6 +159,9 @@ each run once (`final_report.py` refuses the tuning range and allows 200+ for th
   robot did nothing. Found on demo seed 6's pre-registered command; the re-plan now drops the dangling join
   ("Set the table."): dev set 4/5 → 5/5, the other sets unchanged, and seed 6 sets the full table and names the
   candle (`scripts/eval_planner.py`, `tests/test_planner.py`).
+- **Czech commands: plans yes, refusals no.** Six Czech commands, the same prompt: the plan was right 6/6, but
+  the check for what no skill can do refused 4 of the 6 commands it should have accepted — 2/6 end to end. Not
+  shipped; the demo stays in English.
 
 ## The first look: what is already done is not planned again
 
@@ -211,7 +226,9 @@ directions, tuning seeds 120–139, OpenVINO (`scripts/eval_agent_table.py --pus
   recovers.
 - Gates written down before any result, one attempt: the plate alone ≥ 29/30 from both starts (30/30, 30/30); no
   regression on the 50 tuning tables (41/50, as deployed; v4 alone 40/50); ≥ 60 of 80 knocked plates put back —
-  30/80 missed it. So neither the classifier nor the plate is deployed; the next step is repair data toward arm A.
+  30/80 missed it. So neither the classifier nor the plate is deployed. More demonstrations alone would not close
+  it: a knock toward arm A defeats even the scripted controller that writes them, and a knock moves more than the
+  plate (the fork and cup targets beside it), so a repair skill needs a controller that re-grasps from there first.
 
 ## Repeatability
 
