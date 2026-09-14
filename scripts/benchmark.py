@@ -30,6 +30,7 @@ from tenplaces.paths import OUT  # noqa: E402
 VARIANTS = {  # IR name in <checkpoint>/openvino -> label
     "fp32": "FP32",
     "w8": "INT8 weights only",
+    "w4": "INT4 weights (groups of 64), not deployed",
     "a8w8_backbone": "INT8 image encoder (weights+activations), transformer float",
     "a8w8": "INT8 everything (weights+activations)",
 }

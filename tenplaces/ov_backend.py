@@ -92,6 +92,8 @@ def compile_act(policy, preprocess, precision: str, calib_cache: str | Path | No
                                   ignored_scope=nncf.IgnoredScope(patterns=[r"^(?!.*backbone).*$"], validate=False))
         elif precision == "w8":  # weight-only INT8
             model = nncf.compress_weights(model, mode=nncf.CompressWeightsMode.INT8_ASYM)
+        elif precision == "w4":  # weight-only INT4, groups of 64 (NNCF keeps the first and last layers INT8): a study
+            model = nncf.compress_weights(model, mode=nncf.CompressWeightsMode.INT4_ASYM, group_size=64, ratio=1.0)
         elif precision != "fp32":
             raise ValueError(f"unknown precision {precision}")
         ov.save_model(model, xml, compress_to_fp16=False)

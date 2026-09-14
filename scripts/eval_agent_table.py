@@ -29,7 +29,7 @@ def main():
     ap.add_argument("--seeds", type=int, nargs=2, default=[100, 120], metavar=("FIRST", "STOP"))
     ap.add_argument("--report", action="store_true", help="allow the reporting seeds (0-49)")
     ap.add_argument("--runs", nargs="+", default=["out/train/skills_v1", "out/train/skills_v2", "out/train/skills_ctx"])
-    ap.add_argument("--backend", default="torch", choices=["torch", "ov-w8", "ov-fp32"])
+    ap.add_argument("--backend", default="torch", choices=["torch", "ov-w8", "ov-fp32", "ov-w4"])
     ap.add_argument("--workers", type=int, default=6)
     ap.add_argument("--classifier", default="models/state_classifier_v3/state_classifier.xml")
     ap.add_argument("--name", default=None)
