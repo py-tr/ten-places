@@ -36,11 +36,12 @@ def _require_key() -> str:
 
 
 async def _stream(source, rate: int, language: str, on_partial=None, end_time=None, on_final=None,
-                  on_segment_partial=None):
+                  on_segment_partial=None, on_final_span=None):
     """Stream raw mono int16 PCM from source.read() to Speechmatics RT.
 
     on_partial(text so far, finals + current partial), on_final(new final segment), on_segment_partial(current
-    partial segment only); end_time() -> when the audio ended, for the latency figure.
+    partial segment only); on_final_span(segment, start_s, end_s): the same with where it lies in the audio sent;
+    end_time() -> when the audio ended, for the latency figure.
     """
     from speechmatics.rt import (AsyncClient, AudioEncoding, AudioFormat, ServerMessageType, TranscriptionConfig,
                                  TranscriptResult)
@@ -59,12 +60,15 @@ async def _stream(source, rate: int, language: str, on_partial=None, end_time=No
 
         @client.on(ServerMessageType.ADD_TRANSCRIPT)
         def _final(message):
-            text = TranscriptResult.from_message(message).metadata.transcript
+            meta = TranscriptResult.from_message(message).metadata
+            text = meta.transcript
             if text:
                 finals.append(text)
                 t_final["t"] = time.perf_counter()
                 if on_final is not None:
                     on_final(text)
+                if on_final_span is not None:
+                    on_final_span(text, meta.start_time, meta.end_time)
 
         config = TranscriptionConfig(language=language, enable_partials=True, max_delay=1.0)
         fmt = AudioFormat(encoding=AudioEncoding.PCM_S16LE, sample_rate=rate)

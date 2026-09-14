@@ -1,0 +1,9 @@
+{
+ "about": "The live take: the command spoken, and a change to the plan said into the microphone while both arms work, transcribed live by Speechmatics. Fixed before recording, like configs/demo_seeds.json; a held-out seed, not tuned on. Up to three takes are recorded and the best is kept; the video says which take it is. The statistics are the 100 held-out tables, not this take.",
+ "fixed_on": "2026-09-14",
+ "seeds": [
+  {"seed": 11, "command": "Set the table, please.", "mode": "spoken", "live_say": "Actually, skip the fork.",
+   "say_when": "after the terminal shows skill_start for the spoon", "expected_steps": ["drawer", "spoon", "plate", "cup"],
+   "take": null}
+ ]
+}

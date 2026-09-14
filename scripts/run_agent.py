@@ -100,11 +100,11 @@ def main():
                   "s_total": round(time.perf_counter() - t, 2)}
         print(f"speechmatics: {command!r} (final {ms:.0f} ms after the speech ended)", flush=True)
 
-    voice = None
+    voice = live = None
     if args.listen:
         from tenplaces.listen import LiveVoice
 
-        voice = LiveVoice()
+        voice = live = LiveVoice()
     elif args.say:
         from tenplaces.listen import ScriptedVoice
 
@@ -143,6 +143,11 @@ def main():
             rec.close()
         if voice is not None:
             voice.close()
+        live_info = None
+        if live is not None and args.video:  # the whole microphone recording, for scripts/voice_over.py
+            live_info = live.save(Path(args.video).with_suffix(".live.wav"))
+            print(f"[voice] kept {live_info['audio_s']:.1f} s of microphone audio over {live_info['wall_s']:.1f} s of "
+                  f"wall time, {len(live_info['utterances'])} sentences", flush=True)
         if speaker is not None:
             speaker.close()
             if rec is not None:  # the robot's voice as the video's audio track, aligned to simulated time
@@ -155,6 +160,8 @@ def main():
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps({"command": command, "voice": spoken, "seed": args.seed, "backend": args.backend,
                                "look_first": args.look_first, "prepared": args.prepared,
+                               "video_t_start": rec.t_start if rec else None,  # sim time of the video's first frame
+                               "live_audio": live_info and live_info["wav"],
                                "cores": args.cores, "sources": policy.sources, "exec_settings": policy.exec_settings,
                                "events": events, "grade": grade}, indent=1,
                               default=lambda o: o.item() if hasattr(o, "item") else str(o)), encoding="utf-8")

@@ -2,10 +2,13 @@
 anything said while it works.
 
 Spoken commands use the microphone recording saved during the run (<video>.command.wav, from
-run_agent.py --mic --video): the audio Speechmatics transcribed. Typed commands and scripted interjections
-(run_agent.py --say) are read by a text-to-speech voice different from the robot's, and the intro labels them as
-typed. The intro holds the first frame with only the command on the panel while it is said; the original video
-and the robot's own track (<video>.wav) follow unchanged.
+run_agent.py --mic --video): the audio Speechmatics transcribed. What was said while the robot worked
+(run_agent.py --listen --video) comes from the whole-run recording (<video>.live.wav/.json): each sentence the
+robot heard is cut at Speechmatics' own timings and placed at the simulated moment it was said, from the
+computer's clock logged against simulated time (tenplaces.listen.live_placements) — not by eye. Typed commands and
+scripted interjections (run_agent.py --say) are read by a text-to-speech voice different from the robot's, and the
+intro labels them as typed. The intro holds the first frame with only the command on the panel while it is said;
+the original video and the robot's own track (<video>.wav) follow unchanged.
 
     python scripts/voice_over.py                  # out/video/demo/seed<N>.mp4 -> out/video/demo/voiced/seed<N>.mp4
 """
@@ -76,8 +79,9 @@ def level(x: np.ndarray, peak: float = 0.8) -> np.ndarray:
     return x * (peak / m) if m > 0 else x
 
 
-def intro_frame(first: np.ndarray, label: str, text: str) -> np.ndarray:
-    """The first frame with the panel cleared down to the command: the plan appears when the video starts."""
+def intro_frame(first: np.ndarray, label: str, text: str, notes=()) -> np.ndarray:
+    """The first frame with the panel cleared down to the command: the plan appears when the video starts.
+    notes: smaller lines under it (how the audio was placed, which take)."""
     img = Image.fromarray(first)
     d = ImageDraw.Draw(img)
     x0 = MAIN_HW[1]
@@ -91,6 +95,11 @@ def intro_frame(first: np.ndarray, label: str, text: str) -> np.ndarray:
     for line in _wrap(f'"{text}"', 38):
         d.text((x, y), line, font=_font(20), fill=(255, 255, 255))
         y += 26
+    y += 12
+    for note in notes:
+        for line in _wrap(note, 52):
+            d.text((x, y), line, font=_font(14), fill=(170, 170, 180))
+            y += 19
     return np.asarray(img)
 
 
@@ -108,21 +117,41 @@ def voice_over(stem: Path, entry: dict, out: Path, voice: str, lead_s: float = 0
     first = reader.get_data(0)
     n_intro = int(np.ceil((lead_s + len(cmd) / RATE + tail_s) * FPS))
     robot = load_wav(stem.with_suffix(".wav"))
-    # Said while the robot works (--say): in the same voice, ending just before the robot hears it. Video time 0 is
-    # the first control step, which starts right after the plan.
-    t0 = min((e["t"] for e in run["events"] if e["kind"] == "skill_start"), default=0.5)
-    for e in run["events"]:
-        if e["kind"] == "heard" and entry["mode"] != "spoken":
-            clip = level(tts(e["text"], voice))
-            i = max(0, int((e["t"] - t0 - 0.2) * RATE) - len(clip))
-            seg = clip[: max(0, len(robot) - i)]
-            robot[i: i + len(seg)] += seg
+    # Video time 0 is the simulated time of the video's first frame (older runs: the first control step).
+    t0 = run.get("video_t_start")
+    if t0 is None:
+        t0 = min((e["t"] for e in run["events"] if e["kind"] == "skill_start"), default=0.5)
+    notes, live_json = [], stem.with_suffix(".live.json")
+    if live_json.exists():  # said while the robot works, live: the person's own voice where it was said
+        from tenplaces.listen import live_placements
+
+        live = json.loads(live_json.read_text(encoding="utf-8"))
+        rec = load_wav(live_json.with_name(live["wav"]))
+        for p in live_placements(run["events"], live):
+            clip = fade(level(trim(rec[max(0, int((p["audio_start"] - 0.3) * RATE)): int((p["audio_end"] + 0.4) * RATE)])))
+            # the clip's last speech (0.3 s before its end, see trim) lands at the simulated moment it ended
+            i = max(0, int((p["sim_end"] - t0 + 0.3) * RATE) - len(clip))
+            robot = np.concatenate([robot, np.zeros(max(0, i + len(clip) - len(robot)), np.float32)])
+            robot[i: i + len(clip)] += clip
+            print(f"  live: {p['text']!r} said at sim {p['sim_start']:.2f}-{p['sim_end']:.2f} s, heard at "
+                  f"{p['heard_t']:.2f} s -> video {i / RATE:.2f} s", flush=True)
+        notes.append("Said while working: the microphone, placed at the simulated moment it was said "
+                     "(from the computer's clock logged against simulated time)")
+    else:  # scripted (--say): in the TTS voice, ending just before the robot hears it
+        for e in run["events"]:
+            if e["kind"] == "heard" and entry["mode"] != "spoken":
+                clip = level(tts(e["text"], voice))
+                i = max(0, int((e["t"] - t0 - 0.2) * RATE) - len(clip))
+                seg = clip[: max(0, len(robot) - i)]
+                robot[i: i + len(seg)] += seg
+    if entry.get("take"):
+        notes.append(f"Take {entry['take']}")
     audio = np.concatenate([np.zeros(int(lead_s * RATE), np.float32), cmd])
     audio = np.concatenate([audio, np.zeros(max(0, int(n_intro / FPS * RATE) - len(audio)), np.float32), robot])
     out.mkdir(parents=True, exist_ok=True)
     video = out / f"{stem.name}.mp4"
     writer = iio.get_writer(str(video), fps=FPS, macro_block_size=8)
-    frame = intro_frame(first, label, shown)
+    frame = intro_frame(first, label, shown, notes)
     for _ in range(n_intro):
         writer.append_data(frame)
     for f in reader:

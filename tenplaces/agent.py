@@ -198,11 +198,13 @@ def run_command(policy, planner, command: str, seed: int, budgets=None, max_atte
         ep.ctl.on_step = lambda m, d: started.extend(s for s in slides if s.update(ep))
 
     def event(kind, **kw):
-        kw.update(kind=kind, t=round(ep.d.time, 2))
+        # wall: the computer's clock next to simulated time, so what was said can be placed where it was heard
+        kw.update(kind=kind, t=round(ep.d.time, 2), wall=round(time.time(), 3))
         events.append(kw)
         if on_event is not None:
             on_event(kw)
-        log(f"[{kw['t']:6.2f}s] {kind}: " + ", ".join(f"{k}={v}" for k, v in kw.items() if k not in ("kind", "t")))
+        log(f"[{kw['t']:6.2f}s] {kind}: " + ", ".join(f"{k}={v}" for k, v in kw.items()
+                                                      if k not in ("kind", "t", "wall")))
 
     def listen():
         if voice is None or said["stop"]:
