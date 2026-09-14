@@ -13,6 +13,7 @@ scripts/bench_concurrency.py.
 import argparse
 import csv
 import json
+import os
 import platform
 import sys
 import time
@@ -71,6 +72,7 @@ def main():
 
     (out / "provenance.json").write_text(json.dumps({
         "seeds": [seeds[0], seeds[-1]], "rows": args.rows, "home_frames": args.home_frames,
+        "stress": float(os.environ.get("TENPLACES_STRESS", "1.0")),  # scene_table.sample: ranges widened by this
         "budgets": DEFAULT_BUDGETS, "camera_ends": CAMERA_ENDS, "settle": SETTLE, "retry": RETRY,
         "exec_settings": exec_settings, "selected": selected,
         "checkpoints": sources, "runs": runs, "classifier": args.classifier, "date": time.strftime("%Y-%m-%d %H:%M"),

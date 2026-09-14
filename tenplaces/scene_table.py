@@ -50,28 +50,46 @@ class TableParams:
         return asdict(self)
 
 
-def sample(seed: int, nominal: bool = False) -> TableParams:
+def sample(seed: int, nominal: bool = False, stress: float | None = None) -> TableParams:
+    """stress > 1 widens every physical and visual range about its centre (friction, masses, light, colours) by that
+    factor for robustness tests outside the training ranges; placements stay inside the arms' reach. Default: the
+    TENPLACES_STRESS environment variable, else 1.0 (the ranges every result was produced with). The draws are the
+    same for every stress, so stress 1.0 gives exactly the usual table."""
     if nominal:
         return TableParams(seed=seed)
+    if stress is None:
+        import os
+
+        stress = float(os.environ.get("TENPLACES_STRESS", "1.0"))
     rng = np.random.default_rng(seed)
-    u = rng.uniform
+
+    def u(lo, hi, size=None):  # draw as always, then stretch about the centre (bit-identical at stress 1.0)
+        x = rng.uniform(lo, hi, size)
+        return x if stress == 1.0 else (lo + hi) / 2 + (x - (lo + hi) / 2) * stress
+
+    def clip(x, lo, hi):  # physical bounds for stretched values; nothing changes at stress 1.0
+        if stress == 1.0:
+            return tuple(x) if isinstance(x, np.ndarray) else x
+        return tuple(np.clip(x, lo, hi)) if isinstance(x, np.ndarray) else float(np.clip(x, lo, hi))
+
+    p = rng.uniform  # placements: never stretched (reach)
     return TableParams(
         seed=seed,
-        drawer_xy=(u(-0.015, 0.0), u(0.07, 0.10)),  # the open handle must stay >= ~0.1 m from arm A's base
+        drawer_xy=(p(-0.015, 0.0), p(0.07, 0.10)),  # the open handle must stay >= ~0.1 m from arm A's base
         # Under the lid when closed, and >= 3.6 cm clear of its edge once pulled 0.09.
-        spoon_offset=(u(0.0, 0.004), u(-0.005, 0.005)),
-        fork_offset=(u(0.032, 0.036), u(-0.005, 0.005)),  # >= 2 cm from the lid edge once open, 5 mm from the spoon's pad
-        plate_xy=(u(0.15, 0.19), u(0.07, 0.10)),
-        cup_xy=(u(0.19, 0.205), u(-0.15, -0.135)),
-        mat_xy=(u(0.11, 0.125), u(-0.015, 0.015)),  # plate edge >= 6 mm clear of the lid's far end
-        friction=u(0.7, 1.3),
-        cutlery_mass=u(0.025, 0.06),
-        plate_mass=u(0.08, 0.16),
-        cup_mass=u(0.04, 0.09),
+        spoon_offset=(p(0.0, 0.004), p(-0.005, 0.005)),
+        fork_offset=(p(0.032, 0.036), p(-0.005, 0.005)),  # >= 2 cm from the lid edge once open, 5 mm from the spoon's pad
+        plate_xy=(p(0.15, 0.19), p(0.07, 0.10)),
+        cup_xy=(p(0.19, 0.205), p(-0.15, -0.135)),
+        mat_xy=(p(0.11, 0.125), p(-0.015, 0.015)),  # plate edge >= 6 mm clear of the lid's far end
+        friction=clip(u(0.7, 1.3), 0.2, 3.0),
+        cutlery_mass=clip(u(0.025, 0.06), 0.005, 1.0),
+        plate_mass=clip(u(0.08, 0.16), 0.02, 1.0),
+        cup_mass=clip(u(0.04, 0.09), 0.01, 1.0),
         light_dir=tuple(np.array([u(-0.5, 0.5), u(-0.5, 0.5), -1.0])),
-        light_diffuse=u(0.4, 0.9),
-        table_rgb=tuple(u(0.2, 0.8, 3)),
-        floor_rgb=tuple(u(0.1, 0.5, 3)),
+        light_diffuse=clip(u(0.4, 0.9), 0.1, 1.0),
+        table_rgb=clip(u(0.2, 0.8, 3), 0.0, 1.0),
+        floor_rgb=clip(u(0.1, 0.5, 3), 0.0, 1.0),
     )
 
 
