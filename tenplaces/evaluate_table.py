@@ -56,6 +56,16 @@ def ends_on_camera(skill: str, attempt: int = 1, rerun: bool = False) -> bool:
     return CAMERA_ENDS[skill] or (RETRY_CAMERA_END and (attempt > 1 or rerun))
 
 
+# Skills given a third attempt when the camera still says "not done" after the second. Empty: as before.
+# Experiments only: TENPLACES_THIRD_ATTEMPT="plate,fork,cup" (spawned evaluation workers inherit the environment).
+EXTRA_ATTEMPT = set(filter(None, os.environ.get("TENPLACES_THIRD_ATTEMPT", "").split(",")))
+
+
+def attempts_for(skill: str, retried: bool) -> int:
+    """How many attempts a skill gets: 1 if it is not retried, 2 if it is, 3 if it is in EXTRA_ATTEMPT too."""
+    return (3 if skill in EXTRA_ATTEMPT else 2) if retried else 1
+
+
 def run_episode(policy, seed: int, budgets=None, video_path: Path | None = None, checker=None,
                 check_every: int = 10, min_frames: int = 40, settle_frames: int = 30, home_frames: int = 0,
                 retry: bool = True):
@@ -73,7 +83,7 @@ def run_episode(policy, seed: int, budgets=None, video_path: Path | None = None,
     retries = []
     for k, (skill, _, text) in enumerate(SKILLS):
         retried = RETRY[skill] or skill in getattr(policy, "alternates", {})  # a second controller is also a retry
-        attempts = 2 if retry and checker is not None and retried else 1
+        attempts = attempts_for(skill, retry and checker is not None and retried)
         for attempt in range(1, attempts + 1):
             if (k or attempt > 1) and home_frames:
                 obs = go_home(ep, home_frames, on_frame=record)

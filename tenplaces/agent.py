@@ -24,7 +24,7 @@ import numpy as np
 
 from .env import FPS
 from .env_table import SKILLS, TableEpisode, go_home
-from .evaluate_table import CAMERA_ENDS, DEFAULT_BUDGETS, RETRY, SETTLE, ends_on_camera
+from .evaluate_table import CAMERA_ENDS, DEFAULT_BUDGETS, EXTRA_ATTEMPT, RETRY, SETTLE, ends_on_camera
 from .grader_table import grade_table
 from .listen import STOP
 from .planner import verify
@@ -372,7 +372,7 @@ def run_command(policy, planner, command: str, seed: int, budgets=None, max_atte
         ok = False
         # drawer/spoon retries with the same controller never recovered; a second controller (RETRY_EXEC) is a retry
         retried = RETRY[skill] or skill in getattr(policy, "alternates", {})
-        for attempt in range(1, (max_attempts if retried else 1) + 1):
+        for attempt in range(1, (max_attempts + (skill in EXTRA_ATTEMPT) if retried else 1) + 1):
             if home_frames and started_any:
                 # Every demonstration starts a skill with the grippers released and both arms home; the camera can
                 # call a step done while an arm still holds the drawer handle. Tuning seeds 100-119: 4/20 -> 10/20
