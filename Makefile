@@ -61,7 +61,7 @@ DEPLOYED ?= out/train/chain_t2_drawer/drawer/checkpoints/007500/pretrained_model
     out/train/cutlery_t1/spoon/checkpoints/010000/pretrained_model \
     out/train/plate_t1/plate/checkpoints/005000/pretrained_model \
     out/train/cutlery_t1/fork/checkpoints/007500/pretrained_model \
-    out/train/skills_ctx/cup/checkpoints/015000/pretrained_model
+    out/train/cup_sizes2/cup/checkpoints/007500/pretrained_model
 bench:
 	for ck in $(DEPLOYED); do $(PY) scripts/benchmark.py --checkpoint $$ck || exit 1; done
 

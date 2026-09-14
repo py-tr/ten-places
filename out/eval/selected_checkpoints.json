@@ -1,4 +1,5 @@
 {
+ "cup": "out/train/cup_sizes2/cup/checkpoints/007500/pretrained_model",
  "drawer": "out/train/chain_t2_drawer/drawer/checkpoints/007500/pretrained_model",
  "fork": "out/train/cutlery_t1/fork/checkpoints/007500/pretrained_model",
  "plate": "out/train/plate_t1/plate/checkpoints/005000/pretrained_model",

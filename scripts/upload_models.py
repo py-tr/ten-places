@@ -15,13 +15,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from tenplaces.paths import OUT  # noqa: E402
 
-CUP = "out/train/skills_ctx/cup/checkpoints/015000/pretrained_model"
+CUP = "out/train/skills_ctx/cup/checkpoints/015000/pretrained_model"  # only when the selection names no cup
 CLASSIFIER = "models/state_classifier_v3"
 
 
 def artefacts() -> list[str]:
     selected = json.loads((OUT / "eval" / "selected_checkpoints.json").read_text())
-    return [*sorted(selected.values()), CUP, CLASSIFIER]
+    return [*sorted(selected.values()), *([] if "cup" in selected else [CUP]), CLASSIFIER]
 
 
 def main():

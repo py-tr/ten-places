@@ -142,13 +142,21 @@ each run once (`final_report.py` refuses the tuning range and allows 200+ for th
   all 50 tables at ±20%, as at the trained sizes. Each skill learned one size of each object. With only the cup's
   size varied ±20% (`TENPLACES_SHAPE_ONLY=cup`, the same cups as in the every-object row): 18/50 (2 better, 17 worse,
   p < 0.001), the cup placed 23/50 — nearly the whole loss of the every-object row (17/50).
-- One attempt to teach the cup other sizes, gates written before any result (tuning seeds 100–149): 100 scripted
-  demonstrations with the cup ×0.77–1.25 (40 at the trained size), the deployed cup fine-tuned 7.5k steps on its own
-  statistics. It got worse at every size — cup alone at the trained size 37/50 against 48/50, at ±20% cup sizes 24/50
-  against 29/50, the fixed sequence 22/50 full tables against 42/50 — so it is not shipped. Before it could
-  demonstrate the larger cups at all, the scripted controller needed a higher approach (×1.2: 3/20 placed, then
-  20/20). The deployed cup's misses at other sizes are all "never picked up", none a false "done" from the camera.
-  Untested: the fine-tune used the knock attempt's recipe (augmentation, AMP, lr 2e-5), not the deployed cup's own.
+- Teaching the cup other sizes, gates written before any result, all on tuning seeds. Before it could demonstrate
+  the larger cups at all, the scripted controller needed a higher approach (×1.2: 3/20 placed, then 20/20). The
+  deployed cup's misses at other sizes are all "never picked up", none a false "done" from the camera.
+  - Attempt 1: 100 scripted demonstrations with the cup ×0.77–1.25 (40 at the trained size), the deployed cup
+    fine-tuned 7.5k steps with the knock attempt's recipe (augmentation, AMP, lr 2e-5). Worse at every size — cup
+    alone at the trained size 37/50 against 48/50, at ±20% cup sizes 24/50 against 29/50, the fixed sequence 22/50
+    full tables against 42/50. Not shipped.
+  - Attempt 2, one variable against attempt 1's loss at the trained size: the deployed cup's own 80 demonstrations
+    added (180), the deployed cup's own recipe (no augmentation, no AMP, default lr), its statistics, final
+    checkpoint only. Trained size 48/50 against 48/50; fixed sequence 43/50 against 42/50 (cup 49 against 47); at
+    ±20% cup sizes 35/50 against 29/50 (+12 / −6, p = 0.24) — below the p < 0.05 set for that gate, so not shipped
+    on it.
+  - Confirmation, written before it ran: the same checkpoint on 150 tuning seeds nothing had used (150–199,
+    300–399), cup alone at ±20% cup sizes: 99 against 80 (+31 / −12, p = 0.005). It passes, and with the other two
+    gates already holding the attempt-2 cup replaced the deployed one. The first 50-seed test is not pooled in.
 
 Where the 14 lost tables of the 100 went (full agent, OpenVINO, `out/eval/agent_table/ov_w8_report5.json` and
 `ov_w8_fresh200-249.json`; a table counts at its first step, in task order, that is still undone at the end):
@@ -256,7 +264,14 @@ fresh OpenGL context can render a few pixels one intensity level differently; th
 (seed 128: drawer 6.40 vs 6.30 cm). Seed-level comparisons between runs are therefore partly noise, and results are
 reported over 50 seeds with Wilson intervals. How much: two agent runs of the identical system on seeds 100–149 set
 41 and 39 tables and disagree on 10 of the 50 (the first-look gate above) — a difference of two tables between runs
-is not a result; paired comparisons with McNemar tests are.
+is not a result; paired comparisons with McNemar tests are. The fixed sequence shows the same: two runs on tuning
+seeds 100–199 that could differ only where a spoon retry succeeded (none did, below) both set 70/100 and disagreed on
+16 tables, 8 each way.
+
+**Retrying a failed spoon with the other controller** (gate written first): the spoon's second attempt with the whole
+50-action chunk run open-loop instead of ensembling (`skill_policies.RETRY_EXEC`, `eval_table_chain.py --retry-exec
+spoon=exec50`). Tuning seeds 100–199: 13 spoons retried, none placed — a spoon that fails once fails again from the
+state it leaves, under either controller (the earlier same-controller retries: 0 of 23). Not switched on.
 
 Timing is a separate matter. Started from a console with no visible window, a process can be classed as background
 by Windows 11 and throttled (EcoQoS): on 2026-09-14 the benchmarks came out 4–8× slower on PyTorch and ~1.3× on
