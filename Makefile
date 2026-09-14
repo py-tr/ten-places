@@ -93,6 +93,8 @@ report-fresh:
 	env TENPLACES_STRESS=1.5 $(PY) scripts/final_report.py --seeds 200 250 --rows ov_w8 --videos 0 --workers 4 --out out/eval/stress_1.5
 	env TENPLACES_SHAPE=0.1 $(PY) scripts/final_report.py --seeds 200 250 --rows ov_w8 --videos 0 --workers 4 --out out/eval/shape_0.1
 	env TENPLACES_SHAPE=0.2 $(PY) scripts/final_report.py --seeds 200 250 --rows ov_w8 --videos 0 --workers 4 --out out/eval/shape_0.2
+	env TENPLACES_SHAPE=0.2 TENPLACES_SHAPE_ONLY=cup $(PY) scripts/final_report.py --seeds 200 250 --rows ov_w8 --videos 0 \
+		--workers 4 --out out/eval/shape_cup_0.2
 
 # Context shift: each skill from every start a verified subset plan can give it, then demos from those starts.
 eval-context:

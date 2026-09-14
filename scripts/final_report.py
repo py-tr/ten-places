@@ -74,6 +74,7 @@ def main():
         "seeds": [seeds[0], seeds[-1]], "rows": args.rows, "home_frames": args.home_frames,
         "stress": float(os.environ.get("TENPLACES_STRESS", "1.0")),  # scene_table.sample: ranges widened by this
         "shape": float(os.environ.get("TENPLACES_SHAPE", "0")),  # scene_table.sample: object sizes 1 ± shape
+        "shape_only": os.environ.get("TENPLACES_SHAPE_ONLY", ""),  # which objects' sizes vary ("" = all)
         "budgets": DEFAULT_BUDGETS, "camera_ends": CAMERA_ENDS, "settle": SETTLE, "retry": RETRY,
         "exec_settings": exec_settings, "selected": selected,
         "checkpoints": sources, "runs": runs, "classifier": args.classifier, "date": time.strftime("%Y-%m-%d %H:%M"),
@@ -84,7 +85,7 @@ def main():
     kind = "reporting seeds" if seeds[0] < 100 else "fresh seeds (stress test)"
     lines = [f"# Full table, {kind} {seeds[0]}-{seeds[-1]} ({len(seeds)} randomised tables)"
              + (f", ranges widened ×{stress}" if stress != 1.0 else "")
-             + (f", object sizes ±{shape:.0%}" if shape else ""), "",
+             + (f", {os.environ.get('TENPLACES_SHAPE_ONLY') or 'object'} sizes ±{shape:.0%}" if shape else ""), "",
              "Selections frozen before the run: see provenance.json."
              + (" The first 10 seeds are the ones in the video grid." if seeds[0] < 100 else ""), "",
              "| row | full tables | 95% CI | seeds 0-9 | mean steps | " + " | ".join(KEYS) + " |",

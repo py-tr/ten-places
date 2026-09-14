@@ -41,6 +41,16 @@ def test_shape_varies_only_the_sizes():
         assert 0.9 <= varied["cutlery_scale"] <= 1.1  # the 16 cm tray
 
 
+def test_shape_only_the_cup(monkeypatch):
+    monkeypatch.delenv("TENPLACES_SHAPE_ONLY", raising=False)
+    for s in SEEDS:
+        every, cup = sample(s, shape=0.2), sample(s, shape=0.2, only=("cup",))
+        assert (cup.plate_scale, cup.cutlery_scale) == (1.0, 1.0)
+        assert cup.cup_scale == every.cup_scale != 1.0  # the same cup as with every object varied
+    monkeypatch.setenv("TENPLACES_SHAPE_ONLY", "cup")
+    assert sample(7, shape=0.2).to_dict() == sample(7, shape=0.2, only=("cup",)).to_dict()
+
+
 def test_the_environment_sets_the_default(monkeypatch):
     monkeypatch.setenv("TENPLACES_STRESS", "1.5")
     assert sample(7).to_dict() == sample(7, stress=1.5).to_dict()

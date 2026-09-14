@@ -53,21 +53,28 @@ class TableParams:
         return asdict(self)
 
 
-def sample(seed: int, nominal: bool = False, stress: float | None = None, shape: float | None = None) -> TableParams:
+def sample(seed: int, nominal: bool = False, stress: float | None = None, shape: float | None = None,
+           only=None) -> TableParams:
     """shape > 0 also varies object sizes: plate and cup scaled by 1 ± shape, the cutlery by 1 ± min(shape, 0.1) (it
     lies in a 16 cm tray); drawn from a stream of their own, so a table differs from its usual self only in its object
-    sizes. Default: the TENPLACES_SHAPE environment variable, else 0 (sizes fixed, as every reported result)."""
+    sizes. Default: the TENPLACES_SHAPE environment variable, else 0 (sizes fixed, as every reported result).
+    only: the objects whose size varies (e.g. ("cup",); default TENPLACES_SHAPE_ONLY, comma-separated, else all);
+    the others stay at their trained size, and those that vary get the same size as with every object varied."""
+    import os
+
     params = _sample(seed, nominal, stress)
     if shape is None:
-        import os
-
         shape = float(os.environ.get("TENPLACES_SHAPE", "0"))
+    if only is None:
+        only = tuple(filter(None, os.environ.get("TENPLACES_SHAPE_ONLY", "").split(","))) or None
     if shape and not nominal:
         rng = np.random.default_rng([seed, 1])  # its own stream: the usual draws stay untouched
-        params.plate_scale = float(1 + rng.uniform(-shape, shape))
-        params.cup_scale = float(1 + rng.uniform(-shape, shape))
+        scales = {"plate": float(1 + rng.uniform(-shape, shape)), "cup": float(1 + rng.uniform(-shape, shape))}
         cutlery = min(shape, 0.10)
-        params.cutlery_scale = float(1 + rng.uniform(-cutlery, cutlery))
+        scales["cutlery"] = float(1 + rng.uniform(-cutlery, cutlery))
+        for name, s in scales.items():
+            if only is None or name in only:
+                setattr(params, f"{name}_scale", s)
     return params
 
 
