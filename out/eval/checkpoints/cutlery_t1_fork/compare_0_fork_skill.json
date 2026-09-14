@@ -1,0 +1,262 @@
+{
+ "summary": {
+  "skill": "fork",
+  "label": "compare_0_fork",
+  "checkpoint": "out\\train\\skills_ctx\\fork\\checkpoints\\015000\\pretrained_model",
+  "episodes": 30,
+  "success": 16,
+  "rate": 0.5333333333333333,
+  "wilson95": [
+   0.361,
+   0.698
+  ],
+  "per_opening": {
+   "0.08": "6/10",
+   "0.09": "10/10",
+   "0.1": "0/10"
+  },
+  "mean_frames": 394.8666666666667
+ },
+ "rows": [
+  {
+   "seed": 100,
+   "skill": "fork",
+   "success": false,
+   "frames": 500,
+   "err_m": 0.1787,
+   "drawer_open": 0.08
+  },
+  {
+   "seed": 101,
+   "skill": "fork",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0072,
+   "drawer_open": 0.08
+  },
+  {
+   "seed": 102,
+   "skill": "fork",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.0052,
+   "drawer_open": 0.08
+  },
+  {
+   "seed": 103,
+   "skill": "fork",
+   "success": false,
+   "frames": 500,
+   "err_m": 0.1875,
+   "drawer_open": 0.08
+  },
+  {
+   "seed": 104,
+   "skill": "fork",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.0041,
+   "drawer_open": 0.08
+  },
+  {
+   "seed": 105,
+   "skill": "fork",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.0051,
+   "drawer_open": 0.08
+  },
+  {
+   "seed": 106,
+   "skill": "fork",
+   "success": false,
+   "frames": 500,
+   "err_m": 0.1687,
+   "drawer_open": 0.08
+  },
+  {
+   "seed": 107,
+   "skill": "fork",
+   "success": false,
+   "frames": 500,
+   "err_m": 0.1831,
+   "drawer_open": 0.08
+  },
+  {
+   "seed": 108,
+   "skill": "fork",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.0044,
+   "drawer_open": 0.08
+  },
+  {
+   "seed": 109,
+   "skill": "fork",
+   "success": true,
+   "frames": 321,
+   "err_m": 0.0067,
+   "drawer_open": 0.08
+  },
+  {
+   "seed": 100,
+   "skill": "fork",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.01,
+   "drawer_open": 0.09
+  },
+  {
+   "seed": 101,
+   "skill": "fork",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.0053,
+   "drawer_open": 0.09
+  },
+  {
+   "seed": 102,
+   "skill": "fork",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.0072,
+   "drawer_open": 0.09
+  },
+  {
+   "seed": 103,
+   "skill": "fork",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.0052,
+   "drawer_open": 0.09
+  },
+  {
+   "seed": 104,
+   "skill": "fork",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.003,
+   "drawer_open": 0.09
+  },
+  {
+   "seed": 105,
+   "skill": "fork",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.0047,
+   "drawer_open": 0.09
+  },
+  {
+   "seed": 106,
+   "skill": "fork",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.0154,
+   "drawer_open": 0.09
+  },
+  {
+   "seed": 107,
+   "skill": "fork",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.0035,
+   "drawer_open": 0.09
+  },
+  {
+   "seed": 108,
+   "skill": "fork",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.0045,
+   "drawer_open": 0.09
+  },
+  {
+   "seed": 109,
+   "skill": "fork",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.0064,
+   "drawer_open": 0.09
+  },
+  {
+   "seed": 100,
+   "skill": "fork",
+   "success": false,
+   "frames": 500,
+   "err_m": 0.1871,
+   "drawer_open": 0.1
+  },
+  {
+   "seed": 101,
+   "skill": "fork",
+   "success": false,
+   "frames": 500,
+   "err_m": 0.1873,
+   "drawer_open": 0.1
+  },
+  {
+   "seed": 102,
+   "skill": "fork",
+   "success": false,
+   "frames": 500,
+   "err_m": 0.1866,
+   "drawer_open": 0.1
+  },
+  {
+   "seed": 103,
+   "skill": "fork",
+   "success": false,
+   "frames": 500,
+   "err_m": 0.1949,
+   "drawer_open": 0.1
+  },
+  {
+   "seed": 104,
+   "skill": "fork",
+   "success": false,
+   "frames": 500,
+   "err_m": 0.1779,
+   "drawer_open": 0.1
+  },
+  {
+   "seed": 105,
+   "skill": "fork",
+   "success": false,
+   "frames": 500,
+   "err_m": 0.1837,
+   "drawer_open": 0.1
+  },
+  {
+   "seed": 106,
+   "skill": "fork",
+   "success": false,
+   "frames": 500,
+   "err_m": 0.1832,
+   "drawer_open": 0.1
+  },
+  {
+   "seed": 107,
+   "skill": "fork",
+   "success": false,
+   "frames": 500,
+   "err_m": 0.1793,
+   "drawer_open": 0.1
+  },
+  {
+   "seed": 108,
+   "skill": "fork",
+   "success": false,
+   "frames": 500,
+   "err_m": 0.18,
+   "drawer_open": 0.1
+  },
+  {
+   "seed": 109,
+   "skill": "fork",
+   "success": false,
+   "frames": 500,
+   "err_m": 0.192,
+   "drawer_open": 0.1
+  }
+ ]
+}

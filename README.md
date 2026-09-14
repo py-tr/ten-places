@@ -1,21 +1,23 @@
 # Ten Places
 
 Two simulated SO-101 arms set a dinner table in MuJoCo from a spoken or typed command: open the drawer, hand the
-spoon and the fork from one arm to the other, move the plate, set the cup. A small vision-language model plans the
-steps, learned ACT policies drive both arms from the cameras, and a camera classifier checks every step — all on an
+spoon and the fork from one arm to the other, place the plate, set the cup. A vision-language model plans, one learned
+ACT policy per skill drives both arms from the cameras, a camera classifier checks every step. Everything runs on an
 Intel CPU with OpenVINO.
 
-**86 of 100 held-out tables set completely** (two sets of 50 randomised tables, frozen configuration, each run once).
-Every grasp is friction contact with a ~17 N gripper — no weld or attach constraint anywhere — and at run time the
-robot sees only its cameras and its joint angles, never the simulator's object poses. It is a hierarchical VLA: a
-vision-language model plans from the top camera and the command, and small ACT policies act from three cameras at
-25 Hz. The skills themselves are not language-conditioned — a single policy given the skill as an input learned to
-ignore it (`docs/findings.md`) — so language reaches the arms through the plan.
+- **82 of 100 held-out tables set completely** — two sets of 50 randomised tables, frozen configuration, each run once.
+- Grasps are friction contact only (~17 N gripper). No weld or attach constraint.
+- At run time: cameras and joint angles only. No simulator object poses.
+- Hierarchical VLA: the VLM plans from the top camera and the command; ACT policies act from three cameras at 25 Hz.
+  The skills are not language-conditioned (a single skill-conditioned policy learned to ignore the skill input,
+  `docs/findings.md`); language reaches the arms through the plan.
+- Every model that runs on the machine runs on OpenVINO: policies (INT8 weights), planner (Qwen3-VL-4B INT4,
+  OpenVINO GenAI), classifier. Speech: Speechmatics' cloud service.
 
-Built for the Intel online challenge *Bimanual VLA Manipulation with Multi-Modal Reasoning* (AI Infra Summit
-Hackathon 2026). Every number below comes from the script or result file named next to it. Evaluation seeds 0–49 are
-never used for training; choices are made on tuning seeds 100–149 (two early ones, made on seeds 0–29, were re-checked
-there and held — `docs/findings.md`).
+Intel online challenge *Bimanual VLA Manipulation with Multi-Modal Reasoning*, AI Infra Summit Hackathon 2026.
+
+Seeds: held-out evaluation 0–49 and 200–249, never used for training; two early choices made on seeds 0–29 were
+re-checked on tuning seeds and held (`docs/findings.md`). Tuning 100–199 and 300–399; demonstrations 1000+. Every number below names the script or result file it comes from.
 
 ## How it works
 
@@ -37,89 +39,83 @@ One ACT policy per skill (3 cameras + joints → 12 joint targets at 25 Hz), Ope
 MuJoCo: two SO-101 arms, randomised dinner table
 ```
 
-**Why a VLM above small learned policies.** Language and scene understanding live in the vision-language model;
-the visuomotor policies that move the arms are small ACT models (one of the candidate policies the challenge names),
-trained here in MuJoCo with LeRobot. The split is a latency decision: at 16 ms per forward pass on the CPU (OpenVINO
-INT8 weights), a policy can run every 40 ms control step and blend overlapping action chunks, which keeps it
-closed-loop through contact. On the 50 tuning tables the spoon hand-off fails when the policy re-plans every 10
-actions (4/50) and completes with ensembling (43/50), as it does executing whole 50-action chunks (44/50); on the
-drawer ensembling is ahead (20/20 against 18/20 and 15/20, seeds 100–119). A large end-to-end VLA predicts open-loop chunks — for scale,
-Intel's π0.5 reference takes 294 ms per inference with stock PyTorch on a Core Ultra X7 358H at 40 W
-([Intel](https://docs.openedgeplatform.intel.com/2026.1/OEP-articles/publications/optimizing-pi0.5-lva-model.html)).
-Measured on this i5: LeRobot's SmolVLA (450M parameters) takes 6.6 s per 50-action chunk with stock PyTorch —
-against 40 ms for our ACT policy in PyTorch and 16 ms with OpenVINO INT8 weights (`scripts/bench_smolvla.py`,
-`out/benchmark/smolvla.md`; timing only: the public base checkpoint, not trained on this task, not exported to
-OpenVINO).
-The planner runs at the speed of a conversation (seconds), the policies at the speed of contact (25 Hz).
+VLM above small policies — a latency split:
+- Policy: 16 ms per forward pass on the CPU (OpenVINO INT8 weights), so it runs every 40 ms control step and blends
+  overlapping action chunks (temporal ensembling) — closed loop through contact.
+- Tuning tables: spoon hand-off 43/50 with ensembling, 44/50 executing whole 50-action chunks, 4/50 re-planning every
+  10 actions; drawer 20/20 with ensembling against 18/20 and 15/20 (seeds 100–119).
+- End-to-end VLAs predict open-loop chunks. π0.5 (Intel's reference): 294 ms per inference, stock PyTorch, Core Ultra
+  X7 358H at 40 W ([Intel](https://docs.openedgeplatform.intel.com/2026.1/OEP-articles/publications/optimizing-pi0.5-lva-model.html)).
+  SmolVLA (450M) on this i5: 6.6 s per 50-action chunk, stock PyTorch, against 40 ms (PyTorch) and 16 ms (OpenVINO)
+  for the ACT policy (`scripts/bench_smolvla.py`, `out/benchmark/smolvla.md`; timing only, public base checkpoint).
+- Planner at conversation speed (seconds), policies at contact speed (25 Hz).
 
-The person can keep talking while the robot works: "stop" halts at once; "skip the fork" or "oh, and the cup too"
-changes the plan after the current step, verified like any plan. The robot answers with Speechmatics text-to-speech.
+Talking while it works: "stop" halts at once (matched locally, no model call); "skip the fork", "and the cup too"
+change the plan after the current step, verified like any plan. Replies by Speechmatics text-to-speech.
 
 ## Results
 
-**Full table, 50 held-out randomised tables** (seeds 0–49, run once with every selection frozen beforehand;
-`out/eval/final5/`, `out/eval/agent_table/ov_w8_report5.json`):
+**Seeds 0–49** — 50 held-out randomised tables, every selection frozen beforehand, each run once
+(`out/eval/final6/`, `out/eval/agent_table/ov_w8_report6.json`):
 
 | Run | Full tables (95% CI) | Mean steps of 5 | Drawer | Spoon | Plate | Fork | Cup |
 |---|---|---|---|---|---|---|---|
-| **Full agent on OpenVINO** (what the robot runs: re-checks, repairs, re-queues failed steps) | **43/50 (74–93%)** | 4.76 | 50 | 47 | 47 | 45 | 49 |
-| Fixed five-step sequence (plate, fork, cup retried once), OpenVINO INT8 weights | 41/50 (69–90%) | 4.74 | 50 | 46 | 47 | 46 | 48 |
-| Fixed five-step sequence, PyTorch reference (CUDA GPU) | 39/50 (65–87%) | 4.62 | 49 | 46 | 45 | 43 | 48 |
+| **Full agent, OpenVINO** (re-checks, retries, re-queues failed steps) | **43/50 (74–93%)** | 4.80 | 50 | 47 | 48 | 47 | 48 |
+| Fixed five-step sequence (plate, fork, cup retried once), OpenVINO INT8 weights | 42/50 (72–92%) | 4.76 | 50 | 47 | 46 | 46 | 49 |
+| Fixed five-step sequence, PyTorch reference (CUDA GPU) | 38/50 (63–86%) | 4.54 | 48 | 45 | 45 | 39 | 50 |
 
-Task success does not depend on inference speed: the simulation waits for each action, so the GPU reference and the
-CPU rows differ only in the numbers the networks compute.
+- Success does not depend on inference speed (the simulation waits for each action): GPU and CPU rows differ only in
+  the numbers the networks compute. OpenVINO INT8 vs PyTorch per seed: +6 / −2, McNemar p = 0.29.
+- Configuration chosen on tuning seeds 100–149 (fixed sequence, PyTorch: 43/50).
 
-OpenVINO INT8 and PyTorch are indistinguishable per seed (5 tables differ one way, 3 the other; McNemar p = 0.73).
-The configuration was chosen on 50 separate tuning tables (seeds 100–149), where it set 41/50 with PyTorch.
+**Seeds 200–249** — a second held-out set, same frozen configuration, each run once; robustness rows on the same
+tables (`out/eval/agent_table/ov_w8_fresh200-249_cup2.json`, `out/eval/cup2_*/`):
 
-**A second held-out set, and tables outside the training ranges** — 50 fresh seeds (200–249) never used before, the
-same frozen configuration, each run once (`out/eval/agent_table/ov_w8_fresh200-249.json`, `out/eval/stress_*/`):
-
-| Run on seeds 200–249 | Full tables (95% CI) |
+| Run | Full tables (95% CI) |
 |---|---|
-| **Full agent on OpenVINO** | **43/50 (74–93%)** |
-| Fixed five-step sequence, OpenVINO | 33/50 (52–78%) |
-| Fixed sequence, friction, masses, light and colours widened ×1.5 beyond the training ranges | 41/50 (69–90%) |
-| … widened ×2.0 | 33/50 (52–78%) |
-| Fixed sequence, plate and cup sizes ±10%, cutlery length ±10% (training used one size of each) | 25/50 (37–63%) |
-| Fixed sequence, plate and cup sizes ±20%, cutlery length ±10% | 17/50 (22–48%) |
-| Fixed sequence, only the cup's size ±20% | 18/50 (24–50%) |
+| **Full agent, OpenVINO** | **39/50 (65–87%)** |
+| Fixed five-step sequence, OpenVINO | 30/50 (46–72%) |
+| Fixed sequence; friction, masses, light, colours widened ×1.5 beyond the training ranges | 40/50 (67–89%) |
+| … widened ×2.0 | 38/50 (63–86%) |
+| Fixed sequence; plate and cup sizes ±10%, cutlery length ±10% | 27/50 (40–67%) |
+| Fixed sequence; plate and cup sizes ±20%, cutlery length ±10% | 26/50 (38–65%) |
+| Fixed sequence; cup size only ±20% | 22/50 (31–58%) |
 
-The agent replicates its 43/50; here its re-checks, retries and re-queued steps add 10 tables and lose none (McNemar
-p = 0.002). Widening the ranges cost nothing measurable (paired with the normal ranges: 14 tables better, 6 worse,
-p = 0.12; at ×2.0, 10 better and 10 worse). Object sizes are where it breaks: every skill learned one size of each object, and paired with the
-trained sizes ±10% loses 12 tables and gains 4 (p = 0.08), ±20% loses 18 and gains 2 (p < 0.001) — mostly the cup,
-placed about as often as usual within 5% of its trained size and rarely beyond 10%. With only the cup's size
-varied, 18/50: the cup alone carries nearly all of it. The grader is size-proof (an
-object set on its target passes on all 50 tables at ±20%). Over both held-out sets the full agent sets 86 of 100 tables. The submission video shows the first 10
-seeds as a grid with pass/fail per seed. (The first look, on in `run_agent.py`, is off in these rows; on fresh tables
-it skips nothing — `docs/findings.md`.)
+- Agent vs fixed sequence, same tables: +11 / −2, p = 0.02 — the re-checks, retries and re-queues.
+- Both held-out sets, full agent: 82/100.
+- Robustness rows vs the fixed sequence at the training ranges and sizes (30/50), same tables: ×1.5 +17 / −7
+  (p = 0.06), ×2.0 +15 / −7 (p = 0.13); sizes ±10% +4 / −7 (p = 0.55), ±20% +4 / −8 (p = 0.39); cup size only
+  +3 / −11 (p = 0.06). Cup placed at ±20%: 40/50 with every object varied, 34/50 with the cup alone (previous cup:
+  25/50, 23/50).
+- Sizes: the cup was trained on ×0.77–1.25 sizes (`docs/findings.md`); plate and cutlery on one size each. The grader
+  is size-proof (an object set on its target passes on all 50 tables at ±20%).
+- Video: the first 10 seeds as a grid, pass/fail per seed. The first look (on in `run_agent.py`) is off in these rows;
+  on fresh tables it skips nothing (`docs/findings.md`).
 
-**Placement accuracy**, full agent over the 100 held-out tables (the simulator's measurement): median error spoon
-0.33 cm, plate 0.41 cm, cup 0.44 cm, fork 0.78 cm; every placed object within the 2.5 cm tolerance (largest 2.45 cm);
-184 of 200 hand-offs completed.
+**Placement accuracy**, full agent, 100 held-out tables (simulator measurement): median error spoon 0.34 cm, plate
+0.40 cm, cup 0.36 cm, fork 0.86 cm; every placed object within the 2.5 cm tolerance (largest 2.01 cm); 184 of 200
+hand-offs completed.
 
 | Component | Result | Evidence |
 |---|---|---|
 | Demonstration runs: 10 tables, 10 requests fixed before recording (2 spoken, 1 changed mid-run by a scripted sentence), full agent on OpenVINO | 9/10 done exactly as asked; seed 4's plate missed four times, each miss caught by the camera | `scripts/score_demo.py`, `out/video/demo/summary.md` |
 | Planner: unseen commands → correct verified plan | 8/8 on the set written before it was scored, incl. naming what no skill can do ("dim the lights"); 10/10, 5/5 and 4/6 on the three sets used while writing the prompts | `scripts/eval_planner.py` |
-| First look: steps already done are skipped | fresh tables: none read as done (50/50); half-set tables: read exactly 50/50; agent on 50 fresh tables: skipped nothing | `scripts/eval_initial_state.py`, `eval_agent_table.py --look-first` |
-| A VLA baseline: SmolVLA (450M) fine-tuned on the same 100 cup demonstrations, same 30 tuning tables, all seven starts | 63/210 cups placed (ACT on the same data: 167/210; the deployed ACT cup: 198/210); 6.6 s per chunk on this CPU against 16 ms | `scripts/train_smolvla.py`, `out/eval/context/cup_smolvla005000_*` |
+| First look: steps already done are skipped | fresh tables: none read as done (50/50); half-set tables: read exactly (50/50); agent on 50 fresh tables: skipped nothing | `scripts/eval_initial_state.py`, `eval_agent_table.py --look-first` |
+| VLA baseline: SmolVLA (450M) fine-tuned on the same 100 cup demonstrations, 30 tuning tables, all seven starts | 63/210 cups placed (ACT, same data: 167/210; ACT cup with context demonstrations: 198/210); 6.6 s per chunk on this CPU against 16 ms | `scripts/train_smolvla.py`, `out/eval/context/cup_smolvla005000_*` |
 | Mid-run spoken changes understood | 8/10 on sentences written before the run | `scripts/eval_amend.py --set fresh` |
 | Camera classifier on learned-policy states | false "drawer done" 3/363, false "spoon done" 1/671 | `docs/findings.md` |
 | Scripted demonstrator (training data) | 60/60 full tables, 72/72 verified subset plans | `make spike-table` |
 
-How the system got from 0 to 43 of 50 tables — every change, what it measured, and what did not work —
-is in [`docs/findings.md`](docs/findings.md).
+Every change from 0 to 43 of 50 tables, what it measured, what did not work: [`docs/findings.md`](docs/findings.md).
 
 ## OpenVINO on an Intel Core i5-13600KF
 
-**Policy latency**, the five deployed skill policies, idle machine, batch 1 (`scripts/benchmark.py`,
-`out/benchmark/<skill>_<step>.md`):
+**Policy latency** — the deployed skill policies, idle machine, batch 1 (`scripts/benchmark.py`,
+`out/benchmark/<skill>_<step>.md`; the cup row measured on the previous cup checkpoint, same architecture):
 
 | Variant | Latency median (p95) | Throughput | IR size |
 |---|---|---|---|
-| PyTorch FP32 eager (CPU, its default 14 threads) | 39–45 ms (45–48) | – | – |
+| PyTorch FP32 eager (CPU, default 14 threads) | 39–45 ms (45–48) | – | – |
 | OpenVINO FP32 (drawer, cup) | 18.4–19.5 ms (21–22) | 85–92 inf/s | 130.5 MB |
 | **OpenVINO INT8 weights** (deployed) | **15.5–15.8 ms** (17–20) | 109–112 inf/s | 33.0 MB |
 | … E-cores only | 37–66 ms | – | – |
@@ -135,11 +131,10 @@ while the 4B planner generates, 60 s per placement (`scripts/bench_concurrency.p
 | … + hyper-threading on for control | **29 / 36 ms** | **0%** | 5.5 s |
 | … + pinned threads (`--cores split`, `tenplaces/cores.py`) | 29 / 55 ms | 6% | 5.9 s |
 
-Left to the OS, the planner makes almost every control step late. Splitting the cores fixes that at the cost of a
-slower planner (4.2 → 5.5 s). The robot ships the pinned placement (6% late); hyper-threading on measured 0% in this
-run and is not shipped.
+Default scheduling: the planner makes almost every control step late. Core split: fixed, planner 4.2 → 5.5 s.
+Shipped: the pinned split (6% late). Hyper-threading on measured 0% in this run; not shipped.
 
-**Power and energy** — CPU package power logged by HWiNFO64 (package, not wall power), cup policy, 60 s per phase
+**Power and energy** — CPU package power, HWiNFO64 (package, not wall), cup policy, 60 s per phase
 (`scripts/power_bench.py`, `out/benchmark/power.md`):
 
 | Phase | Package power | Inferences/s | Energy per inference, above idle |
@@ -151,50 +146,47 @@ run and is not shipped.
 | OpenVINO INT8 weights at 25 Hz, default scheduling | 63.3 W | 25 | 1.81 J |
 | … at 25 Hz, P-cores, pinned | 56.0 W | 25 | 1.52 J |
 
-What the optimisation buys:
-- **Precision chosen by task success, not output error.** INT8 weights keep full-table success (41 vs 39 of 50);
-  INT8 activations in the transformer cost it (hand-off checkpoint: 7/20 against 13/20 for FP32 and 14/20 for INT8
-  weights on the same seeds, `docs/findings.md`), so they are not shipped. INT4 weights (23 MB instead of 33) keep
-  four skills but break the cup — its actions drift ~0.05 rad — so the full table fails every time (0/50 against
-  41/50 on the tuning seeds), and in the same benchmark run they are no faster than INT8 weights on this CPU
-  (16.8–21.3 ms against 16.8–19.3 ms, `out/benchmark/opt_out_0914/`): the ladder stops at INT8 weights.
-- **Latency spent on quality.** At 16 ms the policy can run every control step with temporal ensembling: the drawer
-  20/20 against 18/20 open-loop and 15/20 re-planning every 10 actions (seeds 100–119); the spoon hand-off 43/50
-  against 4/50 re-planning every 10 actions (open-loop whole chunks: 44/50, seeds 100–149).
-- **Hybrid-core placement for concurrent workloads.** Real-time control on the P-cores, the VLM on the E-cores:
-  the arms keep 25 Hz while the planner thinks. The first plan comes while the arms are still, so it runs on
-  every core: median 7.1 s against 14.3 s on the E-cores, same plans (10 demo commands,
-  `scripts/bench_planner_placement.py`); OpenVINO GenAI's own metrics for that plan: 3.45 s to the first token (image
-  encoding and prefill of 452 tokens), then 8.4 tokens/s for its 34 (`out/benchmark/opt_out_0914/planner_placement.md`).
-  Everything asked while the arms move — the check for impossible parts
-  ("light a candle"), spoken changes — stays on the E-cores.
-- **Energy.** INT8 weights use 2.4× less energy per inference than PyTorch at its default 14 threads on the same
-  CPU (1.43 vs 3.50 J above idle); at the robot's 25 Hz, P-core placement draws 7 W less than default scheduling.
-- Every model that runs on the machine runs on OpenVINO: the policies (INT8 weights), the planner (Qwen3-VL-4B INT4,
-  OpenVINO GenAI) and the camera classifier (ResNet18, 5–6 ms); speech is Speechmatics' cloud service. The benchmark
-  and evaluation scripts take `--device` and `benchmark.py` lists the machine's OpenVINO devices; the hybrid-core
-  placement is CPU-only, and the Core Ultra iGPU/NPU paths are untested here.
-- **In Intel's Physical AI terms**, this is a hierarchical VLA: a VLM as the reasoning layer and ACT as the action
-  expert — the policy family Intel's Physical AI Studio exports to OpenVINO. Here each policy is converted with
-  `ov.convert_model` and compressed with NNCF directly (`tenplaces/ov_backend.py`), because Physical AI Studio
-  targets Linux and this machine runs Windows.
-- **Model cache, measured rather than assumed.** OpenVINO's `CACHE_DIR` gets each skill policy ready in 0.16–0.17 s
-  instead of 0.83–0.86 s (5×) — but the 4B planner loads slower from its 3 GB cache (8.8 s) than it compiles from
-  its IR (4.7 s). The robot does not use the cache yet: the policies would save ~3.4 s per launch, the planner would
-  lose ~4 s (`scripts/bench_compile_cache.py`, `out/benchmark/compile_cache.md`).
+Optimisation results:
+- **Precision by task success, not output error.** INT8 weights keep full-table success (42 vs 38 of 50 for
+  PyTorch, +6 / −2, p = 0.29). INT8
+  activations in the transformer lose it (hand-off checkpoint: 7/20 against 13/20 FP32, 14/20 INT8 weights; same
+  seeds). INT4 weights (23 MB instead of 33): four skills hold, the cup of that time drifts ~0.05 rad and fails every table (0/50
+  against 41/50, tuning seeds); no faster than INT8 on this CPU in the same run (16.8–21.3 against 16.8–19.3 ms,
+  `out/benchmark/opt_out_0914/`). Ladder stops at INT8 weights.
+- **Latency spent on quality.** 16 ms per step allows temporal ensembling every step: drawer 20/20 against 18/20
+  open-loop, 15/20 re-planning every 10 actions (seeds 100–119); spoon hand-off 43/50 against 4/50 re-planning every
+  10 actions (open-loop whole chunks 44/50, seeds 100–149).
+- **Hybrid cores.** Control on the P-cores, VLM on the E-cores: 25 Hz held while the planner runs. The first plan
+  comes while the arms are still, so it runs on every core: median 7.1 s against 14.3 s on the E-cores, same plans
+  (10 demo commands, `scripts/bench_planner_placement.py`). OpenVINO GenAI metrics for that plan: 3.45 s to the first
+  token (image encoding + prefill, 452 tokens), then 8.4 tokens/s for 34 tokens
+  (`out/benchmark/opt_out_0914/planner_placement.md`). Everything asked while the arms move (impossible-part check,
+  spoken changes) stays on the E-cores.
+- **Energy.** INT8 weights: 2.4× less energy per inference than PyTorch at its default 14 threads (1.43 vs 3.50 J
+  above idle). At 25 Hz, P-core placement draws 7 W less than default scheduling.
+- **Windows power throttling.** A process started from a console without a visible window can be classed as
+  background (EcoQoS): 14-thread PyTorch matmul 227 GFLOP/s as launched, 646 GFLOP/s after opting out. The robot and
+  the benchmarks opt out at start (`tenplaces.cores.no_power_throttling`).
+- **Devices.** The benchmark and evaluation scripts take `--device`; `benchmark.py` lists the OpenVINO devices. The
+  hybrid-core placement is CPU-only; Core Ultra iGPU/NPU paths untested (no Core Ultra available).
+- **Intel Physical AI terms.** Hierarchical VLA: VLM as the reasoning layer, ACT as the action expert — the policy
+  family Physical AI Studio exports to OpenVINO. Export here: `ov.convert_model` + NNCF (`tenplaces/ov_backend.py`);
+  Physical AI Studio targets Linux, this machine runs Windows.
+- **Model cache, measured.** OpenVINO `CACHE_DIR`: each skill policy ready in 0.16–0.17 s instead of 0.83–0.86 s
+  (5×); the 4B planner loads slower from its 3 GB cache (8.8 s) than it compiles from its IR (4.7 s). Not used yet:
+  policies would save ~3.4 s per launch, the planner would lose ~4 s (`scripts/bench_compile_cache.py`,
+  `out/benchmark/compile_cache.md`).
 
 ## The scene
 
-Built from scratch with `mujoco.MjSpec` from the official SO-101 model (Apache-2.0); every prop is a MuJoCo
-primitive.
-- Arm A (x = −0.30 m) faces arm B (x = +0.30 m). **The hand-offs are forced by reach:** with the fingers pointing
-  down neither arm can grasp past the table's midline, so cutlery that starts in A's drawer and must end on B's side
-  has to change hands.
-- The drawer is a tray under a fixed lid; the cutlery is only reachable once arm A has pulled it open.
-- The stock finger collision meshes fill the gap between the jaws; they are replaced by box pads, with gripper force
-  limited to a realistic ~17 N.
+`mujoco.MjSpec`, from the official SO-101 model (Apache-2.0); every prop a MuJoCo primitive.
+- Arm A (x = −0.30 m) faces arm B (x = +0.30 m). **Hand-offs forced by reach:** fingers down, neither arm grasps past
+  the table's midline; cutlery from A's drawer that ends on B's side changes hands.
+- Drawer: a tray under a fixed lid; cutlery reachable only once arm A has pulled it open.
+- Finger collision meshes replaced by box pads (the stock meshes fill the gap between the jaws); gripper force
+  limited to ~17 N.
 - Randomised per seed, uniformly (`tenplaces/scene_table.py`, `sample()`; positions in the table frame; object sizes
-  are fixed in training — `TENPLACES_SHAPE` varies them for the robustness rows above):
+  fixed unless `TENPLACES_SHAPE` is set, as in the robustness rows):
 
   | What | Range |
   |---|---|
@@ -210,13 +202,13 @@ primitive.
 
 ## Training
 
-- A scripted controller with privileged state (IK for the 5-DOF arm, closed-loop drawer pull) generates the
-  demonstrations; it is never used at run time.
+- Demonstrations: a scripted controller with privileged state (IK for the 5-DOF arm, closed-loop drawer pull). Never
+  used at run time.
 - One LeRobot ACT policy per skill, fine-tuned on demonstrations from every start a verified plan can produce, on
-  layouts weighted toward the hard cases, and on takeover episodes (the learned policy starts, the scripted
-  controller finishes).
-- The camera classifier is trained on scripted runs labelled by the simulator, including drawer pulls that stop
-  short, so "drawer done" means open far enough for the cutlery.
+  layouts weighted toward the hard cases, and on takeover episodes (learned policy starts, scripted controller
+  finishes). The cup also on sizes ×0.77–1.25.
+- Camera classifier: scripted runs labelled by the simulator, incl. drawer pulls that stop short, so "drawer done"
+  means open far enough for the cutlery.
 
 ## Run it
 
@@ -229,43 +221,43 @@ make watch SEED=3                                        # scripted controller, 
 make watch-agent CMD="just the plate and the cup" SEED=3 # VLM plan + learned policies, live
 make agent CMD="set the table, but skip the cup" SEED=3  # rendered to out/video/ with the plan panel
 make bench                                               # OpenVINO benchmark of the five deployed policies
-make report                                              # the 50 held-out tables (hours; PyTorch row needs CUDA)
+make report                                              # held-out seeds 0-49 (hours; PyTorch row needs CUDA)
+make report-fresh                                        # held-out seeds 200-249 and the robustness rows
 make grid                                                # score the 10 demo runs, tile them into one video
 ```
 
-`requirements-lock.txt` pins the exact environment every number was produced with (Python 3.13, openvino 2026.3.1,
-openvino-genai 2026.3.1, nncf 3.3.0, mujoco 3.13.0, lerobot 0.6.1; torch is only needed for training).
+`requirements-lock.txt`: the exact environment of every number (Python 3.13, openvino 2026.3.1, openvino-genai
+2026.3.1, nncf 3.3.0, mujoco 3.13.0, lerobot 0.6.1; torch for training only).
 
-Voice (set `SPEECHMATICS_API_KEY`):
+Voice (`SPEECHMATICS_API_KEY`):
 
 ```
 python scripts/run_agent.py --mic --listen --speak --seed 3 --video out/video/voice_s3.mp4
 ```
 
-Speak the command; the arms start as soon as the transcript is final. With `--listen` the microphone stays open:
-"stop" halts at once (matched locally, no model call); anything else goes to the planner, is verified, and takes
-over when the current step ends, so an object is never dropped mid-air. `--speak` lets the robot say its plan and
-the reason for any correction ("I'll open the drawer first — the spoon is inside") and what it cannot do. Speech runs
-on worker threads, so the control loop never waits for the network. The hybrid-core placement above is on by
-default (`--cores default` turns it off).
+- Spoken command → arms start when the transcript is final.
+- `--listen`: microphone stays open. "stop" halts at once (local match, no model call); anything else goes to the
+  planner, is verified, and takes over when the current step ends — no object dropped mid-air.
+- `--speak`: the robot says its plan, the reason for any correction ("I'll open the drawer first — the spoon is
+  inside"), and what it cannot do.
+- Speech on worker threads; the control loop never waits for the network. Hybrid-core placement on by default
+  (`--cores default` turns it off).
 
 ## Limitations
 
-- 14 of 100 held-out tables are not set completely: cutlery that never leaves the tray (the spoon 6, the fork 3),
-  the plate off its mat (4), the fork 2.8 cm from its spot (1) — `docs/findings.md`.
-- Object sizes were never varied in training, and the skills do not carry over to other sizes: plate and cup ±10%
-  cost 8 of 33 fixed-sequence tables, ±20% cost 16, the cup most. One attempt to fine-tune the cup on 100
-  demonstrations with varied sizes made it worse at every size (fixed sequence on the tuning seeds: 22/50 against
-  42/50), so it is not shipped (`docs/findings.md`).
-- The first look skips what is already done, but a table half-set out of the order the skills were trained in (the
-  plate already out before the spoon) can make a later skill fail; the verifier flags such orders.
-- A plate knocked off its mat is noticed 27 times out of 75 and put back twice by the deployed robot. An experimental
-  classifier and plate fine-tune reach 77/80 noticed and 30/80 put back — below the bar set before the attempt (60/80),
-  so they are not shipped (`docs/findings.md`).
-- Learned rollouts are repeatable only up to rendering (a new OpenGL context can shift a few pixels by one intensity
-  level), so results are reported over 50 seeds with confidence intervals.
-- Measured on a desktop Intel CPU without iGPU or NPU (no Core Ultra was available); on a Core Ultra,
-  `scripts/benchmark.py --device GPU` or `NPU` is the path to try, untested here.
+- 18 of 100 held-out tables not set completely. First failed step: spoon 7, plate 5, drawer 2, fork 2, cup 2
+  (`docs/findings.md`).
+- Object sizes: plate and cutlery trained on one size each, the cup on ×0.77–1.25. At ±20% sizes: no significant
+  loss with every object varied (26/50 vs 30/50), a borderline one with the cup alone (22/50, p = 0.06). The cup is
+  still the most size-sensitive step (placed 34–40/50 at ±20%, 44/50 at trained sizes, same tables).
+- First look: a table half-set out of the trained order (plate out before the spoon) can make a later skill fail; the
+  verifier flags such orders.
+- Plate knocked off its mat: noticed 27/75, put back 2/75. Experimental classifier + plate fine-tune: 77/80 noticed,
+  30/80 put back — below the 60/80 set before the attempt; not shipped (`docs/findings.md`).
+- Learned rollouts repeat only up to rendering (a new OpenGL context can shift a few pixels by one intensity level):
+  two runs of the fixed sequence disagree on ~16 of 100 tables. Results: 50 seeds per row, Wilson intervals, paired
+  McNemar tests.
+- Measured on a desktop Intel CPU without iGPU or NPU; Core Ultra (`--device GPU` / `NPU`) untested.
 
 ## Layout
 

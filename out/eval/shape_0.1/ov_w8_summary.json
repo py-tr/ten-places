@@ -1,0 +1,19 @@
+{
+ "row": "ov_w8",
+ "episodes": 50,
+ "full": 25,
+ "wilson95": [
+  0.366,
+  0.634
+ ],
+ "first10_full": 5,
+ "mean_steps": 3.92,
+ "per_step": {
+  "drawer_open": 44,
+  "spoon": 40,
+  "plate": 42,
+  "fork": 32,
+  "cup": 38
+ },
+ "wall_s": 815
+}

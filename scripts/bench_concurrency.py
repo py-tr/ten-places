@@ -35,7 +35,7 @@ BUDGET_MS = 40.0
 
 
 class SyntheticControl:
-    """Stand-in policy + classifier: small conv nets on the real image sizes (not our models)."""
+    """Stand-in policy + classifier: small conv nets on the real image sizes (not the trained models)."""
 
     def __init__(self):
         import openvino.opset13 as ops
@@ -232,7 +232,7 @@ def main():
     scenarios.append(("e", "as c, CPU pinning on", {**ctl, "ENABLE_CPU_PINNING": True},
                       {**plan, "ENABLE_CPU_PINNING": True} if topo.hybrid else plan))
 
-    busy = psutil.cpu_percent(interval=1.0)  # other load before we start: these are wall-clock numbers
+    busy = psutil.cpu_percent(interval=1.0)  # other load before the start: these are wall-clock numbers
     if args.dry_run:
         control, make_planner = SyntheticControl(), lambda cfg: SyntheticPlanner(cfg)
     else:

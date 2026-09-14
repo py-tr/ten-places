@@ -5,7 +5,7 @@ sorted by seed afterwards; serial and parallel runs give the same rows (tests/te
     rows = run_skill_parallel({"kind": "lerobot", "path": ck, "kwargs": {"n_action_steps": 10}}, "plate",
                               range(100, 150), workers=4)
 
-Why: an episode is 10-20 s of single-threaded MuJoCo + rendering + a small policy, and honest comparisons need
+Why: an episode is 10-20 s of single-threaded MuJoCo + rendering + a small policy, and comparisons need
 40-60 seeds per setting (a 10-seed comparison cannot separate 60% from 80% success). On a 14-core CPU with one
 GPU, 4 workers while something trains and 6-8 on an idle machine.
 

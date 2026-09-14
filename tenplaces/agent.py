@@ -24,7 +24,7 @@ import numpy as np
 
 from .env import FPS
 from .env_table import SKILLS, TableEpisode, go_home
-from .evaluate_table import CAMERA_ENDS, DEFAULT_BUDGETS, RETRY, SETTLE
+from .evaluate_table import CAMERA_ENDS, DEFAULT_BUDGETS, RETRY, SETTLE, ends_on_camera
 from .grader_table import grade_table
 from .listen import STOP
 from .planner import verify
@@ -347,6 +347,7 @@ def run_command(policy, planner, command: str, seed: int, budgets=None, max_atte
     queue, replans = list(plan["steps"]), 0
     wanted = list(plan["steps"])  # what the person currently wants: the plan, then every spoken change
     started_any = False  # the first skill starts from the episode's initial pose; later ones after go_home
+    ran = set()  # skills run at least once: a re-queued budget-ended skill may end at the camera (ends_on_camera)
     while not said["stop"]:
         broken = sweep()
         queue = broken + [s for s in queue if s not in broken]
@@ -381,8 +382,10 @@ def run_command(policy, planner, command: str, seed: int, budgets=None, max_atte
             alternate = policy.attempt(skill, attempt) if hasattr(policy, "attempt") else False
             event("skill_start", skill=skill, attempt=attempt, **({"alternate": True} if alternate else {}))
             obs, ok, ms = run_skill(ep, policy, skill, obs, budgets[skill], frame, checker,
-                                    interrupt=lambda: said["stop"], early_end=CAMERA_ENDS[skill],
+                                    interrupt=lambda: said["stop"],
+                                    early_end=ends_on_camera(skill, attempt, rerun=skill in ran),
                                     settle_frames=SETTLE[skill])
+            ran.add(skill)
             if said["stop"]:
                 break
             if checker is None:

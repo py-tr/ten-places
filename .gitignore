@@ -18,6 +18,8 @@ docs/slides.md
 out/*
 !out/eval/
 out/eval/**/*.*
+# folders whose names contain a dot (stress_1.0, shape_0.2) are folders, not files: keep them visible
+!out/eval/**/
 !out/eval/**/*.json
 !out/eval/**/*.csv
 !out/eval/**/*.md

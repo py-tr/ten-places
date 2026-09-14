@@ -8,7 +8,7 @@ on the same data, the same tuning tables and the same evaluation. Not deployed.
 Data: the 100 cup episodes of data/table_v1_skill (the full-table demonstrations the first ACT cup learned from; every
 joint moves somewhere in that set, so MEAN_STD normalisation is safe — data/table_ctx_cup has four arm-A joints with
 zero spread). Base checkpoint: models/smolvla_base (lerobot/smolvla_base: config, weights, processor files); its
-backbone is built from the config (load_vlm_weights=false; the checkpoint holds every weight). Our cameras are renamed
+backbone is built from the config (load_vlm_weights=false; the checkpoint holds every weight). The cameras are renamed
 to the base model's. The instruction text of each frame is the language input. The camera names and the rename map
 pass through Python, never a Windows shell (PowerShell 5.1 mangles the JSON's quotes).
 """

@@ -40,6 +40,19 @@ SETTLE = {s: 30 for s in DEFAULT_BUDGETS}
 # spoon 0/23 — a stalled drawer and a spoon left in a short drawer are policy limits, not transients, so those two
 # are not retried (the agent uses the same table, tenplaces/agent.py).
 RETRY = {"drawer": False, "spoon": False, "plate": True, "fork": True, "cup": True}
+# A retry or re-run of a budget-ended skill (the drawer) ends at the camera's "done" + settle instead of running its
+# whole budget again from a half-open start (the camera-ended drawer re-pull, with RETRY["drawer"]). Off: as before.
+RETRY_CAMERA_END = False
+# Experiments only: TENPLACES_DRAWER_REPULL=1 turns the re-pull on (RETRY["drawer"] and RETRY_CAMERA_END), for spawned
+# evaluation workers, which inherit the environment, not the parent's objects.
+if os.environ.get("TENPLACES_DRAWER_REPULL") == "1":
+    RETRY["drawer"], RETRY_CAMERA_END = True, True
+
+
+def ends_on_camera(skill: str, attempt: int = 1, rerun: bool = False) -> bool:
+    """May the camera end this run of the skill early? Camera-ended skills always; a budget-ended one only on a retry
+    (attempt > 1) or a re-run of a re-queued step, and only with RETRY_CAMERA_END."""
+    return CAMERA_ENDS[skill] or (RETRY_CAMERA_END and (attempt > 1 or rerun))
 
 
 def run_episode(policy, seed: int, budgets=None, video_path: Path | None = None, checker=None,
@@ -77,7 +90,7 @@ def run_episode(policy, seed: int, budgets=None, video_path: Path | None = None,
                 obs = ep.step(action)
                 if record is not None:
                     record(ep, obs)
-                if (checker is not None and CAMERA_ENDS[skill] and i >= min_frames and i % check_every == 0
+                if (checker is not None and ends_on_camera(skill, attempt) and i >= min_frames and i % check_every == 0
                         and checker(skill, obs["images"]["top"])):
                     # Let the policy finish releasing and retreating (the classifier sees "done" while still held).
                     for _ in range(max(settle_frames, SETTLE[skill])):

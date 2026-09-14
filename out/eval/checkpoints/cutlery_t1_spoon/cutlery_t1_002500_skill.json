@@ -1,0 +1,262 @@
+{
+ "summary": {
+  "skill": "spoon",
+  "label": "cutlery_t1_002500",
+  "checkpoint": "out\\train\\cutlery_t1\\spoon\\checkpoints\\002500\\pretrained_model",
+  "episodes": 30,
+  "success": 19,
+  "rate": 0.6333333333333333,
+  "wilson95": [
+   0.455,
+   0.781
+  ],
+  "per_opening": {
+   "0.08": "9/10",
+   "0.09": "9/10",
+   "0.1": "1/10"
+  },
+  "mean_frames": 356.3333333333333
+ },
+ "rows": [
+  {
+   "seed": 100,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0135,
+   "drawer_open": 0.08
+  },
+  {
+   "seed": 101,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0133,
+   "drawer_open": 0.08
+  },
+  {
+   "seed": 102,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0014,
+   "drawer_open": 0.08
+  },
+  {
+   "seed": 103,
+   "skill": "spoon",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.0059,
+   "drawer_open": 0.08
+  },
+  {
+   "seed": 104,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0051,
+   "drawer_open": 0.08
+  },
+  {
+   "seed": 105,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0049,
+   "drawer_open": 0.08
+  },
+  {
+   "seed": 106,
+   "skill": "spoon",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.0103,
+   "drawer_open": 0.08
+  },
+  {
+   "seed": 107,
+   "skill": "spoon",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.0032,
+   "drawer_open": 0.08
+  },
+  {
+   "seed": 108,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0068,
+   "drawer_open": 0.08
+  },
+  {
+   "seed": 109,
+   "skill": "spoon",
+   "success": false,
+   "frames": 450,
+   "err_m": 0.2545,
+   "drawer_open": 0.08
+  },
+  {
+   "seed": 100,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0141,
+   "drawer_open": 0.09
+  },
+  {
+   "seed": 101,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0147,
+   "drawer_open": 0.09
+  },
+  {
+   "seed": 102,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0067,
+   "drawer_open": 0.09
+  },
+  {
+   "seed": 103,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0062,
+   "drawer_open": 0.09
+  },
+  {
+   "seed": 104,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0052,
+   "drawer_open": 0.09
+  },
+  {
+   "seed": 105,
+   "skill": "spoon",
+   "success": true,
+   "frames": 301,
+   "err_m": 0.0048,
+   "drawer_open": 0.09
+  },
+  {
+   "seed": 106,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0093,
+   "drawer_open": 0.09
+  },
+  {
+   "seed": 107,
+   "skill": "spoon",
+   "success": false,
+   "frames": 321,
+   "err_m": 0.2375,
+   "drawer_open": 0.09
+  },
+  {
+   "seed": 108,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0059,
+   "drawer_open": 0.09
+  },
+  {
+   "seed": 109,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0067,
+   "drawer_open": 0.09
+  },
+  {
+   "seed": 100,
+   "skill": "spoon",
+   "success": false,
+   "frames": 450,
+   "err_m": 0.2506,
+   "drawer_open": 0.1
+  },
+  {
+   "seed": 101,
+   "skill": "spoon",
+   "success": false,
+   "frames": 450,
+   "err_m": 0.2361,
+   "drawer_open": 0.1
+  },
+  {
+   "seed": 102,
+   "skill": "spoon",
+   "success": false,
+   "frames": 450,
+   "err_m": 0.2477,
+   "drawer_open": 0.1
+  },
+  {
+   "seed": 103,
+   "skill": "spoon",
+   "success": false,
+   "frames": 450,
+   "err_m": 0.2364,
+   "drawer_open": 0.1
+  },
+  {
+   "seed": 104,
+   "skill": "spoon",
+   "success": false,
+   "frames": 450,
+   "err_m": 0.2416,
+   "drawer_open": 0.1
+  },
+  {
+   "seed": 105,
+   "skill": "spoon",
+   "success": false,
+   "frames": 450,
+   "err_m": 0.2461,
+   "drawer_open": 0.1
+  },
+  {
+   "seed": 106,
+   "skill": "spoon",
+   "success": false,
+   "frames": 450,
+   "err_m": 0.2416,
+   "drawer_open": 0.1
+  },
+  {
+   "seed": 107,
+   "skill": "spoon",
+   "success": false,
+   "frames": 450,
+   "err_m": 0.2421,
+   "drawer_open": 0.1
+  },
+  {
+   "seed": 108,
+   "skill": "spoon",
+   "success": false,
+   "frames": 450,
+   "err_m": 0.2388,
+   "drawer_open": 0.1
+  },
+  {
+   "seed": 109,
+   "skill": "spoon",
+   "success": true,
+   "frames": 311,
+   "err_m": 0.0097,
+   "drawer_open": 0.1
+  }
+ ]
+}

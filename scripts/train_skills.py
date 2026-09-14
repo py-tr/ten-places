@@ -13,7 +13,7 @@ sequencer runs them and the camera classifier decides when one is done.
 Fast fine-tunes: --amp trains in bf16 autocast (scripts/train.py), --save-freq keeps intermediate checkpoints so
 the earliest one that holds up in closed loop can be kept (scripts/eval_skill_checkpoints.py; offline loss picks
 checkpoints badly), --augment turns on LeRobot's image transforms (colour jitter + small affine shifts), --lr
-overrides the transformer learning rate (ACT's 1e-5 was set for batch 8; we train at batch 32).
+overrides the transformer learning rate (ACT's 1e-5 was set for batch 8; training here uses batch 32).
 """
 import argparse
 import json
