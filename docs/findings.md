@@ -59,7 +59,8 @@ Held-out seeds 0–49, each row run once with frozen selections (`scripts/final_
 | + drawer runs its budget | 26/50 | 24/50 | 26/50 (PyTorch) |
 | + classifier v3 | 24/50 | 23/50 | 26/50 (PyTorch) |
 | + drawer fine-tuned on genuinely stalled pulls | 39/50 | 41/50 | 43/50 (OpenVINO) |
-| + cup trained on varied sizes (final; re-run of both held-out sets) | 38/50 | 42/50 | **43/50 (OpenVINO)** |
+| + cup trained on varied sizes (re-run of both held-out sets) | 38/50 | 42/50 | 43/50 (OpenVINO) |
+| + camera-ended drawer re-pull (final; re-run of both held-out sets) | 41/50 | 40/50 | **39/50 (OpenVINO)** |
 
 - Rows 3–4 were chosen on 20 tuning seeds and do not show on the held-out seeds: vs the row above, PyTorch +7 / −4
   tables (McNemar p = 0.55). The OpenVINO drawer moved the wrong way, 48 → 42 → 39 of 50 (vs release-and-home: 0
@@ -68,6 +69,8 @@ Held-out seeds 0–49, each row run once with frozen selections (`scripts/final_
 - Row 5, chosen on 50 tuning seeds (41/50), held: vs the classifier-v3 row, PyTorch +15 / −0 (p < 0.001),
   OpenVINO +20 / −2 (p < 0.001), full agent 26 → 43 (+21 / −4).
 - Row 6: the one change is the cup (below); the rest is run-to-run noise (± a few tables, see Repeatability).
+- Row 7: the drawer re-pull (below). Vs row 6: PyTorch +6 / −3, OpenVINO +3 / −5, agent +3 / −7 — within noise; on
+  seeds 200–249 the fixed sequence 30 → 40/50 (+11 / −1, p = 0.006).
 
 **Execution settings re-checked on tuning seeds.** Spoon, plate, fork and cup had their execution setting chosen on
 seeds 20–29 — inside today's held-out set. Re-run on 100–149 with the deployed checkpoints
@@ -97,6 +100,22 @@ from a closed drawer; fine-tuned from the deployed drawer.
 - Idle joints fed their training mean (`LeRobotPolicy(mask_idle_std=1e-4)`, `eval_table_chain.py --mask-idle`): the
   broken first attempt's drawer 0/50 → 18/20. On top of the new drawer: 34/50 vs 41/50; off.
 
+**Drawer re-pull.** Tuning seeds 100–199, spoon first attempt by the drawer opening at its start: < 7.4 cm 0/7,
+≥ 7.4 cm 88/93 (`out/eval/chain/lever1_base/rows.json`). Seven short drawers (5.9–7.0 cm, friction 1.03–1.13)
+pass the grader's 6 cm and are graded as spoon losses. The fixed sequence never retried the drawer; the agent's
+re-queued drawer ran its whole budget from a half-open tray. Fix: a failed drawer check triggers a second pull that
+ends at the camera's "done" (`RETRY["drawer"]`, `RETRY_CAMERA_END`, `evaluate_table.ends_on_camera`).
+- Gate written first: ≥ 3 of 100 tables completed after the second pull (seeds 100–199). Result: 3 (109, 131, 175;
+  175 short in this run only). Re-pulled on 7: camera-ended at 8.6–9.2 cm on five, budget-ended at 7.4 and 7.1 cm on
+  two; spoon after it 6/7. Run 72/100 vs 70/100 (+9 / −7).
+- A wide-open drawer read as "not done": once in 100 (7.57 cm, p = 0.28); the re-pull moved it 0 mm. Every pull
+  ≥ 7.6 cm read p ≥ 0.80.
+- Shipped. Held-out re-run: fixed sequence, seeds 200–249, 30 → 40/50 (+11 / −1, p = 0.006); seeds 0–49 42 → 40/50
+  (+3 / −5). Full agent 39 → 42 (+7 / −4) and 43 → 39 (+3 / −7); both sets 82 → 81/100.
+- Agent, tuning seeds 100–149 (reported, not gating; rows list the retried skills): 40/50 vs 41/50 without; the drawer
+  re-pulled on 2 tables (100, 109), both completed. Held-out sizes ±20% row: re-pulled on 8 tables, spoon ok after it
+  on 7.
+
 **Plate without the spoon step.** Demo seed 4 ("Just the plate and the cup.") lost the plate four times. The plate
 after the drawer alone and after drawer + spoon (scripted prefix, seeds 100–129, `eval_skill_context.py --deployed`):
 30/30 each. Seed 4 is a hard plate table — fails from both starts, and in every run on seeds 0–49; not tuned on.
@@ -115,11 +134,13 @@ refuses the tuning range; `scene_table.sample(stress, shape)`).
 
 - Before the cup change: full agent 43/50 (74–93%); both held-out sets 86/100. Fixed sequence 33/50 (52–78%);
   agent vs fixed +10 / −0 (p = 0.002).
-- Final (cup trained on varied sizes, re-run): full agent 39/50 (65–87%), fixed sequence 30/50 (46–72%); agent vs
+- Size-trained cup, re-run: full agent 39/50 (65–87%), fixed sequence 30/50 (46–72%); agent vs
   fixed +11 / −2 (p = 0.02). Both held-out sets: 82/100. Vs before, per seed: 0–49 +3 / −3 (lost 11 plate, 25 cup,
   46 spoon), 200–249 +1 / −5 (lost 207, 239 plate; 228, 245 spoon; 243 cup; p = 0.22). Two of the eight lost tables
   are cup misses (25, 243): cup 97/100 against 99/100, within the noise of a step at 97–99%. The other six are steps
   the change does not run.
+- Final (drawer re-pull on, re-run): full agent 42/50 (72–92%), fixed sequence 40/50 (67–89%); agent vs fixed
+  +5 / −3 (p = 0.73). Both held-out sets: 81/100.
 - Robustness rows, previous cup, paired with the fixed sequence at the training ranges (33/50):
   friction, the three masses, light and colours widened ×1.5 about their centres (placements unchanged): 41/50
   (+14 / −6, p = 0.12); ×2.0: 33/50 (+10 / −10, p = 1.0).
@@ -130,11 +151,17 @@ refuses the tuning range; `scene_table.sample(stress, shape)`).
   (tables the trained sizes set): within ±5% 9/11, 5–10% off 9/12, > 10% smaller 1/11, > 10% larger 4/13. Plate:
   fails > 10% smaller (0/5), holds larger (12/13). Longer cutlery (+5–10%) costs the fork (5/9).
 - Grader size-proof: a cup or plate set exactly on its target passes on all 50 tables at ±20% and at trained sizes.
-- Robustness rows, final cup, paired with the fixed sequence at the training ranges and sizes (30/50): ×1.5 40/50
+- Robustness rows, size-trained cup before the re-pull, paired with the fixed sequence at the training ranges and
+  sizes (30/50): ×1.5 40/50
   (+17 / −7, p = 0.06); ×2.0 38/50 (+15 / −7, p = 0.13); sizes ±10% 27/50 (+4 / −7, p = 0.55); ±20% 26/50 (+4 / −8,
   p = 0.39), cup placed 40/50 (previous cup 25/50); cup size only ±20% 22/50 (+3 / −11, p = 0.06), cup placed 34/50
   (previous 23/50). Same cup sizes in the last two rows, cup placed 40 vs 34: run-to-run noise at this size. Gap
   smaller, not closed.
+- Robustness rows, final (re-pull on), paired with the same run at the training ranges and sizes. Fixed sequence
+  (40/50): ×1.5 43/50 (+9 / −6, p = 0.61), ×2.0 35/50 (+7 / −12, p = 0.36), sizes ±10% 28/50 (+2 / −14,
+  p = 0.004), ±20% 23/50 (+2 / −19, p < 0.001), cup size only ±20% 25/50 (+0 / −15, p < 0.001). Full agent
+  (42/50): ×2.0 36/50 (+6 / −12, p = 0.24), sizes ±20% 23/50 (+1 / −20, p < 0.001). Against a 40/50 baseline the
+  size loss is clear; the earlier "±20% not significant" sat on a 30/50 baseline.
 
 **Cup trained on varied sizes.** Gates written before any result, all on tuning seeds. The deployed cup's misses at
 other sizes: all "never picked up", none a false "done" from the camera.
@@ -151,18 +178,17 @@ other sizes: all "never picked up", none a false "done" from the camera.
   alone, ±20% cup sizes: 99 vs 80 (+31 / −12, p = 0.005). Passed; with the other two gates holding, it replaced the
   deployed cup. The first 50-seed test not pooled in.
 
-**Lost tables, final re-run** (full agent, OpenVINO, `out/eval/agent_table/ov_w8_report6.json`,
-`ov_w8_fresh200-249_cup2.json`; a table counts at its first step, in task order, still undone at the end):
+**Lost tables, final re-run** (full agent, OpenVINO, `out/eval/agent_table/ov_w8_report7.json`,
+`ov_w8_fresh200-249_v7.json`; a table counts at its first step, in task order, still undone at the end):
 
 | Step | Tables | Seeds | Final distance from target |
 |---|---|---|---|
-| spoon | 7 | 24, 36, 46, 214, 220, 245 · 228 | 23.5–24.6 cm: not picked up (tuning seeds: 7 of 12 such tables had a drawer at 5.8–7.0 cm — open for the grader's 6 cm, not for the cutlery's 7.4) · 13.3 cm |
-| plate | 5 | 11, 204 · 207, 226, 239 | 16–19 cm: not carried · 4.2–5.2 cm off the mat |
-| drawer | 2 | 223, 240 | not open enough; spoon and fork undone after it |
-| fork | 2 | 12, 18 | 17–18 cm: not carried |
-| cup | 2 | 25, 243 | 5.2–6.8 cm |
+| plate | 8 | 11, 204, 239, 247 · 12, 207, 229 · 233 | 16.6–20.8 cm: not carried · 3.6–4.2 cm off the mat · 0.9 cm: within the distance, failed another check (flat, upright or released) |
+| spoon | 5 | 1, 36, 37, 47, 214 | 22.6–25.3 cm: not picked up |
+| fork | 4 | 4, 18 · 44, 222 | 16.7–19.3 cm: not carried · 2.9–3.6 cm, just outside the 2.5 cm tolerance |
+| cup | 2 | 41 · 45 | 5.2 cm · 1.4 cm: within the distance, failed another check |
 
-Cutlery not leaving the tray (spoon, and the fork after it) is the largest single loss.
+No table lost at the drawer. Largest single losses: the plate (8), then the spoon (5).
 
 Mechanisms, tuning seeds 100–199 (fixed sequence, first attempts, recorded start/end states, `out/eval/chain/lever1_base/rows.json`):
 - Spoon: drawer at the spoon's start < 7.4 cm 0/7 placed, ≥ 7.4 cm 88/93. The seven short drawers (5.9–7.0 cm,

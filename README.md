@@ -5,7 +5,7 @@ spoon and the fork from one arm to the other, place the plate, set the cup. A vi
 ACT policy per skill drives both arms from the cameras, a camera classifier checks every step. Everything runs on an
 Intel CPU with OpenVINO.
 
-- **82 of 100 held-out tables set completely** — two sets of 50 randomised tables, frozen configuration, each run once.
+- **81 of 100 held-out tables set completely** — two sets of 50 randomised tables, the shipped configuration, each run once.
 - Grasps are friction contact only (~17 N gripper). No weld or attach constraint.
 - At run time: cameras and joint angles only. No simulator object poses.
 - Hierarchical VLA: the VLM plans from the top camera and the command; ACT policies act from three cameras at 25 Hz.
@@ -35,6 +35,7 @@ Verifier  ── adds physical prerequisites (cutlery needs the drawer open; the
 One ACT policy per skill (3 cameras + joints → 12 joint targets at 25 Hz), OpenVINO INT8 weights
         │   between skills: grippers released, arms home; after each: camera classifier (ResNet18, OpenVINO, 5–6 ms)
         │   → done / retry / re-queue the unfinished steps; finished steps are re-checked before the next one
+        │   a drawer not open enough for the cutlery is pulled again; the pull ends when the camera sees it open
         ▼
 MuJoCo: two SO-101 arms, randomised dinner table
 ```
@@ -56,44 +57,50 @@ change the plan after the current step, verified like any plan. Replies by Speec
 ## Results
 
 **Seeds 0–49** — 50 held-out randomised tables, every selection frozen beforehand, each run once
-(`out/eval/final6/`, `out/eval/agent_table/ov_w8_report6.json`):
+(`out/eval/final7/`, `out/eval/agent_table/ov_w8_report7.json`):
 
 | Run | Full tables (95% CI) | Mean steps of 5 | Drawer | Spoon | Plate | Fork | Cup |
 |---|---|---|---|---|---|---|---|
-| **Full agent, OpenVINO** (re-checks, retries, re-queues failed steps) | **43/50 (74–93%)** | 4.80 | 50 | 47 | 48 | 47 | 48 |
-| Fixed five-step sequence (plate, fork, cup retried once), OpenVINO INT8 weights | 42/50 (72–92%) | 4.76 | 50 | 47 | 46 | 46 | 49 |
-| Fixed five-step sequence, PyTorch reference (CUDA GPU) | 38/50 (63–86%) | 4.54 | 48 | 45 | 45 | 39 | 50 |
+| **Full agent, OpenVINO** (re-checks, retries, re-queues failed steps) | **39/50 (65–87%)** | 4.72 | 50 | 46 | 48 | 44 | 48 |
+| Fixed five-step sequence (drawer, plate, fork, cup retried once), OpenVINO INT8 weights | 40/50 (67–89%) | 4.70 | 50 | 46 | 47 | 45 | 47 |
+| Fixed five-step sequence, PyTorch reference (CUDA GPU) | 41/50 (69–90%) | 4.74 | 50 | 48 | 45 | 45 | 49 |
 
 - Success does not depend on inference speed (the simulation waits for each action): GPU and CPU rows differ only in
-  the numbers the networks compute. OpenVINO INT8 vs PyTorch per seed: +6 / −2, McNemar p = 0.29.
-- Configuration chosen on tuning seeds 100–149 (fixed sequence, PyTorch: 43/50).
+  the numbers the networks compute. OpenVINO INT8 vs PyTorch per seed: +3 / −4, McNemar p = 1.0.
+- Configuration chosen on tuning seeds (with the drawer re-pull: fixed sequence 72/100 on seeds 100–199; full agent
+  40/50 on seeds 100–149).
 
 **Seeds 200–249** — a second held-out set, same frozen configuration, each run once; robustness rows on the same
-tables (`out/eval/agent_table/ov_w8_fresh200-249_cup2.json`, `out/eval/cup2_*/`):
+tables (`out/eval/agent_table/ov_w8_fresh200-249_v7.json`, `ov_w8_fresh_*_v7.json`, `out/eval/v7_*/`):
 
 | Run | Full tables (95% CI) |
 |---|---|
-| **Full agent, OpenVINO** | **39/50 (65–87%)** |
-| Fixed five-step sequence, OpenVINO | 30/50 (46–72%) |
-| Fixed sequence; friction, masses, light, colours widened ×1.5 beyond the training ranges | 40/50 (67–89%) |
-| … widened ×2.0 | 38/50 (63–86%) |
-| Fixed sequence; plate and cup sizes ±10%, cutlery length ±10% | 27/50 (40–67%) |
-| Fixed sequence; plate and cup sizes ±20%, cutlery length ±10% | 26/50 (38–65%) |
-| Fixed sequence; cup size only ±20% | 22/50 (31–58%) |
+| **Full agent, OpenVINO** | **42/50 (72–92%)** |
+| Full agent; friction, masses, light, colours widened ×2.0 beyond the training ranges | 36/50 (58–82%) |
+| Full agent; plate and cup sizes ±20%, cutlery length ±10% | 23/50 (33–60%) |
+| Fixed five-step sequence, OpenVINO | 40/50 (67–89%) |
+| Fixed sequence; friction, masses, light, colours widened ×1.5 beyond the training ranges | 43/50 (74–93%) |
+| … widened ×2.0 | 35/50 (56–81%) |
+| Fixed sequence; plate and cup sizes ±10%, cutlery length ±10% | 28/50 (42–69%) |
+| Fixed sequence; plate and cup sizes ±20%, cutlery length ±10% | 23/50 (33–60%) |
+| Fixed sequence; cup size only ±20% | 25/50 (37–63%) |
 
-- Agent vs fixed sequence, same tables: +11 / −2, p = 0.02 — the re-checks, retries and re-queues.
-- Both held-out sets, full agent: 82/100.
-- Robustness rows vs the fixed sequence at the training ranges and sizes (30/50), same tables: ×1.5 +17 / −7
-  (p = 0.06), ×2.0 +15 / −7 (p = 0.13); sizes ±10% +4 / −7 (p = 0.55), ±20% +4 / −8 (p = 0.39); cup size only
-  +3 / −11 (p = 0.06). Cup placed at ±20%: 40/50 with every object varied, 34/50 with the cup alone (previous cup:
-  25/50, 23/50).
+- Fixed sequence with vs without the drawer re-pull, same tables: 40/50 vs 30/50 (+11 / −1, p = 0.006). Agent vs
+  fixed sequence: +5 / −3 (p = 0.73); before the re-pull +11 / −2.
+- Both held-out sets, full agent: 81/100. Frozen runs of the last three configurations (before the size-trained cup,
+  with it, with the drawer re-pull) set 86, 82 and 81 of 100; identical systems differ on 10–16 tables per 100, so
+  the three are one number with its noise. Every comparison here is paired.
+- Robustness vs the same run at the training ranges and sizes, same tables. Fixed sequence (40/50): ×1.5 +9 / −6
+  (p = 0.61), ×2.0 +7 / −12 (p = 0.36); sizes ±10% +2 / −14 (p = 0.004), ±20% +2 / −19 (p < 0.001), cup size only
+  +0 / −15 (p < 0.001). Full agent (42/50): ×2.0 +6 / −12 (p = 0.24), sizes ±20% +1 / −20 (p < 0.001). Widened
+  ranges: no measurable loss. Object sizes: a clear loss; the cup placed 31–34/50 at ±20%, 45–50/50 at trained sizes.
 - Sizes: the cup was trained on ×0.77–1.25 sizes (`docs/findings.md`); plate and cutlery on one size each. The grader
   is size-proof (an object set on its target passes on all 50 tables at ±20%).
 - Video: the first 10 seeds as a grid, pass/fail per seed. The first look (on in `run_agent.py`) is off in these rows;
   on fresh tables it skips nothing (`docs/findings.md`).
 
-**Placement accuracy**, full agent, 100 held-out tables (simulator measurement): median error spoon 0.34 cm, plate
-0.40 cm, cup 0.36 cm, fork 0.86 cm; every placed object within the 2.5 cm tolerance (largest 2.01 cm); 184 of 200
+**Placement accuracy**, full agent, 100 held-out tables (simulator measurement): median error spoon 0.33 cm, plate
+0.39 cm, cup 0.31 cm, fork 0.82 cm; every placed object within the 2.5 cm tolerance (largest 2.48 cm); 186 of 200
 hand-offs completed.
 
 | Component | Result | Evidence |
@@ -147,8 +154,8 @@ Shipped: the pinned split (6% late). Hyper-threading on measured 0% in this run;
 | … at 25 Hz, P-cores, pinned | 56.0 W | 25 | 1.52 J |
 
 Optimisation results:
-- **Precision by task success, not output error.** INT8 weights keep full-table success (42 vs 38 of 50 for
-  PyTorch, +6 / −2, p = 0.29). INT8
+- **Precision by task success, not output error.** INT8 weights keep full-table success (40 vs 41 of 50 for
+  PyTorch, +3 / −4, p = 1.0). INT8
   activations in the transformer lose it (hand-off checkpoint: 7/20 against 13/20 FP32, 14/20 INT8 weights; same
   seeds). INT4 weights (23 MB instead of 33): four skills hold, the cup of that time drifts ~0.05 rad and fails every table (0/50
   against 41/50, tuning seeds); no faster than INT8 on this CPU in the same run (16.8–21.3 against 16.8–19.3 ms,
@@ -216,7 +223,7 @@ Optimisation results:
 make third-party      # the official SO-101 model (TheRobotStudio/SO-ARM100) at the pinned commit
 pip install -r requirements-lock.txt
 make models HF_SKILLS_REPO=<user>/<repo>   # trained skills + classifier, and the OpenVINO planner (~4.4 GB)
-make test             # 186 tests
+make test             # 190 tests
 make watch SEED=3                                        # scripted controller, live 3D viewer
 make watch-agent CMD="just the plate and the cup" SEED=3 # VLM plan + learned policies, live
 make agent CMD="set the table, but skip the cup" SEED=3  # rendered to out/video/ with the plan panel
@@ -245,11 +252,12 @@ python scripts/run_agent.py --mic --listen --speak --seed 3 --video out/video/vo
 
 ## Limitations
 
-- 18 of 100 held-out tables not set completely. First failed step: spoon 7, plate 5, drawer 2, fork 2, cup 2
+- 19 of 100 held-out tables not set completely. First failed step: plate 8, spoon 5, fork 4, cup 2, drawer 0
   (`docs/findings.md`).
-- Object sizes: plate and cutlery trained on one size each, the cup on ×0.77–1.25. At ±20% sizes: no significant
-  loss with every object varied (26/50 vs 30/50), a borderline one with the cup alone (22/50, p = 0.06). The cup is
-  still the most size-sensitive step (placed 34–40/50 at ±20%, 44/50 at trained sizes, same tables).
+- Object sizes: plate and cutlery trained on one size each, the cup on ×0.77–1.25. Sizes ±20% cost tables: fixed
+  sequence 23/50 vs 40/50, full agent 23/50 vs 42/50 (p < 0.001); the cup is placed 31–34/50 at ±20% against
+  45–50/50 at trained sizes. The size-trained cup improved the cup alone at ±20% on untouched tuning tables (80 → 99
+  of 150); the gap is not closed.
 - First look: a table half-set out of the trained order (plate out before the spoon) can make a later skill fail; the
   verifier flags such orders.
 - Plate knocked off its mat: noticed 27/75, put back 2/75. Experimental classifier + plate fine-tune: 77/80 noticed,
