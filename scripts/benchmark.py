@@ -89,7 +89,15 @@ def main():
     ap.add_argument("--sweep-variant", default="w8")
     ap.add_argument("--name", default=None,
                     help="output name (default <run or skill>_<step>: skill checkpoints share step folder names)")
+    ap.add_argument("--force", action="store_true", help="benchmark even if the CPU is busy (numbers then mean little)")
     args = ap.parse_args()
+    import psutil
+
+    # Latency on a loaded machine is not latency: a run next to other work read PyTorch at 155-329 ms against 39-45 ms
+    # idle. Measure the load first and refuse, unless forced; the load goes into the report either way.
+    busy = psutil.cpu_percent(interval=3.0)
+    if busy > 15 and not args.force:
+        sys.exit(f"CPU {busy:.0f}% busy before the benchmark; close other work and retry (or --force)")
     ck = Path(args.checkpoint)
     name = args.name or f"{ck.parents[2].name}_{ck.parent.name}"
     core = ov.Core()
