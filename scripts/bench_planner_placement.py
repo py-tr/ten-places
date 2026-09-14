@@ -29,6 +29,7 @@ def med(rows, key):
 
 
 def main():
+    cores.no_power_throttling()
     planner = VLMPlanner(ov_config=cores.planner_config(), idle_config={})
     rows = []
     for c in json.loads(Path("configs/demo_seeds.json").read_text(encoding="utf-8"))["seeds"]:

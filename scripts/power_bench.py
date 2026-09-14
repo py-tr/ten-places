@@ -193,6 +193,9 @@ def main():
     a.add_argument("--phases", default="out/power/phases.json")
     a.add_argument("--column", default="CPU Package Power")
     args = ap.parse_args()
+    from tenplaces.cores import no_power_throttling
+
+    no_power_throttling()
     if args.cmd == "run":
         run_phases(Path(args.checkpoint), args.seconds, Path(args.out))
         return

@@ -54,6 +54,9 @@ def main():
     ap.add_argument("--repeats", type=int, default=3)
     ap.add_argument("--child", nargs=3, metavar=("KIND", "PATH", "CACHE"))
     args = ap.parse_args()
+    from tenplaces.cores import no_power_throttling
+
+    no_power_throttling()
     if args.child:
         return child(*args.child)
     rows = []

@@ -87,6 +87,9 @@ def main():
     import torch
 
     torch.set_num_threads(1)  # as scripts/run_agent.py: pre/post-processing only; OpenVINO owns the control threads
+    from tenplaces.cores import no_power_throttling
+
+    no_power_throttling()
     runs = [r for r in args.runs if Path(r).is_dir()]
     view = LiveView(args.speed)
     try:

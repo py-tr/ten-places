@@ -212,6 +212,9 @@ def main():
     import torch
 
     torch.set_num_threads(1)  # as scripts/run_agent.py: pre/post-processing only; OpenVINO owns the control threads
+    from tenplaces.cores import no_power_throttling
+
+    no_power_throttling()
     seconds = min(args.seconds, 20.0) if args.quick else args.seconds
     topo = cores.topology()
     # The defaults are the pinned placement (scenario e); a', c, d are measured against its unpinned form.

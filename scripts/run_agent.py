@@ -65,6 +65,9 @@ def main():
     # The policy's pre/post-processing is 3 small images and a 12-D vector; torch's default (14 OpenMP threads over
     # P- and E-cores on the i5-13600KF) competes with OpenVINO's control threads. One thread; OpenVINO does the work.
     torch.set_num_threads(1)
+    from tenplaces.cores import no_power_throttling
+
+    no_power_throttling()  # Windows may otherwise class a console-started robot as background and slow it down
 
     # Load the models first, so a spoken command is acted on as soon as it is transcribed.
     control_cfg = planner_cfg = None

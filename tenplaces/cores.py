@@ -134,6 +134,26 @@ def config(role: str, topo: Topology | None = None, threads: int | None = None) 
     return {CONTROL: control_config, PLANNER: planner_config}[role](topo, threads)
 
 
+def no_power_throttling() -> bool:
+    """Opt this process out of Windows 11 power throttling (EcoQoS). A process started from a console without a
+    visible window can be classed as background and run slowed down, mostly on the efficiency cores: a 14-thread
+    PyTorch matmul here ran 227 GFLOP/s as launched and 646 GFLOP/s after this call, in the same process. Only this
+    process changes, nothing system-wide; a no-op off Windows. Returns whether the opt-out took effect."""
+    if sys.platform != "win32":
+        return False
+    from ctypes import wintypes
+
+    class _State(ctypes.Structure):  # PROCESS_POWER_THROTTLING_STATE
+        _fields_ = [("Version", wintypes.ULONG), ("ControlMask", wintypes.ULONG), ("StateMask", wintypes.ULONG)]
+
+    k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    k32.GetCurrentProcess.restype = wintypes.HANDLE
+    k32.SetProcessInformation.argtypes = [wintypes.HANDLE, ctypes.c_int, ctypes.c_void_p, wintypes.DWORD]
+    k32.SetProcessInformation.restype = wintypes.BOOL
+    state = _State(1, 0x1, 0)  # control EXECUTION_SPEED, state 0: never throttle
+    return bool(k32.SetProcessInformation(k32.GetCurrentProcess(), 4, ctypes.byref(state), ctypes.sizeof(state)))
+
+
 def effective(compiled) -> dict:
     """What a compiled model actually runs with (the plugin may adjust what was asked)."""
     out = {}

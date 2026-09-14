@@ -113,6 +113,9 @@ def main():
     feed = [t.numpy() for t in x]
     net = ACTCore(pol.policy.model, has_env_state=pol.policy.config.env_state_feature is not None).eval()
     torch.set_num_threads(max(1, torch.get_num_threads()))
+    from tenplaces.cores import no_power_throttling
+
+    no_power_throttling()  # else Windows may throttle a console-started benchmark (PyTorch 4-8x, OpenVINO ~1.3x slower)
     with torch.no_grad():
         pt_med, pt_p95 = timeit(lambda: net(*x), args.iters // 4)
 
