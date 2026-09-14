@@ -210,6 +210,8 @@ default (`--cores default` turns it off).
 
 - 7 of 50 held-out tables are not set completely; the losses are spread over the spoon hand-off (3), the plate (2)
   and the fork (2).
+- The first look skips what is already done, but a table half-set out of the order the skills were trained in (the
+  plate already out before the spoon) can make a later skill fail; the verifier flags such orders.
 - A plate knocked off its mat is noticed 27 times out of 75 and put back twice by the deployed robot. An experimental
   classifier and plate fine-tune reach 77/80 noticed and 30/80 put back — below the bar set before the attempt (60/80),
   so they are not shipped (`docs/findings.md`).

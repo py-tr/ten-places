@@ -1,7 +1,10 @@
 {
  "about": "Beyond the 10 demonstration seeds: the first look. Before the robot starts, the scripted controller does some steps (someone else half-set the table); the robot must see that, skip those steps and finish the rest. Fixed before recording, like configs/demo_seeds.json; a held-out seed, not tuned on.",
  "fixed_on": "2026-09-14",
+ "revised_on": "2026-09-14",
+ "revision": "First fixed with the drawer and the plate done. Before any recording, a smoke test on tuning seed 120 showed that a plate already on its mat puts the spoon outside the order it was trained from (the spoon failed twice there; the verifier flags the order). Revised to the drawer and the spoon done, a half-set table in the trained order. Seed 10 itself has not been run.",
  "seeds": [
-  {"seed": 10, "command": "Set the table.", "mode": "typed", "prepared": ["drawer", "plate"], "expected_steps": ["spoon", "fork", "cup"]}
+  {"seed": 10, "command": "Set the table.", "mode": "typed", "prepared": ["drawer", "spoon"], "expected_steps": ["plate", "fork", "cup"],
+   "was": {"prepared": ["drawer", "plate"], "expected_steps": ["spoon", "fork", "cup"]}}
  ]
 }

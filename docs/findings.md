@@ -131,6 +131,12 @@ without it: the look skipped nothing on any table (41/50 without, 39/50 with —
 and 6 the other, are run-to-run noise, since nothing the robot did changed; McNemar p = 0.75). On by default in
 `run_agent.py`; the reported evaluations run without it.
 
+A half-set table can still be outside what the skills learned. Tuning seed 120 with the drawer and the plate already
+done: the look saw both (p = 1.0), the planner proposed only spoon, fork and cup — and the spoon failed twice, because
+every spoon demonstration had the plate still at its start; a plate already on its mat is a scene the spoon policy has
+never seen (the verifier flags the order: "'spoon' after 'plate' is outside the order tested collision-free"). The
+extra demonstration therefore half-sets the table in the trained order (drawer and spoon done).
+
 ## OpenVINO precision study
 
 One hand-off checkpoint (40k steps), 20 held-out seeds, task success re-measured in closed loop for every precision
