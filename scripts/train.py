@@ -44,6 +44,9 @@ def make_train_eval_datasets(cfg):
 
         dts = resolve_delta_timestamps(cfg.trainable_config, train.meta) or {}
         deltas = {k: [round(t * train.meta.fps) for t in v] for k, v in dts.items()}
+        # A delta of just [0] is the current frame, which the cache returns anyway; SmolVLA asks for that on its images
+        # and state (ACT asks only for action chunks). Only real windows go to the cache as deltas.
+        deltas = {k: v for k, v in deltas.items() if v != [0]}
         train = FastDataset(train, cache, deltas)
         print(f"[tenplaces] training from memmap cache {cache} (delta keys: {list(deltas)})", flush=True)
     return train, evald
