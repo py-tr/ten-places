@@ -37,6 +37,9 @@ class TableParams:
     light_diffuse: float = 0.7
     table_rgb: tuple = (0.55, 0.42, 0.30)
     floor_rgb: tuple = (0.25, 0.28, 0.32)
+    plate_scale: float = 1.0   # object sizes (shape randomisation, off by default: see sample())
+    cup_scale: float = 1.0
+    cutlery_scale: float = 1.0
 
     def targets(self) -> dict:
         mx, my = self.mat_xy
@@ -50,7 +53,25 @@ class TableParams:
         return asdict(self)
 
 
-def sample(seed: int, nominal: bool = False, stress: float | None = None) -> TableParams:
+def sample(seed: int, nominal: bool = False, stress: float | None = None, shape: float | None = None) -> TableParams:
+    """shape > 0 also varies object sizes: plate and cup scaled by 1 ± shape, the cutlery by 1 ± min(shape, 0.1) (it
+    lies in a 16 cm tray); drawn from a stream of their own, so a table differs from its usual self only in its object
+    sizes. Default: the TENPLACES_SHAPE environment variable, else 0 (sizes fixed, as every reported result)."""
+    params = _sample(seed, nominal, stress)
+    if shape is None:
+        import os
+
+        shape = float(os.environ.get("TENPLACES_SHAPE", "0"))
+    if shape and not nominal:
+        rng = np.random.default_rng([seed, 1])  # its own stream: the usual draws stay untouched
+        params.plate_scale = float(1 + rng.uniform(-shape, shape))
+        params.cup_scale = float(1 + rng.uniform(-shape, shape))
+        cutlery = min(shape, 0.10)
+        params.cutlery_scale = float(1 + rng.uniform(-cutlery, cutlery))
+    return params
+
+
+def _sample(seed: int, nominal: bool = False, stress: float | None = None) -> TableParams:
     """stress > 1 widens every physical and visual range about its centre (friction, masses, light, colours) by that
     factor for robustness tests outside the training ranges; placements stay inside the arms' reach. Default: the
     TENPLACES_STRESS environment variable, else 1.0 (the ranges every result was produced with). The draws are the
@@ -171,44 +192,49 @@ def build(p: TableParams) -> mujoco.MjSpec:
 
     # Cutlery lying across the tray (axis along +y): grip_a is the end nearer the table centre. A turns
     # each utensil to point along +x before the hand-off (B takes grip_b).
+    sl = p.cutlery_scale  # along the utensil only; x * 1.0 is exact, so the usual table is unchanged
     for name, off, head in (("spoon", p.spoon_offset, "bowl"), ("fork", p.fork_offset, "tines")):
         b = wb.add_body(name=name, pos=[dx + off[0], dy + off[1], 0.004 + HALF_THICK], quat=_yaw_quat(np.pi / 2))
         b.add_freejoint(name=f"{name}_free")
         kw = dict(friction=fr, condim=4, rgba=[0.8, 0.8, 0.85, 1])
-        b.add_geom(name=f"{name}_handle", type=mujoco.mjtGeom.mjGEOM_BOX, size=[0.055, 0.008, HALF_THICK],
+        b.add_geom(name=f"{name}_handle", type=mujoco.mjtGeom.mjGEOM_BOX, size=[0.055 * sl, 0.008, HALF_THICK],
                    mass=0.8 * p.cutlery_mass, **kw)
         if head == "bowl":
-            b.add_geom(name=f"{name}_head", type=mujoco.mjtGeom.mjGEOM_ELLIPSOID, size=[0.016, 0.012, HALF_THICK],
-                       pos=[0.066, 0, 0], mass=0.2 * p.cutlery_mass, **kw)
+            b.add_geom(name=f"{name}_head", type=mujoco.mjtGeom.mjGEOM_ELLIPSOID, size=[0.016 * sl, 0.012, HALF_THICK],
+                       pos=[0.066 * sl, 0, 0], mass=0.2 * p.cutlery_mass, **kw)
         else:
-            b.add_geom(name=f"{name}_head", type=mujoco.mjtGeom.mjGEOM_BOX, size=[0.014, 0.011, HALF_THICK * 0.7],
-                       pos=[0.066, 0, -0.002], mass=0.2 * p.cutlery_mass, **kw)
-        b.add_site(name=f"{name}_grip_a", pos=[-0.035, 0, 0], size=[0.003, 0, 0], group=4)
-        b.add_site(name=f"{name}_grip_b", pos=[0.035, 0, 0], size=[0.003, 0, 0], group=4)
+            b.add_geom(name=f"{name}_head", type=mujoco.mjtGeom.mjGEOM_BOX, size=[0.014 * sl, 0.011, HALF_THICK * 0.7],
+                       pos=[0.066 * sl, 0, -0.002], mass=0.2 * p.cutlery_mass, **kw)
+        b.add_site(name=f"{name}_grip_a", pos=[-0.035 * sl, 0, 0], size=[0.003, 0, 0], group=4)
+        b.add_site(name=f"{name}_grip_b", pos=[0.035 * sl, 0, 0], size=[0.003, 0, 0], group=4)
 
     # Plate: disc with a raised rim wall (pads straddle the wall).
     plate = wb.add_body(name="plate", pos=[*p.plate_xy, 0.0])
     plate.add_freejoint(name="plate_free")
     white = [0.95, 0.95, 0.93, 1]
-    plate.add_geom(name="plate_base", type=mujoco.mjtGeom.mjGEOM_CYLINDER, size=[0.052, 0.003, 0], pos=[0, 0, 0.003],
+    sp = p.plate_scale  # radius only
+    plate.add_geom(name="plate_base", type=mujoco.mjtGeom.mjGEOM_CYLINDER, size=[0.052 * sp, 0.003, 0], pos=[0, 0, 0.003],
                    mass=0.6 * p.plate_mass, rgba=white, friction=fr, condim=4)
-    _ring(plate, "plate", 0.050, 0.016, 0.004, 0.006, 16, 0.4 * p.plate_mass, white, p.friction)
+    _ring(plate, "plate", 0.050 * sp, 0.016, 0.004, 0.006, 16, 0.4 * p.plate_mass, white, p.friction)
     # Grasp point on the +y side of the rim: reachable at both the start and the placemat (the +x rim
     # is not reachable at the placemat, too close to arm B's base).
-    plate.add_site(name="plate_grip", pos=[0, 0.050, 0.019], size=[0.003, 0, 0], group=4)
+    plate.add_site(name="plate_grip", pos=[0, 0.050 * sp, 0.019], size=[0.003, 0, 0], group=4)
 
     # Cup: thin-walled cylinder (pads straddle the wall at the rim).
     cup = wb.add_body(name="cup", pos=[*p.cup_xy, 0.0])
     cup.add_freejoint(name="cup_free")
     blue = [0.35, 0.5, 0.8, 1]
-    cup.add_geom(name="cup_base", type=mujoco.mjtGeom.mjGEOM_CYLINDER, size=[0.024, 0.003, 0], pos=[0, 0, 0.003],
+    sc = p.cup_scale  # radius and height together
+    cup.add_geom(name="cup_base", type=mujoco.mjtGeom.mjGEOM_CYLINDER, size=[0.024 * sc, 0.003, 0], pos=[0, 0, 0.003],
                  mass=0.5 * p.cup_mass, rgba=blue, friction=fr, condim=4)
     # Espresso-cup height (3.5 cm): arm B's fingers-down reach near its base ends ~7 cm up, and the cup
     # must clear the plate rim while carried past it.
-    _ring(cup, "cup", 0.023, 0.035, 0.004, 0.006, 12, 0.5 * p.cup_mass, blue, p.friction)
+    _ring(cup, "cup", 0.023 * sc, 0.035 * sc, 0.004, 0.006, 12, 0.5 * p.cup_mass, blue, p.friction)
     # -x rim: B's jaw then points away from its own base (36/40 start/target poses reachable vs ~29/40
     # for the side rims); a +x rim would point B's jaw back at its base, which the wrist cannot reach.
-    cup.add_site(name="cup_grip", pos=[-0.023, 0, 0.036], size=[0.003, 0, 0], group=4)
+    # 5 mm below the rim top; the literal at scale 1.0 keeps the usual table bit-identical.
+    grip_z = 0.036 if sc == 1.0 else 0.006 + 0.035 * sc - 0.005
+    cup.add_site(name="cup_grip", pos=[-0.023 * sc, 0, grip_z], size=[0.003, 0, 0], group=4)
 
     wb.add_camera(name="top", pos=[0, -0.42, 0.62], quat=_lookat_quat([0, -0.42, 0.62], [0, 0.0, 0.0]), fovy=55)
     wb.add_camera(name="front", pos=[0.0, -0.75, 0.35], quat=_lookat_quat([0.0, -0.75, 0.35], [0, 0, 0.05]), fovy=45)

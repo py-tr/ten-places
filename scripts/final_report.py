@@ -73,15 +73,18 @@ def main():
     (out / "provenance.json").write_text(json.dumps({
         "seeds": [seeds[0], seeds[-1]], "rows": args.rows, "home_frames": args.home_frames,
         "stress": float(os.environ.get("TENPLACES_STRESS", "1.0")),  # scene_table.sample: ranges widened by this
+        "shape": float(os.environ.get("TENPLACES_SHAPE", "0")),  # scene_table.sample: object sizes 1 ± shape
         "budgets": DEFAULT_BUDGETS, "camera_ends": CAMERA_ENDS, "settle": SETTLE, "retry": RETRY,
         "exec_settings": exec_settings, "selected": selected,
         "checkpoints": sources, "runs": runs, "classifier": args.classifier, "date": time.strftime("%Y-%m-%d %H:%M"),
         "versions": {"openvino": openvino.__version__, "torch": torch.__version__, "mujoco": mujoco.__version__,
                      "python": platform.python_version()}}, indent=1))
     stress = float(os.environ.get("TENPLACES_STRESS", "1.0"))
+    shape = float(os.environ.get("TENPLACES_SHAPE", "0"))
     kind = "reporting seeds" if seeds[0] < 100 else "fresh seeds (stress test)"
     lines = [f"# Full table, {kind} {seeds[0]}-{seeds[-1]} ({len(seeds)} randomised tables)"
-             + (f", ranges widened ×{stress}" if stress != 1.0 else ""), "",
+             + (f", ranges widened ×{stress}" if stress != 1.0 else "")
+             + (f", object sizes ±{shape:.0%}" if shape else ""), "",
              "Selections frozen before the run: see provenance.json."
              + (" The first 10 seeds are the ones in the video grid." if seeds[0] < 100 else ""), "",
              "| row | full tables | 95% CI | seeds 0-9 | mean steps | " + " | ".join(KEYS) + " |",

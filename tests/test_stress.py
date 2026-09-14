@@ -24,6 +24,23 @@ def test_stress_widens_about_the_centre_and_keeps_placements():
         assert 0.1 <= wide.light_diffuse <= 1.0 and all(0.0 <= c <= 1.0 for c in wide.table_rgb)
 
 
+def test_shape_off_is_the_usual_table(monkeypatch):
+    monkeypatch.delenv("TENPLACES_SHAPE", raising=False)
+    for s in SEEDS:
+        p = sample(s)
+        assert (p.plate_scale, p.cup_scale, p.cutlery_scale) == (1.0, 1.0, 1.0)
+        assert p.to_dict() == sample(s, shape=0.0).to_dict()
+
+
+def test_shape_varies_only_the_sizes():
+    for s in SEEDS:
+        base, varied = sample(s, shape=0.0).to_dict(), sample(s, shape=0.2).to_dict()
+        scales = ("plate_scale", "cup_scale", "cutlery_scale")
+        assert {k: v for k, v in base.items() if k not in scales} == {k: v for k, v in varied.items() if k not in scales}
+        assert 0.8 <= varied["plate_scale"] <= 1.2 and 0.8 <= varied["cup_scale"] <= 1.2
+        assert 0.9 <= varied["cutlery_scale"] <= 1.1  # the 16 cm tray
+
+
 def test_the_environment_sets_the_default(monkeypatch):
     monkeypatch.setenv("TENPLACES_STRESS", "1.5")
     assert sample(7).to_dict() == sample(7, stress=1.5).to_dict()
