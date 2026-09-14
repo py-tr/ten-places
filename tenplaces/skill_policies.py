@@ -21,6 +21,9 @@ from .paths import OUT
 EXEC_SETTINGS = OUT / "eval" / "exec_settings.json"
 SELECTED = OUT / "eval" / "selected_checkpoints.json"
 SKILL_NAMES = [s for s, _, _ in SKILLS]
+# A skill's second attempt under another execution setting of the same checkpoint (a different controller with its
+# own failure modes); a skill listed here is also retried. Empty: every attempt as the first.
+RETRY_EXEC: dict = {}
 
 
 def latest_checkpoint(run: Path) -> Path:
@@ -69,9 +72,10 @@ def resolve_checkpoints(runs_dirs, step: int | None = None, selected: dict | Non
 
 class SkillPolicies:
     def __init__(self, runs_dir, step: int | None = None, exec_settings=None, checkpoints=None, skills=None,
-                 **policy_kwargs):
+                 retry_exec=None, **policy_kwargs):
         """skills: load only these (default all five). Each policy costs memory in every worker process, and a
-        recording of the drawer, say, never runs the other four."""
+        recording of the drawer, say, never runs the other four. retry_exec: skill -> execution setting for its
+        second attempt (default RETRY_EXEC); attempt() says which attempt a skill is on."""
         runs_dirs = [runs_dir] if isinstance(runs_dir, (str, Path)) else list(runs_dir)
         self.exec_settings = load_exec_settings(exec_settings)
         self.selected = load_selected(checkpoints)
@@ -79,13 +83,27 @@ class SkillPolicies:
                         if skills is None or s in skills}
         self.policies = {s: LeRobotPolicy(p, **{**policy_kwargs, **self.exec_settings.get(s, {})})
                          for s, p in self.sources.items()}
+        self.alternates = {s: LeRobotPolicy(self.sources[s], **{**policy_kwargs, **kw})
+                           for s, kw in (RETRY_EXEC if retry_exec is None else retry_exec).items() if s in self.sources}
+        self.on_alternate = set()
         print(f"[skills] execution settings: {self.exec_settings or 'default for every skill'}; "
-              f"selected checkpoints: {sorted(self.selected) or 'none (latest of each run)'}", flush=True)
+              f"selected checkpoints: {sorted(self.selected) or 'none (latest of each run)'}"
+              + (f"; second attempts: {dict(RETRY_EXEC if retry_exec is None else retry_exec)}" if self.alternates else ""),
+              flush=True)
         self.active = None
 
+    def attempt(self, skill: str, n: int) -> bool:
+        """Attempt n of this skill is about to start; from the second on, its alternate runs (if it has one)."""
+        if n > 1 and skill in self.alternates:
+            self.on_alternate.add(skill)
+        else:
+            self.on_alternate.discard(skill)
+        return skill in self.on_alternate
+
     def reset(self):
-        for p in self.policies.values():
+        for p in [*self.policies.values(), *self.alternates.values()]:
             p.reset()
 
     def select_action(self, obs):
-        return self.policies[obs["skill"]].select_action(obs)
+        s = obs["skill"]
+        return (self.alternates[s] if s in self.on_alternate else self.policies[s]).select_action(obs)

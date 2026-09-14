@@ -369,14 +369,17 @@ def run_command(policy, planner, command: str, seed: int, budgets=None, max_atte
         skill = queue.pop(0)
         said["current"] = skill
         ok = False
-        for attempt in range(1, (max_attempts if RETRY[skill] else 1) + 1):  # drawer/spoon retries never recovered
+        # drawer/spoon retries with the same controller never recovered; a second controller (RETRY_EXEC) is a retry
+        retried = RETRY[skill] or skill in getattr(policy, "alternates", {})
+        for attempt in range(1, (max_attempts if retried else 1) + 1):
             if home_frames and started_any:
                 # Every demonstration starts a skill with the grippers released and both arms home; the camera can
                 # call a step done while an arm still holds the drawer handle. Tuning seeds 100-119: 4/20 -> 10/20
                 # full tables (scripts/eval_table_home.py).
                 obs = go_home(ep, home_frames, on_frame=frame)
             started_any = True
-            event("skill_start", skill=skill, attempt=attempt)
+            alternate = policy.attempt(skill, attempt) if hasattr(policy, "attempt") else False
+            event("skill_start", skill=skill, attempt=attempt, **({"alternate": True} if alternate else {}))
             obs, ok, ms = run_skill(ep, policy, skill, obs, budgets[skill], frame, checker,
                                     interrupt=lambda: said["stop"], early_end=CAMERA_ENDS[skill],
                                     settle_frames=SETTLE[skill])

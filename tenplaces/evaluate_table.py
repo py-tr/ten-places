@@ -58,10 +58,13 @@ def run_episode(policy, seed: int, budgets=None, video_path: Path | None = None,
         if video_path is not None else None
     retries = []
     for k, (skill, _, text) in enumerate(SKILLS):
-        attempts = 2 if retry and checker is not None and RETRY[skill] else 1
+        retried = RETRY[skill] or skill in getattr(policy, "alternates", {})  # a second controller is also a retry
+        attempts = 2 if retry and checker is not None and retried else 1
         for attempt in range(1, attempts + 1):
             if (k or attempt > 1) and home_frames:
                 obs = go_home(ep, home_frames, on_frame=record)
+            if hasattr(policy, "attempt"):
+                policy.attempt(skill, attempt)
             policy.reset()
             onehot = np.zeros(len(SKILLS), dtype=np.float32)
             onehot[k] = 1.0
