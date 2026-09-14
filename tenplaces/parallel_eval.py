@@ -136,6 +136,7 @@ def _agent_job(job):
     return {**grade, "seed": seed, "retries": sum(e["kind"] == "skill_start" and e.get("attempt", 1) > 1 for e in events),
             "replans": kinds.count("replan"), "regressed": kinds.count("regressed"), "pushed": kinds.count("pushed"),
             "regressed_skills": [e.get("skill") for e in events if e["kind"] == "regressed"],
+            "retried_skills": [e.get("skill") for e in events if e["kind"] == "skill_start" and e.get("attempt", 1) > 1],
             "seen": next((e.get("steps", []) for e in events if e["kind"] == "seen_done"), [])}
 
 

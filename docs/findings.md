@@ -164,6 +164,15 @@ other sizes: all "never picked up", none a false "done" from the camera.
 
 Cutlery not leaving the tray (spoon, and the fork after it) is the largest single loss.
 
+Mechanisms, tuning seeds 100–199 (fixed sequence, first attempts, recorded start/end states, `out/eval/chain/lever1_base/rows.json`):
+- Spoon: drawer at the spoon's start < 7.4 cm 0/7 placed, ≥ 7.4 cm 88/93. The seven short drawers (5.9–7.0 cm,
+  friction 1.03–1.13) pass the grader's 6 cm and are graded as spoon losses; the other five misses are grasps that move
+  the spoon ≤ 7 mm (spoon far toward arm A, drawer at the low end of its y range).
+- Plate, 13 failures: 8 grasped and never lifted (held, moved < 3 cm, budget out); 3 not carried; 1 carried 7 cm and
+  still held; 1 upside down.
+- Fork, 22 failures: short drawer 5; dropped or flipped in transit 10 (5 upside down); still held when the budget ran
+  out 4 (hand-off stall at the release); not carried 3.
+
 ## Planner
 
 - **Plan first, check later.** Plan and impossible-part check both before moving: 18.7 s median to the first
