@@ -17,6 +17,8 @@ Per skill the "prefix" is the canonical earlier skills, run by the learned polic
           stalled pull, and of leaving an already-open drawer alone (kept only when the learned pull ended < --drawer-min).
   spoon   learned drawer -> release + home -> [k frames learned spoon] -> scripted spoon
   plate   learned drawer, spoon -> ... -> scripted plate
+          --learned-first-frac F (plate, fork, cup): F of the episodes let the skill's learned policy try first and
+          are kept only when it failed; release + home, then the scripted skill — demos from a retry's start.
   fork    learned drawer, spoon, plate -> ... -> scripted fork
   cup     learned drawer, spoon, plate, fork -> ... -> scripted cup
 Episodes whose learned prefix left a state the scripted controller cannot finish (grade fails, IK error) are dropped
@@ -108,7 +110,7 @@ def run_learned(ep, obs, skill: str):
 
 
 def record_one(job):
-    seed, skill, k, opening, finish = job  # finish: a drawer demo that starts after the learned pull
+    seed, skill, k, opening, finish = job  # finish: the demo starts after the skill's own learned attempt
     frames, cmds, recording = [], [], [False]
     ep = None
 
@@ -130,11 +132,15 @@ def record_one(job):
             obs = run_learned(ep, obs, s)
         g0 = grade_table(ep.m, ep.d, ep.params)
         info["prefix_grade"] = {s: bool(g0[KEY[s]]) for s in prefix}
-        if skill == "drawer" and finish:
-            obs = run_learned(ep, obs, "drawer")  # the learned pull, then the scripted finish is the demo
-            info["learned_drawer_cm"] = round(float(-ep.d.qpos[slide]) * 100, 2)
-        if prefix or (skill == "drawer" and finish):
-            obs = go_home(ep, 20)
+        if finish:  # the skill's learned attempt first; the demo is the scripted skill from where it left things
+            obs = run_learned(ep, obs, skill)
+            if skill == "drawer":
+                info["learned_drawer_cm"] = round(float(-ep.d.qpos[slide]) * 100, 2)
+            else:
+                gl = grade_table(ep.m, ep.d, ep.params)
+                info["learned_ok"] = bool(gl[KEY[skill]])
+        if prefix or finish:
+            obs = go_home(ep, 20)  # release + home: where every demo, and a retry, starts a skill
         info["drawer_cm_at_start"] = round(float(-ep.d.qpos[slide]) * 100, 2)
         if k:
             policy = _W["policy"]
@@ -185,6 +191,9 @@ def main():
                     help="with --drawer-finish: this fraction of the drawer episodes are finish demos, the rest plain pulls "
                          "from a closed drawer in the same dataset, so a fine-tune keeps its first pull")
     ap.add_argument("--drawer-min", type=float, default=0.074, help="keep drawer-finish demos only when the learned pull ended below this")
+    ap.add_argument("--learned-first-frac", type=float, default=0.0,
+                    help="plate/fork/cup: this fraction of the episodes start after the skill's own learned attempt failed "
+                         "(release + home, a retry's start); the rest are plain demos after the learned prefix")
     ap.add_argument("--require-prefix", action="store_true", help="drop episodes where a learned prefix skill failed")
     ap.add_argument("--workers", type=int, default=1)
     ap.add_argument("--writer-threads", type=int, default=4)
@@ -218,14 +227,16 @@ def main():
             onehot = np.zeros(len(SKILLS), dtype=np.float32)
             onehot[SKILL_NAMES.index(skill)] = 1.0
             kept = 0
-            finish_quota = round(n * args.drawer_finish_frac) if (skill == "drawer" and args.drawer_finish) else 0
+            finish_quota = ((round(n * args.drawer_finish_frac) if args.drawer_finish else 0) if skill == "drawer"
+                            else round(n * args.learned_first_frac))
             for finish, quota in ((True, finish_quota), (False, n - finish_quota)):  # finish demos first, then plain
                 got = 0
                 while got < quota:
                     batch = []
                     for _ in range(max(args.workers, 1) * 2):
                         k = int(rng.integers(args.takeover_frames[0], args.takeover_frames[1] + 1)) if rng.random() < args.takeover_frac else 0
-                        batch.append((seed, skill, k, float(rng.uniform(*args.drawer_open)), finish))
+                        batch.append((seed, skill, 0 if (finish and skill != "drawer") else k,
+                                      float(rng.uniform(*args.drawer_open)), finish))
                         seed += 1
                     for info, frames in pool.map(record_one, batch):
                         if got >= quota:
@@ -235,6 +246,8 @@ def main():
                             drop = True
                         if finish and info.get("learned_drawer_cm", 0) >= 100 * args.drawer_min:
                             drop = True  # already open enough: nothing to demonstrate here
+                        if finish and info.get("learned_ok"):
+                            drop = True  # the learned attempt succeeded: no retry start to demonstrate
                         if drop:
                             skipped.append(info)
                             continue
