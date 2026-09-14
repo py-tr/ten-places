@@ -80,10 +80,15 @@ same frozen configuration, each run once (`out/eval/agent_table/ov_w8_fresh200-2
 | **Full agent on OpenVINO** | **43/50 (74–93%)** |
 | Fixed five-step sequence, OpenVINO | 33/50 (52–78%) |
 | Fixed sequence, friction, masses, light and colours widened ×1.5 beyond the training ranges | 41/50 (69–90%) |
+| Fixed sequence, plate and cup sizes ±10%, cutlery length ±10% (training used one size of each) | 25/50 (37–63%) |
+| Fixed sequence, plate and cup sizes ±20%, cutlery length ±10% | 17/50 (22–48%) |
 
 The agent replicates its 43/50; here its re-checks, retries and re-queued steps add 10 tables and lose none (McNemar
 p = 0.002). Widening the ranges cost nothing measurable (paired with the normal ranges: 14 tables better, 6 worse,
-p = 0.12). Over both held-out sets the full agent sets 86 of 100 tables. The submission video shows the first 10
+p = 0.12). Object sizes are where it breaks: every skill learned one size of each object, and paired with the
+trained sizes ±10% loses 12 tables and gains 4 (p = 0.08), ±20% loses 18 and gains 2 (p < 0.001) — mostly the cup,
+placed about as often as usual within 5% of its trained size and rarely beyond 10%. The grader is size-proof (an
+object set on its target passes on all 50 tables at ±20%). Over both held-out sets the full agent sets 86 of 100 tables. The submission video shows the first 10
 seeds as a grid with pass/fail per seed. (The first look, on in `run_agent.py`, is off in these rows; on fresh tables
 it skips nothing — `docs/findings.md`.)
 
@@ -183,7 +188,7 @@ primitive.
 - The stock finger collision meshes fill the gap between the jaws; they are replaced by box pads, with gripper force
   limited to a realistic ~17 N.
 - Randomised per seed, uniformly (`tenplaces/scene_table.py`, `sample()`; positions in the table frame; object sizes
-  are fixed):
+  are fixed in training — `TENPLACES_SHAPE` varies them for the robustness rows above):
 
   | What | Range |
   |---|---|
@@ -213,7 +218,7 @@ primitive.
 make third-party      # the official SO-101 model (TheRobotStudio/SO-ARM100) at the pinned commit
 pip install -r requirements-lock.txt
 make models HF_SKILLS_REPO=<user>/<repo>   # trained skills + classifier, and the OpenVINO planner (~4.4 GB)
-make test             # 176 tests
+make test             # 179 tests
 make watch SEED=3                                        # scripted controller, live 3D viewer
 make watch-agent CMD="just the plate and the cup" SEED=3 # VLM plan + learned policies, live
 make agent CMD="set the table, but skip the cup" SEED=3  # rendered to out/video/ with the plan panel
@@ -240,8 +245,11 @@ default (`--cores default` turns it off).
 
 ## Limitations
 
-- 7 of 50 held-out tables are not set completely; the losses are spread over the spoon hand-off (3), the plate (2)
-  and the fork (2).
+- 14 of 100 held-out tables are not set completely: cutlery that never leaves the tray (the spoon 6, the fork 3),
+  the plate off its mat (4), the fork 2.8 cm from its spot (1) — `docs/findings.md`.
+- Object sizes were never varied in training, and the skills do not carry over to other sizes: plate and cup ±10%
+  cost 8 of 33 fixed-sequence tables, ±20% cost 16, the cup most. Demonstrations with varied sizes are the fix; not
+  done in this window.
 - The first look skips what is already done, but a table half-set out of the order the skills were trained in (the
   plate already out before the spoon) can make a later skill fail; the verifier flags such orders.
 - A plate knocked off its mat is noticed 27 times out of 75 and put back twice by the deployed robot. An experimental

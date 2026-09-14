@@ -131,6 +131,15 @@ each run once (`final_report.py` refuses the tuning range and allows 200+ for th
 - Robustness outside the training ranges: friction, the three masses, light and colours widened ×1.5 about their
   centres (placements unchanged, so the tables pair seed by seed): 41/50 against 33/50 at the normal ranges, 14 tables
   better and 6 worse (p = 0.12) — no measurable loss. The classifier and the policies both see the widened scenes.
+- Object sizes, which training never varied (`TENPLACES_SHAPE`: plate radius, cup radius and height ×(1 ± shape),
+  cutlery length ±min(shape, 10%) for the 16 cm tray; everything else identical to the paired table): ±10%
+  25/50 (4 better, 12 worse, p = 0.08), ±20% 17/50 (2 better, 18 worse, p < 0.001), against 33/50 at the trained
+  sizes. The cup carries most of it — at ±20% it misses on 24 tables where the trained sizes placed it. Of those
+  tables, by the cup's size: within ±5% 9/11 placed, 5–10% off 9/12, more than 10% smaller 1/11, more than 10%
+  larger 4/13. The plate fails when more than 10% smaller (0/5) and holds when larger (12/13); longer cutlery
+  (+5–10%) costs the fork (5/9). The grader is not the cause: a cup or a plate set exactly on its target passes on
+  all 50 tables at ±20%, as at the trained sizes. Each skill learned one size of each object; demonstrations with
+  sizes varied would be the fix, not done in this window.
 
 Where the 14 lost tables of the 100 went (full agent, OpenVINO, `out/eval/agent_table/ov_w8_report5.json` and
 `ov_w8_fresh200-249.json`; a table counts at its first step, in task order, that is still undone at the end):
