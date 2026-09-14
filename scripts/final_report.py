@@ -56,8 +56,8 @@ def main():
                     help="release + return home between skills (env_table.go_home); 0 = no hand-over between skills")
     ap.add_argument("--out", default="out/eval/final")
     args = ap.parse_args()
-    if args.seeds[0] >= 100:
-        sys.exit("the report uses the reporting seeds (0-49); 100-149 are for tuning")
+    if 100 <= args.seeds[0] < 200:
+        sys.exit("the report uses the reporting seeds (0-49); 100-149 are for tuning (200+: fresh seeds for stress tests)")
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     runs = [r for r in args.runs if Path(r).is_dir()]
@@ -78,8 +78,12 @@ def main():
         "checkpoints": sources, "runs": runs, "classifier": args.classifier, "date": time.strftime("%Y-%m-%d %H:%M"),
         "versions": {"openvino": openvino.__version__, "torch": torch.__version__, "mujoco": mujoco.__version__,
                      "python": platform.python_version()}}, indent=1))
-    lines = [f"# Full table, reporting seeds {seeds[0]}-{seeds[-1]} ({len(seeds)} randomised tables)", "",
-             "Selections frozen before the run: see provenance.json. The first 10 seeds are the ones in the video grid.", "",
+    stress = float(os.environ.get("TENPLACES_STRESS", "1.0"))
+    kind = "reporting seeds" if seeds[0] < 100 else "fresh seeds (stress test)"
+    lines = [f"# Full table, {kind} {seeds[0]}-{seeds[-1]} ({len(seeds)} randomised tables)"
+             + (f", ranges widened ×{stress}" if stress != 1.0 else ""), "",
+             "Selections frozen before the run: see provenance.json."
+             + (" The first 10 seeds are the ones in the video grid." if seeds[0] < 100 else ""), "",
              "| row | full tables | 95% CI | seeds 0-9 | mean steps | " + " | ".join(KEYS) + " |",
              "|---|---|---|---|---|" + "---|" * len(KEYS)]
     for i, row in enumerate(args.rows):
