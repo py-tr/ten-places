@@ -125,7 +125,7 @@ def main():
                      "latency_ms_p95": p95, "throughput_ips": ips, "infer_requests": nreq,
                      "ir_mb": round(xml.with_suffix(".bin").stat().st_size / 2**20, 1),
                      "success": success_for(Path(args.success) if args.success else None,
-                                            {"fp32": "ov_fp32", "w8": "ov_w8", "a8w8_backbone": "int8_backbone", "a8w8": "ov_int8"}[variant])})
+                                            {"fp32": "ov_fp32", "w8": "ov_w8", "w4": "ov_w4", "a8w8_backbone": "int8_backbone", "a8w8": "ov_int8"}[variant])})
         print(json.dumps(rows[-1]), flush=True)
 
     sweep = []
