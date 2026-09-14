@@ -85,6 +85,15 @@ report:
 	$(PY) scripts/final_report.py --seeds $(REPORT_SEEDS) --rows torch ov_w8 --videos 10 --workers 4 --home-frames 20 --out out/eval/final
 	$(PY) scripts/eval_agent_table.py --seeds $(REPORT_SEEDS) --report --backend ov-w8 --workers 4 --name ov_w8_report
 
+# The second held-out set (fresh seeds 200-249) and the robustness rows on it: the full agent, the fixed sequence at
+# the training ranges, with friction/masses/light/colours widened x1.5, and with object sizes +-10% and +-20%.
+report-fresh:
+	$(PY) scripts/eval_agent_table.py --seeds 200 250 --backend ov-w8 --workers 4 --name ov_w8_fresh200-249
+	env TENPLACES_STRESS=1.0 $(PY) scripts/final_report.py --seeds 200 250 --rows ov_w8 --videos 0 --workers 4 --out out/eval/stress_1.0
+	env TENPLACES_STRESS=1.5 $(PY) scripts/final_report.py --seeds 200 250 --rows ov_w8 --videos 0 --workers 4 --out out/eval/stress_1.5
+	env TENPLACES_SHAPE=0.1 $(PY) scripts/final_report.py --seeds 200 250 --rows ov_w8 --videos 0 --workers 4 --out out/eval/shape_0.1
+	env TENPLACES_SHAPE=0.2 $(PY) scripts/final_report.py --seeds 200 250 --rows ov_w8 --videos 0 --workers 4 --out out/eval/shape_0.2
+
 # Context shift: each skill from every start a verified subset plan can give it, then demos from those starts.
 eval-context:
 	$(PY) scripts/eval_skill_context.py --skill cup --runs out/train/skills_v1 --seeds 100 130 --name cup_v1_seeds100-129

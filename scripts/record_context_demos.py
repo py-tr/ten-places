@@ -66,6 +66,10 @@ def main():
                     help="disturbance repair: the prefix also performs this skill, the object is knocked "
                          "--displace-range metres in a random direction, and the recorded skill puts it back")
     ap.add_argument("--displace-range", type=float, nargs=2, default=[0.04, 0.09], metavar=("MIN", "MAX"))
+    ap.add_argument("--cup-scale", type=float, nargs=2, default=None, metavar=("MIN", "MAX"),
+                    help="cup size (radius and height) drawn per episode, uniformly — the policies had seen one cup")
+    ap.add_argument("--cup-trained-frac", type=float, default=0.33,
+                    help="with --cup-scale: share of episodes kept at the trained size, so it cannot regress")
     ap.add_argument("--overwrite", action="store_true")
     args = ap.parse_args()
     if len(args.episodes) != len(args.skills):
@@ -86,6 +90,7 @@ def main():
     ds = LeRobotDataset.create(repo_id=args.repo_id, fps=FPS, features=features(), root=root,
                                robot_type="bimanual_so101_sim", use_videos=False, image_writer_threads=args.writer_threads)
     rng = np.random.default_rng(args.start)
+    size_rng = np.random.default_rng([args.start, 7])  # its own stream: the prefix draws stay as without sizes
     text = {s: t for s, _, t in SKILLS}
     by_skill = {s: [] for s in args.skills}
     episodes, skipped, seed, ep_index, t0 = [], [], args.start, 0, time.time()
@@ -108,12 +113,15 @@ def main():
             if policy is not None and rng.random() < args.takeover_frac:
                 k = int(rng.integers(args.takeover_frames[0], args.takeover_frames[1] + 1))
             opening = float(rng.uniform(*args.drawer_open)) if args.drawer_open else None
+            cup_scale = None
+            if args.cup_scale:
+                cup_scale = 1.0 if size_rng.random() < args.cup_trained_frac else float(size_rng.uniform(*args.cup_scale))
             frames, result = record_skill_oracle(seed, skill, before, policy=policy if k else None, policy_frames=k,
                                                  drawer_open=opening, displace_body=skill if knock else None,
-                                                 displace_xy=knock or (0.0, 0.0))
+                                                 displace_xy=knock or (0.0, 0.0), cup_scale=cup_scale)
             if result["error"] or not result[KEY[skill]] or not all(result[KEY[b]] for b in before):
                 skipped.append({"seed": seed, "skill": skill, "before": before, "takeover_frames": k,
-                                "failed": result["failed"], "error": result["error"]})
+                                "cup_scale": cup_scale, "failed": result["failed"], "error": result["error"]})
             else:
                 for f in frames:
                     frame = {"observation.state": f["state"], "action": f["action"],
@@ -125,7 +133,7 @@ def main():
                 by_skill[skill].append(ep_index)
                 episodes.append({"episode": ep_index, "skill": skill, "before": before, "seed": seed,
                                  "frames": len(frames), "takeover_frames": k, "drawer_open": opening,
-                                 "displaced_xy": knock})
+                                 "displaced_xy": knock, "cup_scale": cup_scale})
                 ep_index += 1
                 kept += 1
                 if kept % 10 == 0:

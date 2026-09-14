@@ -160,11 +160,13 @@ def plate(ctl: Bimanual, target_xy, mark=lambda name: None):
     _rim_move(ctl, "plate", "plate_grip", grip_z=0.019, target_xy=target_xy, carry_z=0.06, mark=mark)
 
 
-def cup(ctl: Bimanual, target_xy, mark=lambda name: None, via_xy=None):
+def cup(ctl: Bimanual, target_xy, mark=lambda name: None, via_xy=None, scale: float = 1.0):
     # Approach 5.8 cm (pads clear the 4.1 cm rim), carry 5.8 cm: the cup bottom clears the plate rim by
-    # ~6 mm, and both stay inside B's fingers-down reach near its base.
-    _rim_move(ctl, "cup", "cup_grip", grip_z=0.030, target_xy=target_xy, carry_z=0.058, mark=mark, hover=0.028,
-              via_xy=via_xy)
+    # ~6 mm, and both stay inside B's fingers-down reach near its base. A taller cup (scale > 1) raises the
+    # approach by its extra rim height, so the pads still clear it; the grasp and the carry are the same distance
+    # above the cup's bottom at any size, so they stay.
+    _rim_move(ctl, "cup", "cup_grip", grip_z=0.030, target_xy=target_xy, carry_z=0.058, mark=mark,
+              hover=0.028 + 0.035 * max(0.0, scale - 1.0), via_xy=via_xy)
 
 
 def run_plan(ctl: Bimanual, params, steps, phases: list | None = None):
@@ -180,7 +182,7 @@ def run_plan(ctl: Bimanual, params, steps, phases: list | None = None):
         elif skill == "plate":
             plate(ctl, t["plate"], mark)
         elif skill == "cup":
-            cup(ctl, t["cup"], mark)
+            cup(ctl, t["cup"], mark, scale=params.cup_scale)
         else:
             raise ValueError(f"unknown skill {skill}")
         ctl.move({"a_": HOME, "b_": HOME}, duration=0.8)
@@ -200,7 +202,7 @@ def run(ctl: Bimanual, params, phases: list | None = None):
     ctl.move({"b_": HOME}, duration=0.8)
     cutlery(ctl, "fork", t["fork"], mark)
     ctl.move({"b_": HOME}, duration=0.8)
-    cup(ctl, t["cup"], mark)
+    cup(ctl, t["cup"], mark, scale=params.cup_scale)
     ctl.move({"a_": HOME, "b_": HOME}, duration=1.0)
     ctl.hold(0.5)
     mark("done")

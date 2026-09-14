@@ -37,12 +37,19 @@ def verified_prefixes(skill: str):
 
 
 def run_skill_episode(policy, skill: str, seed: int, checker=None, budget=None, check_every=10, min_frames=40,
-                      settle_frames=30, before=None, drawer_open=None):
+                      settle_frames=30, before=None, drawer_open=None, cup_scale=None):
     """before: skills the scripted controller performs first (default: every earlier skill in canonical order;
     a verified subset plan can start a skill from fewer, e.g. the cup with the plate never moved).
     drawer_open: how far the scripted drawer is pulled (default: the scene's 0.09 m) — the learned drawer opens
-    8.4-9.3 cm, and the spoon policy trained at exactly 9 cm scored 5/10 at 8 cm and 0/10 at 10 cm."""
-    ep = TableEpisode(seed, render=True)
+    8.4-9.3 cm, and the spoon policy trained at exactly 9 cm scored 5/10 at 8 cm and 0/10 at 10 cm.
+    cup_scale: this table with only the cup that size (the rest as usual)."""
+    params = None
+    if cup_scale is not None:
+        from . import scene_table
+
+        params = scene_table.sample(seed)
+        params.cup_scale = float(cup_scale)
+    ep = TableEpisode(seed, render=True, params=params)
     if drawer_open is not None:
         ep.params.drawer_open = drawer_open
     if before is None:
@@ -54,7 +61,7 @@ def run_skill_episode(policy, skill: str, seed: int, checker=None, budget=None, 
     onehot = np.zeros(len(SKILLS), dtype=np.float32)
     onehot[SKILL_NAMES.index(skill)] = 1.0
     text = dict((s, t) for s, _, t in SKILLS)[skill]
-    frames = 0
+    frames, camera_done = 0, False
     for i in range(budget or DEFAULT_BUDGETS[skill]):
         obs["task"], obs["env_state"], obs["skill"] = text, onehot, skill
         obs = ep.step(np.asarray(policy.select_action(obs), dtype=np.float64))
@@ -67,16 +74,19 @@ def run_skill_episode(policy, skill: str, seed: int, checker=None, budget=None, 
                 obs["task"], obs["env_state"], obs["skill"] = text, onehot, skill
                 obs = ep.step(np.asarray(policy.select_action(obs), dtype=np.float64))
             frames += settle_frames
+            camera_done = True
             break
     g = grade_table(ep.m, ep.d, ep.params)
     ep.close()
+    # camera_done: the classifier ended the skill (a failure with it set is a false "done"); else the budget ran out
     return {"seed": seed, "skill": skill, "success": bool(g[KEY[skill]]), "frames": frames,
-            "err_m": g.get(f"{skill}_err_m")}
+            "err_m": g.get(f"{skill}_err_m"), "camera_done": camera_done}
 
 
 def evaluate_skill(policy, skill: str, seeds, out_dir: Path | None = None, checker=None, label=None, before=None,
-                   budget=None, drawer_open=None):
-    rows = [run_skill_episode(policy, skill, s, checker=checker, before=before, budget=budget, drawer_open=drawer_open)
+                   budget=None, drawer_open=None, cup_scales=None):
+    rows = [run_skill_episode(policy, skill, s, checker=checker, before=before, budget=budget, drawer_open=drawer_open,
+                              cup_scale=(cup_scales or {}).get(s))
             for s in seeds]
     k = sum(r["success"] for r in rows)
     summary = {"skill": skill, "label": label or skill, "episodes": len(rows), "success": k,

@@ -32,7 +32,16 @@ def main():
                          "the run's latest checkpoint with 10-action chunks")
     ap.add_argument("--ckpt", default=None, metavar="DIR",
                     help="with --deployed: this checkpoint for the skill instead of the selected one (a candidate)")
+    ap.add_argument("--prefix", default="all", choices=["all", "full"],
+                    help="full: only the full-table start (every earlier skill done), as in the chain")
+    ap.add_argument("--cup-shape", type=float, default=None, metavar="S",
+                    help="only the cup's size varies: per seed the cup scale scene_table.sample(shape=S) gives it")
     args = ap.parse_args()
+    cup_scales = None
+    if args.cup_shape is not None:
+        from tenplaces.scene_table import sample
+
+        cup_scales = {s: sample(s, stress=1.0, shape=args.cup_shape).cup_scale for s in range(*args.seeds)}
     if args.deployed:
         from tenplaces.skill_policies import SkillPolicies
 
@@ -48,9 +57,11 @@ def main():
     name = args.name or args.skill
     lines = [f"# {args.skill} from every verified prefix — {ck}", "",
              "| done before | success | 95% CI | mean frames |", "|---|---|---|---|"]
-    for before in verified_prefixes(args.skill):
+    prefixes = verified_prefixes(args.skill)
+    for before in (prefixes[-1:] if args.prefix == "full" else prefixes):
         label = f"{name}_after_{'-'.join(before) or 'nothing'}"
-        s = evaluate_skill(pol, args.skill, range(*args.seeds), out, checker=clf.is_done, label=label, before=before)
+        s = evaluate_skill(pol, args.skill, range(*args.seeds), out, checker=clf.is_done, label=label, before=before,
+                           cup_scales=cup_scales)
         print(json.dumps(s), flush=True)
         lines.append(f"| {', '.join(before) or '(nothing)'} | {s['success']}/{s['episodes']} | {s['wilson95']} | "
                      f"{s['mean_frames']:.0f} |")

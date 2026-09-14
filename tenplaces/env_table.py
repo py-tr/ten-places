@@ -27,8 +27,8 @@ FULL_TASK = "Set the dinner table: open the drawer, place the spoon, the plate, 
 
 
 class TableEpisode:
-    def __init__(self, seed: int, render: bool = True, on_step=None, image_hw=IMAGE_HW):
-        self.params = scene_table.sample(seed)
+    def __init__(self, seed: int, render: bool = True, on_step=None, image_hw=IMAGE_HW, params=None):
+        self.params = params if params is not None else scene_table.sample(seed)  # params: a table set by hand
         _, self.m, self.d = scene_table.compile_scene(self.params)
         self.substeps = int(round(1.0 / FPS / self.m.opt.timestep))
         self.qadr = np.array([self.m.joint(j).qposadr[0] for j in JOINTS])
@@ -120,7 +120,8 @@ def displace(m, d, body: str, dx: float, dy: float):
 
 
 def record_skill_oracle(seed: int, skill: str, before=(), image_hw=IMAGE_HW, policy=None, policy_frames: int = 0,
-                        drawer_open: float | None = None, displace_body: str | None = None, displace_xy=(0.0, 0.0)):
+                        drawer_open: float | None = None, displace_body: str | None = None, displace_xy=(0.0, 0.0),
+                        cup_scale: float | None = None):
     """Scripted run of the skills in `before` (not recorded), then `skill` alone, recorded at FPS.
 
     Both arms are at home between skills (oracle.table.run_plan), so the recording starts from the same pose
@@ -135,6 +136,7 @@ def record_skill_oracle(seed: int, skill: str, before=(), image_hw=IMAGE_HW, pol
 
     displace_body: after the prefix (which placed it), knock that object by `displace_xy` m and let it settle,
     unrecorded — the recorded skill then puts a displaced object back (disturbance-repair demonstrations).
+    cup_scale: this table with the cup that size (radius and height; scene_table.TableParams.cup_scale).
     """
     from .control import IKFailure
     from .grader_table import grade_table
@@ -147,7 +149,11 @@ def record_skill_oracle(seed: int, skill: str, before=(), image_hw=IMAGE_HW, pol
             frames.append(ep.observation())
             cmds.append(ep.command())
 
-    ep = TableEpisode(seed, render=True, on_step=on_step, image_hw=image_hw)
+    params = None
+    if cup_scale is not None:
+        params = scene_table.sample(seed)
+        params.cup_scale = float(cup_scale)
+    ep = TableEpisode(seed, render=True, on_step=on_step, image_hw=image_hw, params=params)
     if drawer_open is not None:  # the scripted pull reads it at run time (oracle.table.open_drawer)
         ep.params.drawer_open = drawer_open
     error = None
