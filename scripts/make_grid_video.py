@@ -3,17 +3,23 @@
     python scripts/make_grid_video.py --dir out/eval/act_table_v1 --label best_torch_exec10 --out out/video/grid.mp4
 
 Reads <label>_seed<N>.mp4 and <label>.csv from --dir; the stamp comes from the CSV's success column and
-appears over the last second of each tile, with the CSV's cause column (if any) above a FAIL. Shorter clips hold
-their last frame.
+appears over the last second of each tile, with the CSV's cause column (if any) above a FAIL. Under each seed label,
+that table's friction, light and colour (scene_table.sample, with the stress and shape in the dir's provenance.json).
+Shorter clips hold their last frame.
 """
 import argparse
 import csv
+import json
 import re
+import sys
 from pathlib import Path
 
 import imageio.v2 as iio
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from tenplaces.scene_table import sample  # noqa: E402
 
 
 def stamp(frame, text, colour, big=False, line=0):
@@ -31,6 +37,23 @@ def stamp(frame, text, colour, big=False, line=0):
     return np.asarray(img)
 
 
+def chips(frame, p):
+    """Under the seed label: the table's friction and light, and a swatch of its colour — the variation made visible."""
+    img = Image.fromarray(frame)
+    draw = ImageDraw.Draw(img)
+    try:
+        font = ImageFont.truetype("arial.ttf", 14)
+    except OSError:
+        font = ImageFont.load_default()
+    x, y = 6, 26
+    box = draw.textbbox((x, y), f"friction {p.friction:.2f}  light {p.light_diffuse:.2f}", font=font)
+    draw.rectangle([box[0] - 4, box[1] - 2, box[2] + 26, box[3] + 2], fill=(0, 0, 0))
+    draw.text((x, y), f"friction {p.friction:.2f}  light {p.light_diffuse:.2f}", font=font, fill=(220, 220, 220))
+    rgb = tuple(int(255 * c) for c in p.table_rgb)
+    draw.rectangle([box[2] + 6, box[1] - 1, box[2] + 22, box[3] + 1], fill=rgb, outline=(128, 128, 128))
+    return np.asarray(img)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dir", required=True)
@@ -40,8 +63,11 @@ def main():
     ap.add_argument("--fps", type=int, default=25)
     ap.add_argument("--speed", type=int, default=2, help="keep every Nth frame")
     ap.add_argument("--caption", default="held-out seeds passed", help="after the count, e.g. '9/10 <caption>'")
+    ap.add_argument("--no-chips", action="store_true", help="leave out the friction/light/colour line under the seed")
     args = ap.parse_args()
     d = Path(args.dir)
+    prov = json.loads((d / "provenance.json").read_text()) if (d / "provenance.json").is_file() else {}
+    table = lambda s: sample(s, stress=prov.get("stress", 1.0), shape=prov.get("shape", 0.0))  # noqa: E731
     outcome, cause = {}, {}
     with open(d / f"{args.label}.csv") as f:
         for row in csv.DictReader(f):
@@ -52,6 +78,7 @@ def main():
         raise SystemExit(f"no {args.label}_seed*.mp4 in {d}")
     videos = [iio.mimread(p, memtest=False)[::args.speed] for p in clips]
     seeds = [int(re.search(r"seed(\d+)", p.name).group(1)) for p in clips]
+    params = {s: table(s) for s in seeds}
     n = max(len(v) for v in videos)
     h, w = videos[0][0].shape[:2]
     rows = -(-len(videos) // args.cols)
@@ -62,6 +89,8 @@ def main():
         for i, (v, seed) in enumerate(zip(videos, seeds)):
             frame = v[min(t, len(v) - 1)]
             frame = stamp(frame, f"seed {seed}", (255, 255, 255))
+            if not args.no_chips:
+                frame = chips(frame, params[seed])
             if t >= n - args.fps:  # last second: outcome
                 ok = outcome.get(seed, False)
                 frame = stamp(frame, "PASS" if ok else "FAIL", (80, 230, 80) if ok else (240, 70, 70), big=True)
