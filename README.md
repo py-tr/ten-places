@@ -1,9 +1,9 @@
 # Ten Places
 
-Two simulated SO-101 arms set a dinner table in MuJoCo from a spoken or typed command: open the drawer, hand the
-spoon and the fork from one arm to the other, place the plate, set the cup. A vision-language model plans, one learned
-ACT policy per skill drives both arms from the cameras, a camera classifier checks every step. Everything runs on an
-Intel CPU with OpenVINO.
+A request — "set the table, but skip the cup", said or typed — becomes a set dinner table: in MuJoCo, arm A pulls the
+cutlery drawer open and hands the spoon and the fork across to arm B, which places them, the plate and the cup. A
+vision-language model plans; one learned ACT policy per skill drives both arms from three cameras; a camera classifier
+checks every step. Every model runs on an Intel CPU with OpenVINO; speech goes through Speechmatics.
 
 - **92 of 100 held-out tables set completely** — two sets of 50 randomised tables, the shipped configuration, each run once.
 - Grasps are friction contact only (~17 N gripper). No weld or attach constraint.
