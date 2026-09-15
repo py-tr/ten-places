@@ -214,6 +214,9 @@ Optimisation results:
 - One LeRobot ACT policy per skill, fine-tuned on demonstrations from every start a verified plan can produce, on
   layouts weighted toward the hard cases, and on takeover episodes (learned policy starts, scripted controller
   finishes). The cup also on sizes ×0.77–1.25.
+- Takeovers from the policies' own failures, found by running each policy alone first: the plate from the moment its
+  grasp slips (the rim wall under one pad); the fork from wherever its hand-off stopped — B holding it, A holding it
+  short of the exchange point — with the scripted controller continuing, not restarting (`docs/findings.md`).
 - Camera classifier: scripted runs labelled by the simulator, incl. drawer pulls that stop short, so "drawer done"
   means open far enough for the cutlery.
 
@@ -223,7 +226,7 @@ Optimisation results:
 make third-party      # the official SO-101 model (TheRobotStudio/SO-ARM100) at the pinned commit
 pip install -r requirements-lock.txt
 make models HF_SKILLS_REPO=<user>/<repo>   # trained skills + classifier, and the OpenVINO planner (~4.4 GB)
-make test             # 190 tests
+make test             # 192 tests
 make watch SEED=3                                        # scripted controller, live 3D viewer
 make watch-agent CMD="just the plate and the cup" SEED=3 # VLM plan + learned policies, live
 make agent CMD="set the table, but skip the cup" SEED=3  # rendered to out/video/ with the plan panel
