@@ -171,12 +171,14 @@ def record_skill_oracle(seed: int, skill: str, before=(), image_hw=IMAGE_HW, pol
     if drawer_open is not None:  # the scripted pull reads it at run time (oracle.table.open_drawer)
         ep.params.drawer_open = drawer_open
     error = None
+    others0 = {}
     try:
         if before:
             table.run_plan(ep.ctl, ep.params, list(before))
         if displace_body is not None:
             displace(ep.m, ep.d, displace_body, *displace_xy)
             ep.ctl.hold(0.5)  # settle; not recorded
+        others0.update({b: ep.d.body(b).xpos[:2].copy() for b in ("spoon", "fork", "plate", "cup") if b != skill})
         stalled = lifted = False
         ran = 0
         if policy is not None and policy_frames > 0:
@@ -213,6 +215,9 @@ def record_skill_oracle(seed: int, skill: str, before=(), image_hw=IMAGE_HW, pol
     except IKFailure as e:
         error = str(e)
     result = grade_table(ep.m, ep.d, ep.params)
+    # How far every other object moved during the skill (policy part and recording): a demonstration that knocks a
+    # neighbour (the fork 3.4 cm from the spoon) can be dropped by the caller.
+    result["moved_m"] = {b: round(float(np.linalg.norm(ep.d.body(b).xpos[:2] - p0)), 4) for b, p0 in others0.items()}
     result.update(error=error, stalled=stalled, lifted=lifted, policy_frames_run=ran)
     ep.close()
     actions = cmds[1:] + cmds[-1:]
@@ -221,12 +226,15 @@ def record_skill_oracle(seed: int, skill: str, before=(), image_hw=IMAGE_HW, pol
     return frames, result
 
 
-def policy_outcome(seed: int, skill: str, before, policy, frames: int, image_hw=IMAGE_HW):
+def policy_outcome(seed: int, skill: str, before, policy, frames: int, image_hw=IMAGE_HW, drawer_open=None):
     """The learned policy alone on this table (scripted `before`, unrecorded) for `frames` steps: (grade, lifted) —
-    the grade at the end, and whether the object was ever LIFTED_Z up. Picks the tables a policy fails on."""
+    the grade at the end, and whether the object was ever LIFTED_Z up. Picks the tables a policy fails on.
+    drawer_open: how far the scripted drawer is pulled (default the scene's 0.09 m)."""
     from .grader_table import grade_table
 
     ep = TableEpisode(seed, render=True, image_hw=image_hw)
+    if drawer_open is not None:
+        ep.params.drawer_open = drawer_open
     try:
         if before:
             table.run_plan(ep.ctl, ep.params, list(before))

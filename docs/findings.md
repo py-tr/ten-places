@@ -118,6 +118,10 @@ ends at the camera's "done" (`RETRY["drawer"]`, `RETRY_CAMERA_END`, `evaluate_ta
   ≥ 7.6 cm read p ≥ 0.80.
 - Shipped. Held-out re-run: fixed sequence, seeds 200–249, 30 → 40/50 (+11 / −1, p = 0.006); seeds 0–49 42 → 40/50
   (+3 / −5). Full agent 39 → 42 (+7 / −4) and 43 → 39 (+3 / −7); both sets 82 → 81/100.
+- Where the label stops short. First pulls on five tuning runs pooled (~500 tables): spoon placed after 34/41 pulls
+  ending < 7.4 cm (all re-pulled), 15/20 at 7.4–7.8 cm, 67/73 at 7.8–8.2 cm, 344/366 at ≥ 8.2 cm. The label's
+  7.4 cm is short of where the spoon is reliable. A re-pull from < 7.3 cm ended by the camera reached 8.2–9.2 cm (spoon
+  placed 7/7); from 7.3–7.7 cm the drawer policy sees an open tray and barely pulls (300 frames, 0–0.7 cm).
 - Agent, tuning seeds 100–149 (reported, not gating; rows list the retried skills): 40/50 vs 41/50 without; the drawer
   re-pulled on 2 tables (100, 109), both completed. Held-out sizes ±20% row: re-pulled on 8 tables, spoon ok after it
   on 7.

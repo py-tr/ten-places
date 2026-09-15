@@ -104,6 +104,9 @@ def main():
                     help="spoon and fork length drawn per episode, uniformly — the policies had seen one length")
     ap.add_argument("--cutlery-trained-frac", type=float, default=0.33,
                     help="with --cutlery-scale: share of episodes kept at the trained length")
+    ap.add_argument("--max-other-move", type=float, default=None, metavar="M",
+                    help="drop an episode in which any other object moved more than M metres during the skill "
+                         "(e.g. the fork next to the spoon in the tray)")
     ap.add_argument("--overwrite", action="store_true")
     args = ap.parse_args()
     stop_at = None
@@ -129,12 +132,15 @@ def main():
 
         policy = LeRobotPolicy(args.takeover_policy, device="cuda", n_action_steps=args.takeover_n_action_steps,
                                temporal_coeff=args.takeover_temporal_coeff)
-    seed_list = None
+    seed_list, seed_open = None, {}
     if args.seeds_file:
         from glob import glob
 
-        seed_list = sorted(json.loads(line)["seed"] for p in sorted(glob(args.seeds_file)) for line in open(p)
-                           if json.loads(line).get("ok") is False)
+        failed = [json.loads(line) for p in sorted(glob(args.seeds_file)) for line in open(p)
+                  if json.loads(line).get("ok") is False]
+        seed_list = sorted(r["seed"] for r in failed)
+        # the drawer opening that table had in the file's run (skill_pass1.py --drawer-open), so it fails the same way
+        seed_open.update({r["seed"]: r["drawer_open"] for r in failed if r.get("drawer_open") is not None})
         print(f"{len(seed_list)} seeds from {args.seeds_file}", flush=True)
     replay = None
     if args.replay_manifest:
@@ -195,6 +201,7 @@ def main():
                         seed += 1
                         continue
             opening = float(rng.uniform(*args.drawer_open)) if args.drawer_open else None
+            opening = seed_open.get(seed, opening)
             cup_scale = None
             if args.cup_scale:
                 cup_scale = 1.0 if size_rng.random() < args.cup_trained_frac else float(size_rng.uniform(*args.cup_scale))
@@ -222,7 +229,9 @@ def main():
             if k and args.takeover_on_stall:
                 k = result["policy_frames_run"]
             no_stall = bool(k and args.takeover_on_stall and (not result["stalled"] or result["lifted"]))
-            if no_stall or result["error"] or not result[KEY[skill]] or not all(result[KEY[b]] for b in before):
+            knocked = bool(args.max_other_move is not None and result.get("moved_m")
+                           and max(result["moved_m"].values()) > args.max_other_move)
+            if knocked or no_stall or result["error"] or not result[KEY[skill]] or not all(result[KEY[b]] for b in before):
                 skipped.append({"seed": seed, "skill": skill, "before": before, "takeover_frames": k,
                                 "cup_scale": cup_scale, "failed": result["failed"], "error": result["error"],
                                 "stalled": result["stalled"], "lifted": result["lifted"], "no_stall": no_stall})
