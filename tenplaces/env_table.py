@@ -199,8 +199,9 @@ def record_skill_oracle(seed: int, skill: str, before=(), image_hw=IMAGE_HW, pol
                     arm_b.append(ep.state()[6:11].copy())
                     closed = ep.command()[11] < 0
                     slipped = z_peak >= SLIP_RISE and z < SLIP_BACK
-                    still = (z < STALL_Z and len(arm_b) >= STALL_FRAMES
-                             and np.ptp(np.array(arm_b[-STALL_FRAMES:]), axis=0).max() < STALL_RAD)
+                    need = STALL_FRAMES_BY_SKILL.get(skill, STALL_FRAMES)
+                    still = (z < STALL_Z and len(arm_b) >= need
+                             and np.ptp(np.array(arm_b[-need:]), axis=0).max() < STALL_RAD)
                     if not lifted and closed and (slipped or still):
                         stalled = "slip" if slipped else "still"
                         break
@@ -256,6 +257,10 @@ def policy_outcome(seed: int, skill: str, before, policy, frames: int, image_hw=
 # raises the plate 1-2.5 cm, it slips out ~20 frames later, the same grasp again (period ~55-60 frames). Trigger on
 # the first slip (object rose SLIP_RISE, back below SLIP_BACK, gripper still closed) or on an arm held still.
 STALL_FRAMES, STALL_RAD, STALL_Z, LIFTED_Z = 12, 0.01, 0.005, 0.03
+# Per skill: a "still" stall must outlast the demonstrated closing pause. The cup's demonstrations hold still ~18
+# frames while the gripper closes (closed at frame 47, lifted at 65), so 12 frames fired inside every good grasp
+# (L16, notes/levers-0914.md); 40 frames is a state no successful demonstration contains.
+STALL_FRAMES_BY_SKILL = {"cup": 40}
 SLIP_RISE, SLIP_BACK = 0.005, 0.002
 RELEASED = 0.35  # the gripper command every demonstrated skill starts from once that arm has let go (oracle runs)
 

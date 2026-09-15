@@ -1,0 +1,19 @@
+{
+ "row": "torch",
+ "episodes": 50,
+ "full": 47,
+ "wilson95": [
+  0.838,
+  0.979
+ ],
+ "first10_full": 10,
+ "mean_steps": 4.94,
+ "per_step": {
+  "drawer_open": 50,
+  "spoon": 49,
+  "plate": 49,
+  "fork": 50,
+  "cup": 49
+ },
+ "wall_s": 511
+}

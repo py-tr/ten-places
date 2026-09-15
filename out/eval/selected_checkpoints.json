@@ -3,5 +3,5 @@
  "drawer": "out/train/chain_t2_drawer/drawer/checkpoints/007500/pretrained_model",
  "fork": "out/train/fork_cont/fork/checkpoints/007500/pretrained_model",
  "plate": "out/train/plate_t4/plate/checkpoints/007500/pretrained_model",
- "spoon": "out/train/cutlery_t1/spoon/checkpoints/010000/pretrained_model"
+ "spoon": "out/train/spoon_cont2/spoon/checkpoints/007500/pretrained_model"
 }
