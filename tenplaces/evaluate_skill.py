@@ -37,18 +37,22 @@ def verified_prefixes(skill: str):
 
 
 def run_skill_episode(policy, skill: str, seed: int, checker=None, budget=None, check_every=10, min_frames=40,
-                      settle_frames=30, before=None, drawer_open=None, cup_scale=None, grader_ends=False):
+                      settle_frames=30, before=None, drawer_open=None, cup_scale=None, grader_ends=False,
+                      plate_scale=None):
     """before: skills the scripted controller performs first (default: every earlier skill in canonical order;
     a verified subset plan can start a skill from fewer, e.g. the cup with the plate never moved).
     drawer_open: how far the scripted drawer is pulled (default: the scene's 0.09 m) — the learned drawer opens
     8.4-9.3 cm, and the spoon policy trained at exactly 9 cm scored 5/10 at 8 cm and 0/10 at 10 cm.
-    cup_scale: this table with only the cup that size (the rest as usual)."""
+    cup_scale / plate_scale: this table with only the cup / plate that size (the rest as usual)."""
     params = None
-    if cup_scale is not None:
+    if cup_scale is not None or plate_scale is not None:
         from . import scene_table
 
         params = scene_table.sample(seed)
-        params.cup_scale = float(cup_scale)
+        if cup_scale is not None:
+            params.cup_scale = float(cup_scale)
+        if plate_scale is not None:
+            params.plate_scale = float(plate_scale)
     ep = TableEpisode(seed, render=True, params=params)
     if drawer_open is not None:
         ep.params.drawer_open = drawer_open
@@ -88,9 +92,10 @@ def run_skill_episode(policy, skill: str, seed: int, checker=None, budget=None, 
 
 
 def evaluate_skill(policy, skill: str, seeds, out_dir: Path | None = None, checker=None, label=None, before=None,
-                   budget=None, drawer_open=None, cup_scales=None, grader_ends=False):
+                   budget=None, drawer_open=None, cup_scales=None, grader_ends=False, plate_scales=None):
     rows = [run_skill_episode(policy, skill, s, checker=checker, before=before, budget=budget, drawer_open=drawer_open,
-                              cup_scale=(cup_scales or {}).get(s), grader_ends=grader_ends)
+                              cup_scale=(cup_scales or {}).get(s), grader_ends=grader_ends,
+                              plate_scale=(plate_scales or {}).get(s))
             for s in seeds]
     k = sum(r["success"] for r in rows)
     summary = {"skill": skill, "label": label or skill, "episodes": len(rows), "success": k,

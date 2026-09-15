@@ -96,6 +96,10 @@ def main():
     ap.add_argument("--plate-x-max", type=float, default=None, help="only seeds whose plate starts at x <= this")
     ap.add_argument("--stop-at", default=None, metavar="HH:MM",
                     help="stop drawing seeds at this local time (next occurrence) and finalise what was kept")
+    ap.add_argument("--plate-scale", type=float, nargs=2, default=None, metavar=("MIN", "MAX"),
+                    help="plate size (radius) drawn per episode, uniformly — the policies had seen one plate")
+    ap.add_argument("--plate-trained-frac", type=float, default=0.33,
+                    help="with --plate-scale: share of episodes kept at the trained size, so it cannot regress")
     ap.add_argument("--overwrite", action="store_true")
     args = ap.parse_args()
     stop_at = None
@@ -138,6 +142,7 @@ def main():
                                robot_type="bimanual_so101_sim", use_videos=False, image_writer_threads=args.writer_threads)
     rng = np.random.default_rng(args.start)
     size_rng = np.random.default_rng([args.start, 7])  # its own stream: the prefix draws stay as without sizes
+    plate_rng = np.random.default_rng([args.start, 8])  # and the plate's: cup draws stay as without plate sizes
     text = {s: t for s, _, t in SKILLS}
     by_skill = {s: [] for s in args.skills}
     episodes, skipped, seed, ep_index, t0 = [], [], args.start, 0, time.time()
@@ -188,6 +193,10 @@ def main():
             cup_scale = None
             if args.cup_scale:
                 cup_scale = 1.0 if size_rng.random() < args.cup_trained_frac else float(size_rng.uniform(*args.cup_scale))
+            plate_scale = None
+            if args.plate_scale:
+                plate_scale = (1.0 if plate_rng.random() < args.plate_trained_frac
+                               else float(plate_rng.uniform(*args.plate_scale)))
             if replay is not None:
                 if next_r >= len(replay[skill]):
                     print(f"{skill}: replay done with {kept}/{n}", flush=True)
@@ -197,6 +206,7 @@ def main():
             frames, result = record_skill_oracle(seed, skill, before, policy=policy if k else None, policy_frames=k,
                                                  drawer_open=opening, displace_body=skill if knock else None,
                                                  displace_xy=knock or (0.0, 0.0), cup_scale=cup_scale,
+                                                 plate_scale=plate_scale,
                                                  until_stall=bool(k and args.takeover_on_stall),
                                                  continue_takeover=bool(k and args.takeover_continue),
                                                  release_first=bool(k and args.release_first))
@@ -218,7 +228,8 @@ def main():
                 by_skill[skill].append(ep_index)
                 episodes.append({"episode": ep_index, "skill": skill, "before": before, "seed": seed,
                                  "frames": len(frames), "takeover_frames": k, "drawer_open": opening,
-                                 "displaced_xy": knock, "cup_scale": cup_scale, "stalled": result["stalled"]})
+                                 "displaced_xy": knock, "cup_scale": cup_scale, "plate_scale": plate_scale,
+                                 "stalled": result["stalled"]})
                 ep_index += 1
                 kept += 1
                 if kept % 10 == 0:

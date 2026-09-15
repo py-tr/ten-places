@@ -36,6 +36,8 @@ def main():
                     help="full: only the full-table start (every earlier skill done), as in the chain")
     ap.add_argument("--cup-shape", type=float, default=None, metavar="S",
                     help="only the cup's size varies: per seed the cup scale scene_table.sample(shape=S) gives it")
+    ap.add_argument("--plate-shape", type=float, default=None, metavar="S",
+                    help="only the plate's size varies: per seed the plate scale scene_table.sample(shape=S) gives it")
     ap.add_argument("--grader-ends", action="store_true",
                     help="diagnostic: the simulator's grade ends the skill instead of the camera classifier")
     args = ap.parse_args()
@@ -44,6 +46,11 @@ def main():
         from tenplaces.scene_table import sample
 
         cup_scales = {s: sample(s, stress=1.0, shape=args.cup_shape).cup_scale for s in range(*args.seeds)}
+    plate_scales = None
+    if args.plate_shape is not None:
+        from tenplaces.scene_table import sample
+
+        plate_scales = {s: sample(s, stress=1.0, shape=args.plate_shape).plate_scale for s in range(*args.seeds)}
     if args.deployed:
         from tenplaces.skill_policies import SkillPolicies
 
@@ -63,7 +70,7 @@ def main():
     for before in (prefixes[-1:] if args.prefix == "full" else prefixes):
         label = f"{name}_after_{'-'.join(before) or 'nothing'}"
         s = evaluate_skill(pol, args.skill, range(*args.seeds), out, checker=clf.is_done, label=label, before=before,
-                           cup_scales=cup_scales, grader_ends=args.grader_ends)
+                           cup_scales=cup_scales, grader_ends=args.grader_ends, plate_scales=plate_scales)
         print(json.dumps(s), flush=True)
         lines.append(f"| {', '.join(before) or '(nothing)'} | {s['success']}/{s['episodes']} | {s['wilson95']} | "
                      f"{s['mean_frames']:.0f} |")
