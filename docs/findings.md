@@ -60,7 +60,8 @@ Held-out seeds 0–49, each row run once with frozen selections (`scripts/final_
 | + classifier v3 | 24/50 | 23/50 | 26/50 (PyTorch) |
 | + drawer fine-tuned on genuinely stalled pulls | 39/50 | 41/50 | 43/50 (OpenVINO) |
 | + cup trained on varied sizes (re-run of both held-out sets) | 38/50 | 42/50 | 43/50 (OpenVINO) |
-| + camera-ended drawer re-pull (final; re-run of both held-out sets) | 41/50 | 40/50 | **39/50 (OpenVINO)** |
+| + camera-ended drawer re-pull (re-run of both held-out sets) | 41/50 | 40/50 | 39/50 (OpenVINO) |
+| + plate trained on its own failed grasps (re-run of both held-out sets) | 43/50 | 44/50 | 42/50 (OpenVINO) |
 
 - Rows 3–4 were chosen on 20 tuning seeds and do not show on the held-out seeds: vs the row above, PyTorch +7 / −4
   tables (McNemar p = 0.55). The OpenVINO drawer moved the wrong way, 48 → 42 → 39 of 50 (vs release-and-home: 0
@@ -71,6 +72,11 @@ Held-out seeds 0–49, each row run once with frozen selections (`scripts/final_
 - Row 6: the one change is the cup (below); the rest is run-to-run noise (± a few tables, see Repeatability).
 - Row 7: the drawer re-pull (below). Vs row 6: PyTorch +6 / −3, OpenVINO +3 / −5, agent +3 / −7 — within noise; on
   seeds 200–249 the fixed sequence 30 → 40/50 (+11 / −1, p = 0.006).
+- Row 8: the plate's slip takeovers (below). Vs row 7: PyTorch +4 / −2, OpenVINO +6 / −2, agent +7 / −4; seeds
+  200–249 fixed sequence 40 → 42 (+5 / −3), agent 42 → 39 (+4 / −7, new losses spread over five steps). Plate step
+  over the five held-out rows at trained sizes (agent ×2, fixed OpenVINO ×2, PyTorch): 228 → 245 of 250 (+19 / −2;
+  the rows share seeds, so the McNemar p of 0.0002 is descriptive). Both held-out sets: agent 81/100 (81), fixed
+  sequence 86/100 (80). `out/eval/v8_vs_v7.md`.
 
 **Execution settings re-checked on tuning seeds.** Spoon, plate, fork and cup had their execution setting chosen on
 seeds 20–29 — inside today's held-out set. Re-run on 100–149 with the deployed checkpoints
@@ -115,6 +121,52 @@ ends at the camera's "done" (`RETRY["drawer"]`, `RETRY_CAMERA_END`, `evaluate_ta
 - Agent, tuning seeds 100–149 (reported, not gating; rows list the retried skills): 40/50 vs 41/50 without; the drawer
   re-pulled on 2 tables (100, 109), both completed. Held-out sizes ±20% row: re-pulled on 8 tables, spoon ok after it
   on 7.
+
+**Plate: the grasp that slips.** Tuning seeds 100–199, 12 first-attempt plate failures; 7 end with the gripper closed
+at the rim wall, plate flat, moved < 1.5 cm.
+- The jaw pads are boxes 24 mm tall. At those ends their bottoms are at 1.46–2.09 cm, inside the wall's 0.6–2.2 cm
+  band; the pad–plate contacts put a pad on the wall's top face on most: the wall under one pad instead of between
+  them, 0.4–1.5 cm of xy error. A lower grasp is not available: the demonstrations' pad bottoms are 1 mm above the
+  plate's base.
+- Traced on 130, 168, 185, 189 (scripted prefix): the gripper closes at ~frame 45, the plate rises 0.5–2.5 cm, slips
+  out ~20 frames later, and the same grasp repeats every 55–60 frames until the budget ends. The retry repeats it
+  (1/12).
+- Where: 7 of the 43 tables whose plate starts at x < 16.8 cm (farthest from arm B), 0 of 57 nearer — found after
+  the fact on these seeds. The demonstrations are not thin there (51 of 100).
+- Fix: takeover demonstrations from the policy's own failed grasps (`record_skill_oracle(until_stall=True)`,
+  `record_context_demos.py --takeover-on-stall`). The deployed plate runs until the first slip (plate rose ≥ 0.5 cm,
+  back below 0.2 cm, gripper closed); the scripted plate finishes from there. A first pass runs the policy alone for
+  its budget and keeps only tables it fails on without lifting the plate 3 cm — the dip also occurs in grasps that
+  succeed (without the first pass 10 of 11 attempts qualified), and a takeover from a good grasp would demonstrate
+  opening the jaw mid-carry. 60 such episodes + 40 plain, plate x ≤ 16.8 cm, seeds 14000+; + the plate's own 100 and
+  statistics; its recipe; 7.5k steps.
+- Gates written first, tuning seeds, paired with the deployed plate: first attempt 94 vs 88 (+8 / −2, p = 0.11; bar
+  ≥ 93), full tables 76 vs 71 (+13 / −8, p = 0.38; bar ≥ 70); by reach x < 16.8 cm 40/43 vs 33/43, x ≥ 16.8 cm
+  54/57 vs 55/57; 8 failures fixed (130, 139, 160, 162, 167, 172, 184, 185), 2 new (126, 144); plate alone 100–129
+  30/30, 29/30 (126). The mechanism and the reach threshold came from the gate's seeds, so the gain there is an upper
+  estimate; held-out, plate step 228 → 245 of 250 (row 8 above). Shipped.
+
+**Fork: continuing the hand-off.** Fixed sequence with retries, tuning seeds 100–199, fork first-attempt failures
+(14, `out/eval/chain/plate_slip_gateA`): held by B, not placed 4; held by A about 5 cm short of the exchange point, B
+reaching and missing, 4; on its side or lying on another object 4; not grasped 2. The retry recovers 1.
+- Temporal ensembling for the fork instead of whole 50-action chunks (config only, gate ≥ 92 first attempts):
+  79 vs 86 (+2 / −9, p = 0.065). Worse, as on 2026-09-13. Off.
+- Which tables fail (`out/data_fix/fork_pass1.py`): the deployed fork alone for its budget after a scripted drawer,
+  spoon and plate, seeds 20000+: 134 of 5986 (2.2%). Replayed with end states: 133 reproduce; held by B 44, by A 16,
+  by both 14, on its side 27, never lifted 18, dropped flat 14.
+- Scripted continuation from the policy's state (`oracle.table.cutlery_takeover`): B holds the fork — A lets go and
+  goes home, B places it from its current grasp; A holds it — A carries it to the exchange, B takes it; nobody holds
+  it — the whole skill from where it lies. `cutlery()` split into its phases, scripted runs bit-identical. Taken over
+  at frame 225: 5 of 6 held tables placed; re-grasping a fork lying flat knocked the plate (0/2, such episodes fail
+  the prefix check and are dropped); release + home first (a retry's start): 0/4, the released fork falls on its side
+  or out of arm A's reach — not used.
+- Data: continuation at a random frame 150–300 on the 134 failing tables, kept when placed with the earlier steps
+  intact: 84; + 40 plain fork demonstrations; + the deployed fork's own 60, re-recorded alone from their manifest
+  (`record_context_demos.py --replay-manifest`; the original set also holds 80 spoon episodes); the parent's
+  statistics; the parent's recipe, 7.5k steps.
+- Gates written first, tuning seeds, paired with the deployed fork: first attempt 95 vs 86 (+10 / −1, p = 0.012; bar
+  ≥ 92), full tables 81 vs 76 (+11 / −6, p = 0.33; bar ≥ 75); fork alone 100–129 from both starts 30/30, 30/30 (29,
+  30); plate 96 vs 94. Remaining fork failures 126, 144, 149, 168, 171. Shipped.
 
 **Plate without the spoon step.** Demo seed 4 ("Just the plate and the cup.") lost the plate four times. The plate
 after the drawer alone and after drawer + spoon (scripted prefix, seeds 100–129, `eval_skill_context.py --deployed`):
@@ -288,6 +340,11 @@ front of the queue. Plate pushed 7 cm right after placing, four directions, tuni
   second attempt runs the whole 50-action chunk open-loop instead of ensembling (`skill_policies.RETRY_EXEC`,
   `eval_table_chain.py --retry-exec spoon=exec50`). 13 retried, 0 placed: a spoon that fails once fails again from
   the state it leaves, under either controller (same-controller retries earlier: 0/23). Off.
+- **Third attempt** for plate, fork and cup (gate first: ≥ 3 of 100 tables completed on it, seeds 100–199): third
+  attempts on 22 tables, 1 placed, 1 table completed; 72/100 vs 72/100 (+8 / −8). Off (`--third`, `EXTRA_ATTEMPT`).
+- **Re-check of finished steps** (a step re-read as undone is redone). On the four held-out agent runs (v7, v8 × two
+  sets) 19 tables were lost after such an event and 19 without one; the fixed sequence, which has no re-check, set 7
+  of the first (37%) and 11 of the second (58%). The tables where it fires are mostly lost anyway; kept.
 - **Windows power throttling.** A process started from a console without a visible window can be classed as
   background and throttled (EcoQoS): 2026-09-14 benchmarks 4–8× slower on PyTorch, ~1.3× on OpenVINO, CPU otherwise
   idle and at full clock. One process: 14-thread PyTorch matmul 227 GFLOP/s as launched, 646 GFLOP/s after opting out.
