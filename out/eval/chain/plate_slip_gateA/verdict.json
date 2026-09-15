@@ -1,0 +1,53 @@
+{
+ "candidate": "out/train/plate_t4/plate/checkpoints/007500/pretrained_model",
+ "seeds": 100,
+ "A": {
+  "plate_first_attempt": [
+   94,
+   88
+  ],
+  "paired_plate": [
+   8,
+   2
+  ],
+  "p_plate": 0.1094,
+  "full_tables": [
+   76,
+   71
+  ],
+  "paired_full": [
+   13,
+   8
+  ],
+  "p_full": 0.3833,
+  "pass": true
+ },
+ "B": {
+  "plate_alone_100-129": {
+   "drawer": 30,
+   "drawer-spoon": 29
+  },
+  "pass": true
+ },
+ "readout_remaining_plate_failures": {
+  "126": [
+   "none"
+  ],
+  "144": [
+   "fixed:side"
+  ],
+  "168": [
+   "none"
+  ],
+  "171": [
+   "none"
+  ],
+  "189": [
+   "none"
+  ],
+  "197": [
+   "none"
+  ]
+ },
+ "pass": true
+}

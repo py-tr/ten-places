@@ -1,0 +1,68 @@
+{
+ "name": "fork_ens_probe",
+ "out": "C:\\Users\\Makrela\\Documents\\Work\\Hackathons\\ai-infra\\build\\out\\eval\\chain\\fork_ens_probe",
+ "runs": [
+  "out/train/skills_v1",
+  "out/train/skills_v2",
+  "out/train/skills_ctx"
+ ],
+ "exec_settings": {
+  "spoon": {
+   "temporal_coeff": 0.01
+  },
+  "drawer": {
+   "temporal_coeff": 0.01
+  },
+  "plate": {
+   "temporal_coeff": 0.01
+  },
+  "fork": {
+   "temporal_coeff": 0.01
+  },
+  "cup": {
+   "n_action_steps": 10
+  }
+ },
+ "checkpoints": {
+  "cup": "out/train/cup_sizes2/cup/checkpoints/007500/pretrained_model",
+  "drawer": "out/train/chain_t2_drawer/drawer/checkpoints/007500/pretrained_model",
+  "fork": "out/train/cutlery_t1/fork/checkpoints/007500/pretrained_model",
+  "plate": "out/train/plate_t4/plate/checkpoints/007500/pretrained_model",
+  "spoon": "out/train/cutlery_t1/spoon/checkpoints/010000/pretrained_model"
+ },
+ "avg": {},
+ "kwargs": {
+  "device": "cuda",
+  "n_action_steps": 10
+ },
+ "classifier": "models/state_classifier_v3/state_classifier.xml",
+ "threshold": 0.5,
+ "retry": [
+  "drawer",
+  "plate",
+  "fork",
+  "cup"
+ ],
+ "third": [],
+ "retry_exec": {},
+ "budgets": {},
+ "settle": 30,
+ "min_frames": 40,
+ "home_frames": 20,
+ "home_hold": 0,
+ "release": 0.35,
+ "oracle_ref": false,
+ "frames": false,
+ "videos": [],
+ "home_until": 0,
+ "retry_camera_end": true,
+ "drawer_retry_release": 0.0,
+ "camera_ends": {
+  "drawer": false,
+  "spoon": true,
+  "plate": true,
+  "fork": true,
+  "cup": true
+ },
+ "env_camera_ends": ""
+}

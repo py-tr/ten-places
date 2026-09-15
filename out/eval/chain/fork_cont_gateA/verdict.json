@@ -1,0 +1,53 @@
+{
+ "candidate": "out/train/fork_cont/fork/checkpoints/007500/pretrained_model",
+ "seeds": 100,
+ "A": {
+  "fork_first_attempt": [
+   95,
+   86
+  ],
+  "paired_fork": [
+   10,
+   1
+  ],
+  "p_fork": 0.0117,
+  "full_tables": [
+   81,
+   76
+  ],
+  "paired_full": [
+   11,
+   6
+  ],
+  "p_full": 0.3323,
+  "pass": true
+ },
+ "B": {
+  "fork_alone_100-129": {
+   "candidate": {
+    "drawer-plate": 30,
+    "drawer-spoon-plate": 30
+   },
+   "deployed": {
+    "drawer-plate": 29,
+    "drawer-spoon-plate": 30
+   }
+  },
+  "pass": true
+ },
+ "C": {
+  "plate_first_attempt": [
+   96,
+   94
+  ],
+  "pass": true
+ },
+ "remaining_fork_failures": [
+  126,
+  144,
+  149,
+  168,
+  171
+ ],
+ "pass": true
+}
