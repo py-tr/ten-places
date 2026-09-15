@@ -8,6 +8,11 @@ Intel CPU with OpenVINO.
 - **81 of 100 held-out tables set completely** — two sets of 50 randomised tables, the shipped configuration, each run once.
 - Grasps are friction contact only (~17 N gripper). No weld or attach constraint.
 - At run time: cameras and joint angles only. No simulator object poses.
+- The learned policies drive the arms: about 9 in 10 control steps; the rest is the return to the home pose between
+  skills (joint interpolation). Inverse kinematics only generates training demonstrations; it moves nothing at run
+  time (`docs/findings.md`).
+- Hardware: an Intel Core i5-13600KF desktop CPU (no Core Ultra available); every OpenVINO optimisation below is
+  measured on it.
 - Hierarchical VLA: the VLM plans from the top camera and the command; ACT policies act from three cameras at 25 Hz.
   The skills are not language-conditioned (a single skill-conditioned policy learned to ignore the skill input,
   `docs/findings.md`); language reaches the arms through the plan.

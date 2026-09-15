@@ -357,6 +357,10 @@ front of the queue. Plate pushed 7 cm right after placing, four directions, tuni
   second attempt runs the whole 50-action chunk open-loop instead of ensembling (`skill_policies.RETRY_EXEC`,
   `eval_table_chain.py --retry-exec spoon=exec50`). 13 retried, 0 placed: a spoon that fails once fails again from
   the state it leaves, under either controller (same-controller retries earlier: 0/23). Off.
+- **Who moves the arms.** Fixed sequence with retries, tuning seeds 100–199 (`plate_slip_gateA`, `fork_cont_gateA`):
+  learned-policy steps 1,346–1,394 per table (settle frames after a camera "done" included), return to home between
+  skills 120–122 per table (release 8 + interpolation 20 frames per switch; the converge loop, rarely used, not
+  counted): 92% policy. IK runs only in the scripted demonstrator.
 - **Third attempt** for plate, fork and cup (gate first: ≥ 3 of 100 tables completed on it, seeds 100–199): third
   attempts on 22 tables, 1 placed, 1 table completed; 72/100 vs 72/100 (+8 / −8). Off (`--third`, `EXTRA_ATTEMPT`).
 - **Re-check of finished steps** (a step re-read as undone is redone). On the four held-out agent runs (v7, v8 × two
