@@ -13,9 +13,10 @@ Intel CPU with OpenVINO.
   time (`docs/findings.md`).
 - Hardware: an Intel Core i5-13600KF desktop CPU (no Core Ultra available); every OpenVINO optimisation below is
   measured on it.
-- Hierarchical VLA: the VLM plans from the top camera and the command; ACT policies act from three cameras at 25 Hz.
-  The skills are not language-conditioned (a single skill-conditioned policy learned to ignore the skill input,
-  `docs/findings.md`); language reaches the arms through the plan.
+- Hierarchical VLA: the VLM reads the command and the top camera and plans; one ACT policy per skill (ACT is one of
+  the challenge's named candidate policies) drives both arms from three cameras at 25 Hz. The plan selects and
+  sequences the skills — a single skill-conditioned ACT learned to ignore its skill input (`docs/findings.md`), hence
+  the split by skill.
 - Every model that runs on the machine runs on OpenVINO: policies (INT8 weights), planner (Qwen3-VL-4B INT4,
   OpenVINO GenAI), classifier. Speech: Speechmatics' cloud service.
 
@@ -299,6 +300,13 @@ tenplaces/demo_video.py              demo renderer with the live plan panel
 | Intel inference benchmark | `scripts/benchmark.py`, `scripts/bench_concurrency.py` |
 | Video across 10 randomised seeds | `scripts/final_report.py --videos 10` + `scripts/make_grid_video.py` |
 | Technical README / architecture | this file, `docs/findings.md` |
+| — architecture | [How it works](#how-it-works), [Layout](#layout) |
+| — VLA / VLM model choice | [How it works](#how-it-works) (latency split, SmolVLA baseline), [Results](#results) |
+| — bimanual coordination strategy | [The scene](#the-scene) (hand-offs forced by reach), `docs/findings.md` (fork hand-off) |
+| — training approach | [Training](#training) |
+| — robustness methods | [Results](#results) (randomisation, widened ranges, sizes), [Limitations](#limitations) |
+| — OpenVINO optimisation | [OpenVINO on an Intel Core i5-13600KF](#openvino-on-an-intel-core-i5-13600kf) |
+| — Intel hardware mapping | same section (P-/E-core placement, precision per model) |
 
 ## Licence
 
