@@ -121,7 +121,8 @@ def displace(m, d, body: str, dx: float, dy: float):
 
 def record_skill_oracle(seed: int, skill: str, before=(), image_hw=IMAGE_HW, policy=None, policy_frames: int = 0,
                         drawer_open: float | None = None, displace_body: str | None = None, displace_xy=(0.0, 0.0),
-                        cup_scale: float | None = None, until_stall: bool = False):
+                        cup_scale: float | None = None, until_stall: bool = False, continue_takeover: bool = False,
+                        release_first: bool = False):
     """Scripted run of the skills in `before` (not recorded), then `skill` alone, recorded at FPS.
 
     Both arms are at home between skills (oracle.table.run_plan), so the recording starts from the same pose
@@ -141,6 +142,9 @@ def record_skill_oracle(seed: int, skill: str, before=(), image_hw=IMAGE_HW, pol
     slipped back to the table after rising, or arm B's joints within STALL_RAD for STALL_FRAMES frames with the
     object on the table — or `policy_frames`; result["stalled"] is "slip", "still" or False, result["lifted"] whether the policy had lifted the object LIFTED_Z first (a takeover from a good grasp
     would demonstrate opening the jaw mid-carry; the caller drops those).
+    continue_takeover: the script continues the skill from the state the policy left (oracle.table.takeover_plan:
+    for spoon / fork, from who holds the utensil) instead of starting it over.
+    release_first: after the policy's frames both arms let go and go home (go_home, unrecorded) — a retry's start.
     """
     from .control import IKFailure
     from .grader_table import grade_table
@@ -192,9 +196,14 @@ def record_skill_oracle(seed: int, skill: str, before=(), image_hw=IMAGE_HW, pol
                     if not lifted and closed and (slipped or still):
                         stalled = "slip" if slipped else "still"
                         break
+        if release_first:  # a retry's start: both arms let go and go home, unrecorded
+            go_home(ep, 20)
         ep.ctl.steps = 0
         recording[0] = True
-        table.run_plan(ep.ctl, ep.params, [skill])
+        if continue_takeover:
+            table.takeover_plan(ep.ctl, ep.params, skill)
+        else:
+            table.run_plan(ep.ctl, ep.params, [skill])
     except IKFailure as e:
         error = str(e)
     result = grade_table(ep.m, ep.d, ep.params)

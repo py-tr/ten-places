@@ -12,7 +12,7 @@ a straight line through IK waypoints (a joint-space move between equal-height po
 """
 import numpy as np
 
-from ..control import GRIP_CLOSED, Bimanual
+from ..control import GRIP_CLOSED, Bimanual, IKFailure
 from .handoff import HOME
 
 PARTIAL_OPEN = 0.35     # jaw gap ~4 cm: rims and the drawer post
@@ -93,17 +93,31 @@ def cutlery(ctl: Bimanual, name: str, target_xy, mark=lambda name: None):
     ctl.move({"a_": ctl.solve("a_", [grip_a[0], grip_a[1], CUTLERY_GRIP_Z], jaw)}, duration=0.7)
     ctl.move({}, {"a_": GRIP_CLOSED}, 0.4)
     ctl.hold(0.2)
+    ex_jaw = _cutlery_carry(ctl, name, grip_a[:2], jaw, mark)
+    b_jaw = _cutlery_exchange(ctl, name, ex_jaw, mark)
+    _cutlery_place(ctl, name, target_xy, b_jaw, mark)
 
+
+EX_AXIS = np.array([1.0, 0.0])  # the utensil points along +x at the exchange (grip_b toward B)
+
+
+def _cutlery_carry(ctl: Bimanual, name: str, xy, jaw, mark):
+    """A holds the utensil at xy: lift, carry to the exchange point turning it along +x. Returns A's jaw there."""
+    m, d = ctl.m, ctl.d
     mark(f"{name}_carry")
-    ctl.move({"a_": ctl.solve("a_", [grip_a[0], grip_a[1], CARRY_Z], jaw)}, duration=0.7)
+    ctl.move({"a_": ctl.solve("a_", [xy[0], xy[1], CARRY_Z], jaw)}, duration=0.7)
     # Turn the utensil so it points along +x (grip_b toward B): the jaw turns by the same angle.
-    ex_axis = np.array([1.0, 0.0])
-    ex_jaw = _rot(jaw, _signed_angle(_axis_xy(d, m, name), ex_axis))
-    _line(ctl, "a_", [grip_a[0], grip_a[1], CARRY_Z], [-0.035, EXCHANGE_Y, CARRY_Z], jaw, n=10, duration=1.6,
+    ex_jaw = _rot(jaw, _signed_angle(_axis_xy(d, m, name), EX_AXIS))
+    _line(ctl, "a_", [xy[0], xy[1], CARRY_Z], [-0.035, EXCHANGE_Y, CARRY_Z], jaw, n=10, duration=1.6,
           jaw_end=ex_jaw)
     ctl.move({"a_": ctl.solve("a_", [-0.035, EXCHANGE_Y, EXCHANGE_Z], ex_jaw)}, duration=0.5)
     ctl.hold(0.2)
+    return ex_jaw
 
+
+def _cutlery_exchange(ctl: Bimanual, name: str, ex_jaw, mark):
+    """B takes the far end from A at the exchange point; A lets go and goes home. Returns B's jaw."""
+    m, d = ctl.m, ctl.d
     mark(f"{name}_exchange")
     grip_b = d.site(f"{name}_grip_b").xpos.copy()
     # B's moving jaw opens toward -y, away from the drawer lid (toward +y it lands on the lid).
@@ -118,14 +132,76 @@ def cutlery(ctl: Bimanual, name: str, target_xy, mark=lambda name: None):
     # Retreat only 1.5 cm: at y=-0.065 fingers-down reach ends between 6.5 and 7.5 cm.
     ctl.move({"a_": ctl.solve("a_", [-0.035, EXCHANGE_Y, EXCHANGE_Z + 0.015], ex_jaw)}, duration=0.4)
     ctl.move({"a_": HOME}, duration=0.9)
+    return b_jaw
 
+
+def _cutlery_place(ctl: Bimanual, name: str, target_xy, b_jaw, mark, live: bool = False):
+    """B carries the utensil it holds to its spot and lets go. live: from however B holds it now (a takeover) — the
+    target keeps B's current offset to the utensil's centre and the jaw turns the utensil to point along +x; else the
+    exchange's grasp (grip_b, utensil along +x)."""
+    m, d = ctl.m, ctl.d
     mark(f"{name}_place")
-    tgt = np.asarray(target_xy, float) + 0.035 * ex_axis
     held = d.site("b_grip").xpos.copy()
-    _line(ctl, "b_", [held[0], held[1], CARRY_Z - 0.01], [tgt[0], tgt[1], CARRY_Z - 0.01], b_jaw, n=8, duration=1.2)
+    b_jaw_end = None
+    if live:
+        turn = _signed_angle(_axis_xy(d, m, name), EX_AXIS)
+        tgt = np.asarray(target_xy, float) + _rot(held[:2] - d.body(name).xpos[:2], turn)
+        b_jaw_end = _rot(b_jaw, turn)
+    else:
+        tgt = np.asarray(target_xy, float) + 0.035 * EX_AXIS
+    _line(ctl, "b_", [held[0], held[1], CARRY_Z - 0.01], [tgt[0], tgt[1], CARRY_Z - 0.01], b_jaw, n=8, duration=1.2,
+          jaw_end=b_jaw_end)
+    b_jaw = b_jaw if b_jaw_end is None else b_jaw_end
     ctl.move({"b_": ctl.solve("b_", [tgt[0], tgt[1], 0.015], b_jaw)}, duration=0.7)
     ctl.move({}, {"b_": PARTIAL_OPEN}, 0.3)
     ctl.move({"b_": ctl.solve("b_", [tgt[0], tgt[1], 0.05], b_jaw)}, duration=0.5)
+
+
+class NoTakeover(IKFailure):
+    """The state a learned policy left has no scripted continuation (e.g. a utensil lying on its side)."""
+
+
+def _holders(m, d, body: str) -> set:
+    """Arms ("a_", "b_") whose jaw pads touch the body."""
+    bid = m.body(body).id
+    out = set()
+    for i in range(d.ncon):
+        c = d.contact[i]
+        for g, o in ((c.geom1, c.geom2), (c.geom2, c.geom1)):
+            if m.geom_bodyid[g] == bid and "pad" in m.geom(o).name:
+                out.add(m.geom(o).name[:2])
+    return out
+
+
+def _jaw_now(d, arm: str):
+    """The direction an arm's jaws open along now (the grip site's x axis, as ArmIK.down_rotation sets it)."""
+    v = d.site(f"{arm}grip").xmat.reshape(3, 3)[:, 0][:2]
+    return v / np.linalg.norm(v)
+
+
+def cutlery_takeover(ctl: Bimanual, name: str, target_xy, mark=lambda name: None):
+    """Continue the utensil skill from wherever a learned policy left it, instead of restarting it: B holds it -> A
+    lets go (if it still touches it) and goes home, B places it from its current grasp; A holds it -> A carries it to
+    the exchange, B takes it, places it; nobody holds it -> B home, the whole skill from where it lies. Lying on its
+    side -> NoTakeover."""
+    m, d = ctl.m, ctl.d
+    held = _holders(m, d, name)
+    if "b_" in held:
+        if "a_" in held:
+            a = d.site("a_grip").xpos.copy()
+            ctl.move({}, {"a_": PARTIAL_OPEN}, 0.3)
+            ctl.move({"a_": ctl.solve("a_", [a[0], a[1], a[2] + 0.015], _jaw_now(d, "a_"))}, duration=0.4)
+        ctl.move({"a_": HOME}, duration=0.9)
+        _cutlery_place(ctl, name, target_xy, _jaw_now(d, "b_"), mark, live=True)
+    elif "a_" in held:
+        ex_jaw = _cutlery_carry(ctl, name, d.site("a_grip").xpos[:2].copy(), _jaw_now(d, "a_"), mark)
+        b_jaw = _cutlery_exchange(ctl, name, ex_jaw, mark)
+        _cutlery_place(ctl, name, target_xy, b_jaw, mark)
+    else:
+        if d.xmat[m.body(name).id].reshape(3, 3)[2, 2] < 0.8:
+            raise NoTakeover(f"{name} lies on its side")
+        ctl.move({"b_": HOME}, duration=0.9)
+        cutlery(ctl, name, target_xy, mark)
 
 
 def _rim_move(ctl: Bimanual, body: str, site: str, grip_z: float, target_xy, carry_z: float, mark, hover=0.025,
@@ -188,6 +264,19 @@ def run_plan(ctl: Bimanual, params, steps, phases: list | None = None):
         ctl.move({"a_": HOME, "b_": HOME}, duration=0.8)
     ctl.hold(0.5)
     mark("done")
+
+
+def takeover_plan(ctl: Bimanual, params, skill: str, phases: list | None = None):
+    """A learned policy's attempt at `skill` continued by the script from the current state (spoon / fork:
+    cutlery_takeover; other skills: the skill from the start, as run_plan), then both arms home as in run_plan."""
+    mark = (lambda name: phases.append((name, ctl.steps))) if phases is not None else (lambda name: None)
+    if skill in ("spoon", "fork"):
+        cutlery_takeover(ctl, skill, params.targets()[skill], mark)
+        ctl.move({"a_": HOME, "b_": HOME}, duration=0.8)
+        ctl.hold(0.5)
+        mark("done")
+    else:
+        run_plan(ctl, params, [skill], phases)
 
 
 def run(ctl: Bimanual, params, phases: list | None = None):
