@@ -1,0 +1,25 @@
+{
+ "candidate": "out/train/cup_sizes3/cup/checkpoints/007500/pretrained_model",
+ "A": {
+  "seeds": 149,
+  "candidate": 105,
+  "cup_sizes2": 97,
+  "paired": [
+   26,
+   18
+  ],
+  "p": 0.2912,
+  "pass": false
+ },
+ "B": {
+  "trained_size_100-149": 45,
+  "pass": false
+ },
+ "C": {
+  "cup_first": 89,
+  "full": 80,
+  "tables": 100,
+  "pass": true
+ },
+ "pass": false
+}

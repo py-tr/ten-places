@@ -1,0 +1,287 @@
+{
+ "summary": {
+  "skill": "plate",
+  "label": "plate_sizes_cand_after_drawer-spoon",
+  "episodes": 30,
+  "success": 18,
+  "rate": 0.6,
+  "wilson95": [
+   0.423,
+   0.754
+  ],
+  "mean_frames": 176.26666666666668,
+  "prefix_errors": []
+ },
+ "rows": [
+  {
+   "seed": 100,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1183,
+   "camera_done": false,
+   "ended_by": "budget"
+  },
+  {
+   "seed": 101,
+   "skill": "plate",
+   "success": true,
+   "frames": 161,
+   "err_m": 0.0023,
+   "camera_done": true,
+   "ended_by": "camera"
+  },
+  {
+   "seed": 102,
+   "skill": "plate",
+   "success": true,
+   "frames": 161,
+   "err_m": 0.0048,
+   "camera_done": true,
+   "ended_by": "camera"
+  },
+  {
+   "seed": 103,
+   "skill": "plate",
+   "success": true,
+   "frames": 161,
+   "err_m": 0.0009,
+   "camera_done": true,
+   "ended_by": "camera"
+  },
+  {
+   "seed": 104,
+   "skill": "plate",
+   "success": true,
+   "frames": 151,
+   "err_m": 0.0017,
+   "camera_done": true,
+   "ended_by": "camera"
+  },
+  {
+   "seed": 105,
+   "skill": "plate",
+   "success": true,
+   "frames": 161,
+   "err_m": 0.0032,
+   "camera_done": true,
+   "ended_by": "camera"
+  },
+  {
+   "seed": 106,
+   "skill": "plate",
+   "success": true,
+   "frames": 151,
+   "err_m": 0.0026,
+   "camera_done": true,
+   "ended_by": "camera"
+  },
+  {
+   "seed": 107,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1203,
+   "camera_done": false,
+   "ended_by": "budget"
+  },
+  {
+   "seed": 108,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1072,
+   "camera_done": false,
+   "ended_by": "budget"
+  },
+  {
+   "seed": 109,
+   "skill": "plate",
+   "success": true,
+   "frames": 151,
+   "err_m": 0.0032,
+   "camera_done": true,
+   "ended_by": "camera"
+  },
+  {
+   "seed": 110,
+   "skill": "plate",
+   "success": true,
+   "frames": 151,
+   "err_m": 0.004,
+   "camera_done": true,
+   "ended_by": "camera"
+  },
+  {
+   "seed": 111,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1142,
+   "camera_done": false,
+   "ended_by": "budget"
+  },
+  {
+   "seed": 112,
+   "skill": "plate",
+   "success": true,
+   "frames": 151,
+   "err_m": 0.0043,
+   "camera_done": true,
+   "ended_by": "camera"
+  },
+  {
+   "seed": 113,
+   "skill": "plate",
+   "success": true,
+   "frames": 151,
+   "err_m": 0.0068,
+   "camera_done": true,
+   "ended_by": "camera"
+  },
+  {
+   "seed": 114,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0716,
+   "camera_done": false,
+   "ended_by": "budget"
+  },
+  {
+   "seed": 115,
+   "skill": "plate",
+   "success": true,
+   "frames": 161,
+   "err_m": 0.0041,
+   "camera_done": true,
+   "ended_by": "camera"
+  },
+  {
+   "seed": 116,
+   "skill": "plate",
+   "success": true,
+   "frames": 151,
+   "err_m": 0.0048,
+   "camera_done": true,
+   "ended_by": "camera"
+  },
+  {
+   "seed": 117,
+   "skill": "plate",
+   "success": true,
+   "frames": 151,
+   "err_m": 0.0023,
+   "camera_done": true,
+   "ended_by": "camera"
+  },
+  {
+   "seed": 118,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1095,
+   "camera_done": false,
+   "ended_by": "budget"
+  },
+  {
+   "seed": 119,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0582,
+   "camera_done": false,
+   "ended_by": "budget"
+  },
+  {
+   "seed": 120,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.0968,
+   "camera_done": false,
+   "ended_by": "budget"
+  },
+  {
+   "seed": 121,
+   "skill": "plate",
+   "success": true,
+   "frames": 151,
+   "err_m": 0.0014,
+   "camera_done": true,
+   "ended_by": "camera"
+  },
+  {
+   "seed": 122,
+   "skill": "plate",
+   "success": true,
+   "frames": 151,
+   "err_m": 0.0061,
+   "camera_done": true,
+   "ended_by": "camera"
+  },
+  {
+   "seed": 123,
+   "skill": "plate",
+   "success": true,
+   "frames": 151,
+   "err_m": 0.0039,
+   "camera_done": true,
+   "ended_by": "camera"
+  },
+  {
+   "seed": 124,
+   "skill": "plate",
+   "success": true,
+   "frames": 151,
+   "err_m": 0.0033,
+   "camera_done": true,
+   "ended_by": "camera"
+  },
+  {
+   "seed": 125,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1073,
+   "camera_done": false,
+   "ended_by": "budget"
+  },
+  {
+   "seed": 126,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1238,
+   "camera_done": false,
+   "ended_by": "budget"
+  },
+  {
+   "seed": 127,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1194,
+   "camera_done": false,
+   "ended_by": "budget"
+  },
+  {
+   "seed": 128,
+   "skill": "plate",
+   "success": false,
+   "frames": 210,
+   "err_m": 0.1154,
+   "camera_done": false,
+   "ended_by": "budget"
+  },
+  {
+   "seed": 129,
+   "skill": "plate",
+   "success": true,
+   "frames": 151,
+   "err_m": 0.0095,
+   "camera_done": true,
+   "ended_by": "camera"
+  }
+ ]
+}

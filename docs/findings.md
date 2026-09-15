@@ -172,6 +172,19 @@ reaching and missing, 4; on its side or lying on another object 4; not grasped 2
   ≥ 92), full tables 81 vs 76 (+11 / −6, p = 0.33; bar ≥ 75); fork alone 100–129 from both starts 30/30, 30/30 (29,
   30); plate 96 vs 94. Remaining fork failures 126, 144, 149, 168, 171. Shipped.
 
+**Not shipped, 2026-09-15** (gates written first, tuning seeds; untouched seeds 400–699 for the size rows; a table
+whose scripted prefix fails IK is dropped from both arms and listed).
+- Plate on sizes ×0.8–1.2 (100 demonstrations, a third at ×1.0, + the plate's own 200; same recipe and statistics):
+  plate alone at ±20% sizes 69 vs 75 of 149; at the trained size 17/30 and 18/30 (30, 29); fixed sequence, plate
+  first attempt 61 vs 96, full tables 60 vs 81. Worse at every size, the trained size most — as the first cup attempt.
+  The rim grasp has millimetres of margin and its point moves with the plate's radius; untested whether that is the
+  cause.
+- Cup, 100 more size demonstrations (280): ±20% cup sizes 105 vs 97 of 149 (+26 / −18, p = 0.29); trained size 45/50
+  (bar 47); fixed sequence 80/100.
+- Spoon from its own failed grasps (the fork's continuation recipe; 70 failures in 904 tables, 44 continuation
+  episodes): spoon first attempt 94 vs 91 (bar 95), full tables 81 vs 81; the fork, which shares the tray and runs
+  after it, 88 vs 95. The spoon's own misses (6% with the drawer ≥ 8.2 cm) stay.
+
 **Plate without the spoon step.** Demo seed 4 ("Just the plate and the cup.") lost the plate four times. The plate
 after the drawer alone and after drawer + spoon (scripted prefix, seeds 100–129, `eval_skill_context.py --deployed`):
 30/30 each. Seed 4 is a hard plate table — fails from both starts, and in every run on seeds 0–49; not tuned on.

@@ -1,0 +1,31 @@
+{
+ "candidate": "out/train/plate_sizes/plate/checkpoints/007500/pretrained_model",
+ "A": {
+  "seeds": 149,
+  "candidate": 69,
+  "plate_t4": 75,
+  "paired": [
+   27,
+   33
+  ],
+  "p": 0.519,
+  "pass": false
+ },
+ "B": {
+  "drawer": 17,
+  "drawer-spoon": 18,
+  "pass": false
+ },
+ "C": {
+  "plate_first": [
+   61,
+   96
+  ],
+  "full": [
+   60,
+   81
+  ],
+  "pass": false
+ },
+ "pass": false
+}

@@ -1,0 +1,42 @@
+{
+ "candidate": "out/train/spoon_cont/spoon/checkpoints/007500/pretrained_model",
+ "A": {
+  "spoon_first": [
+   94,
+   91
+  ],
+  "paired": [
+   4,
+   1
+  ],
+  "p": 0.375,
+  "full": [
+   81,
+   81
+  ],
+  "pass": false
+ },
+ "B": {
+  "spoon_alone_100-129": {
+   "spoon_cont_cand": 26,
+   "spoon_deployed": 27
+  },
+  "pass": true
+ },
+ "C": {
+  "fork_first": [
+   88,
+   95
+  ],
+  "pass": false
+ },
+ "remaining_spoon_failures": [
+  113,
+  152,
+  156,
+  160,
+  177,
+  191
+ ],
+ "pass": false
+}
