@@ -13,6 +13,7 @@ third_party/SO-ARM100/
 docs/submission.md
 docs/video_script.md
 docs/slides.md
+docs/narration.md
 # out/: generated artefacts stay local (checkpoints, videos, caches); the small result files every number in the
 # README comes from are kept (evaluation summaries, per-seed rows, benchmark tables).
 out/*

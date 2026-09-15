@@ -13,8 +13,9 @@ Intel CPU with OpenVINO.
   time (`docs/findings.md`).
 - Hardware: an Intel Core i5-13600KF desktop CPU (no Core Ultra available); every OpenVINO optimisation below is
   measured on it.
-- Hierarchical VLA: the VLM reads the command and the top camera and plans; one ACT policy per skill (ACT is one of
-  the challenge's named candidate policies) drives both arms from three cameras at 25 Hz. The plan selects and
+- Hierarchical VLA — small learned policies under a larger VLM: the VLM reads the command and the top camera and
+  plans; one ACT policy per skill (ACT is one of the challenge's named candidate policies) drives both arms from three
+  cameras at 25 Hz. The plan selects and
   sequences the skills — a single skill-conditioned ACT learned to ignore its skill input (`docs/findings.md`), hence
   the split by skill.
 - Every model that runs on the machine runs on OpenVINO: policies (INT8 weights), planner (Qwen3-VL-4B INT4,
@@ -26,6 +27,28 @@ Seeds: held-out evaluation 0–49 and 200–249, never used for training; two ea
 re-checked on tuning seeds and held (`docs/findings.md`). Tuning 100–199 and 300–399; demonstrations 1000+. Every number below names the script or result file it comes from.
 
 ## How it works
+
+```mermaid
+flowchart TD
+    CMD["Command — typed, or spoken (Speechmatics real-time STT)"] --> LOOK["First look: camera classifier reads the table<br/>(ResNet18, OpenVINO)"]
+    LOOK --> VLM["Planner: Qwen3-VL-4B INT4, OpenVINO GenAI<br/>top camera + command → JSON plan"]
+    VLM --> VER["Verifier: physical prerequisites, order, duplicates<br/>every correction shown"]
+    VER --> ACT["One ACT policy per skill, OpenVINO INT8 weights<br/>3 cameras + joints → 12 joint targets at 25 Hz"]
+    ACT --> SIM["MuJoCo: two SO-101 arms, randomised dinner table"]
+    SIM --> CHK{"Camera classifier after each skill"}
+    CHK -- done --> NEXT["Next step; finished steps re-checked"]
+    CHK -- not done --> RETRY["Retry / re-queue; a short drawer is pulled again"]
+    RETRY --> ACT
+    NEXT --> ACT
+    subgraph CPU["Intel Core i5-13600KF, CPU only"]
+        VLM
+        ACT
+        LOOK
+        CHK
+    end
+```
+
+The same pipeline, as text:
 
 ```
 "Set the table, but skip the cup."          (typed, or spoken → Speechmatics real-time STT)
