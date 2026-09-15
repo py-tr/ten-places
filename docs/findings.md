@@ -92,8 +92,8 @@ tables per 100):
 | drawer fine-tuned on stalled pulls | 86 | — | drawer demonstrations from genuinely stalled pulls |
 | + cup on sizes ×0.77–1.25 | 82 | +4 / −8 | the cup |
 | + camera-ended drawer re-pull | 81 | +10 / −11 | a second pull when the drawer is short |
-| + plate on its own slipping grasps | 81 | +11 / −11 | the plate (held-out plate step 228 → 245 of 250) |
-| + fork on its own stuck hand-offs | 92 | +11 / −0 | the fork (fork step 235 → 243 of 250) |
+| + plate on its own slipping grasps | 81 | +11 / −11 | the plate (plate step 228 → 245 in 250 held-out runs over 100 tables) |
+| + fork on its own stuck hand-offs | 92 | +11 / −0 | the fork (fork step 235 → 243 in 250 held-out runs over 100 tables) |
 
 **Execution settings re-checked on tuning seeds.** Spoon, plate, fork and cup had their execution setting chosen on
 seeds 20–29 — inside today's held-out set. Re-run on 100–149 with the deployed checkpoints
@@ -165,7 +165,7 @@ at the rim wall, plate flat, moved < 1.5 cm.
   ≥ 93), full tables 76 vs 71 (+13 / −8, p = 0.38; bar ≥ 70); by reach x < 16.8 cm 40/43 vs 33/43, x ≥ 16.8 cm
   54/57 vs 55/57; 8 failures fixed (130, 139, 160, 162, 167, 172, 184, 185), 2 new (126, 144); plate alone 100–129
   30/30, 29/30 (126). The mechanism and the reach threshold came from the gate's seeds, so the gain there is an upper
-  estimate; held-out, plate step 228 → 245 of 250 (row 8 above). Shipped.
+  estimate; held-out, plate step 228 → 245 in 250 runs over 100 tables (row 8 above). Shipped.
 
 **Fork: continuing the hand-off.** Fixed sequence with retries, tuning seeds 100–199, fork first-attempt failures
 (14, `out/eval/chain/plate_slip_gateA`): held by B, not placed 4; held by A about 5 cm short of the exchange point, B
@@ -206,6 +206,17 @@ whose scripted prefix fails IK is dropped from both arms and listed).
 - Spoon from its own failed grasps (the fork's continuation recipe; 70 failures in 904 tables, 44 continuation
   episodes): spoon first attempt 94 vs 91 (bar 95), full tables 81 vs 81; the fork, which shares the tray and runs
   after it, 88 vs 95. The spoon's own misses (6% with the drawer ≥ 8.2 cm) stay.
+- Cup from its own stalled or slipping grasps (the plate's recipe; 60 stall takeovers + 40 plain + the cup's own 180,
+  the cup's recipe and statistics): collapsed — cup first attempt 42 vs 91 in the fixed sequence, cup alone at the
+  trained size 11/50, at ±20% sizes 31/150 (the shipped cup: 99). Cause, measured on the data: in the 40 plain cup
+  demonstrations the gripper closes at frame 47 and the stall rule ("arm still 12 frames, gripper closed, cup on the
+  table") is already true at frame 50 in 40 of 40 — it fires inside the demonstrated closing pause. The takeovers came
+  at a median frame of 61 (51 of 60 at ≤ 70), and the takeover restarts the skill (open, back to the approach): 60 of
+  280 training episodes demonstrated letting go from a state identical to every good grasp. The candidate does exactly
+  that — 41 of its 58 failures end with the cup pushed more than 3 cm by re-approaches.
+- The takeover rule this leaves: take over only from a state that never occurs in a successful demonstration. The
+  plate's slip (the plate rose, then fell back) and the fork's late frames on failing tables meet it; twelve still
+  frames at the close do not.
 
 **Plate without the spoon step.** Demo seed 4 ("Just the plate and the cup.") lost the plate four times. The plate
 after the drawer alone and after drawer + spoon (scripted prefix, seeds 100–129, `eval_skill_context.py --deployed`):
