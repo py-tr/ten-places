@@ -62,6 +62,7 @@ Held-out seeds 0–49, each row run once with frozen selections (`scripts/final_
 | + cup trained on varied sizes (re-run of both held-out sets) | 38/50 | 42/50 | 43/50 (OpenVINO) |
 | + camera-ended drawer re-pull (re-run of both held-out sets) | 41/50 | 40/50 | 39/50 (OpenVINO) |
 | + plate trained on its own failed grasps (re-run of both held-out sets) | 43/50 | 44/50 | 42/50 (OpenVINO) |
+| + fork trained on its own stuck hand-offs (re-run of both held-out sets) | 47/50 | 44/50 | **47/50 (OpenVINO)** |
 
 - Rows 3–4 were chosen on 20 tuning seeds and do not show on the held-out seeds: vs the row above, PyTorch +7 / −4
   tables (McNemar p = 0.55). The OpenVINO drawer moved the wrong way, 48 → 42 → 39 of 50 (vs release-and-home: 0
@@ -77,6 +78,22 @@ Held-out seeds 0–49, each row run once with frozen selections (`scripts/final_
   over the five held-out rows at trained sizes (agent ×2, fixed OpenVINO ×2, PyTorch): 228 → 245 of 250 (+19 / −2;
   the rows share seeds, so the McNemar p of 0.0002 is descriptive). Both held-out sets: agent 81/100 (81), fixed
   sequence 86/100 (80). `out/eval/v8_vs_v7.md`.
+- Row 9: the fork's continuation takeovers (below). Vs row 8, same tables: full agent 0–49 42 → 47 (+5 / −0),
+  200–249 39 → 45 (+6 / −0) — both sets 81 → 92 (+11 / −0, p = 0.001); fixed sequence 0–49 44 → 44 (+4 / −4),
+  200–249 42 → 44 (+5 / −3); PyTorch 43 → 47 (+5 / −1). Fork step over the five held-out rows at trained sizes:
+  235 → 243 of 250. The fixed sequence moved less than the agent: part of the agent's +11 is run-to-run noise on top
+  of the fork. `out/eval/v9_vs_v8.md`.
+
+Frozen runs of both held-out sets, full agent (each configuration run once; identical systems differ on 10–16
+tables per 100):
+
+| Configuration | Full agent, 100 held-out tables | Paired vs the run before | What changed |
+|---|---|---|---|
+| drawer fine-tuned on stalled pulls | 86 | — | drawer demonstrations from genuinely stalled pulls |
+| + cup on sizes ×0.77–1.25 | 82 | +4 / −8 | the cup |
+| + camera-ended drawer re-pull | 81 | +10 / −11 | a second pull when the drawer is short |
+| + plate on its own slipping grasps | 81 | +11 / −11 | the plate (held-out plate step 228 → 245 of 250) |
+| + fork on its own stuck hand-offs | 92 | +11 / −0 | the fork (fork step 235 → 243 of 250) |
 
 **Execution settings re-checked on tuning seeds.** Spoon, plate, fork and cup had their execution setting chosen on
 seeds 20–29 — inside today's held-out set. Re-run on 100–149 with the deployed checkpoints
@@ -171,14 +188,19 @@ reaching and missing, 4; on its side or lying on another object 4; not grasped 2
 - Gates written first, tuning seeds, paired with the deployed fork: first attempt 95 vs 86 (+10 / −1, p = 0.012; bar
   ≥ 92), full tables 81 vs 76 (+11 / −6, p = 0.33; bar ≥ 75); fork alone 100–129 from both starts 30/30, 30/30 (29,
   30); plate 96 vs 94. Remaining fork failures 126, 144, 149, 168, 171. Shipped.
+- Held-out re-run (row 9 above): fork step 235 → 243 of 250 over the five trained-size rows; full agent 81 → 92
+  (+11 / −0); fork placement error median 0.44 cm (0.72–0.90 before).
 
 **Not shipped, 2026-09-15** (gates written first, tuning seeds; untouched seeds 400–699 for the size rows; a table
 whose scripted prefix fails IK is dropped from both arms and listed).
 - Plate on sizes ×0.8–1.2 (100 demonstrations, a third at ×1.0, + the plate's own 200; same recipe and statistics):
   plate alone at ±20% sizes 69 vs 75 of 149; at the trained size 17/30 and 18/30 (30, 29); fixed sequence, plate
   first attempt 61 vs 96, full tables 60 vs 81. Worse at every size, the trained size most — as the first cup attempt.
-  The rim grasp has millimetres of margin and its point moves with the plate's radius; untested whether that is the
-  cause.
+  Where the jaw ends on the 39 first-attempt plate failures of that run (pad centres from the plate centre; the wall
+  spans r 4.8–5.2 cm): fixed pad median 3.8 cm (1.5–5.2), moving pad 6.5 cm (2.3–8.4); 24 touch nothing, 14 one pad.
+  The shipped plate's 4 failures on the same tables end the same way (3.7, 6.3 cm): the failure is the same, ten times
+  as often. The rim grasp's point moves with the plate's radius and the pinch has millimetres of margin; that the
+  mixed sizes moved the trained-size grasp is the reading, not tested further.
 - Cup, 100 more size demonstrations (280): ±20% cup sizes 105 vs 97 of 149 (+26 / −18, p = 0.29); trained size 45/50
   (bar 47); fixed sequence 80/100.
 - Spoon from its own failed grasps (the fork's continuation recipe; 70 failures in 904 tables, 44 continuation
@@ -247,17 +269,11 @@ other sizes: all "never picked up", none a false "done" from the camera.
   alone, ±20% cup sizes: 99 vs 80 (+31 / −12, p = 0.005). Passed; with the other two gates holding, it replaced the
   deployed cup. The first 50-seed test not pooled in.
 
-**Lost tables, final re-run** (full agent, OpenVINO, `out/eval/agent_table/ov_w8_report7.json`,
-`ov_w8_fresh200-249_v7.json`; a table counts at its first step, in task order, still undone at the end):
-
-| Step | Tables | Seeds | Final distance from target |
-|---|---|---|---|
-| plate | 8 | 11, 204, 239, 247 · 12, 207, 229 · 233 | 16.6–20.8 cm: not carried · 3.6–4.2 cm off the mat · 0.9 cm: within the distance, failed another check (flat, upright or released) |
-| spoon | 5 | 1, 36, 37, 47, 214 | 22.6–25.3 cm: not picked up |
-| fork | 4 | 4, 18 · 44, 222 | 16.7–19.3 cm: not carried · 2.9–3.6 cm, just outside the 2.5 cm tolerance |
-| cup | 2 | 41 · 45 | 5.2 cm · 1.4 cm: within the distance, failed another check |
-
-No table lost at the drawer. Largest single losses: the plate (8), then the spoon (5).
+**Lost tables, latest re-run** (full agent, OpenVINO, `out/eval/agent_table/ov_w8_report9.json`,
+`ov_w8_fresh200-249_v9.json`; a table counts at its first step, in task order, still undone at the end): 8 of 100 —
+spoon 4 (24, 37, 214, 243), cup 2 (41, 233), plate 1 (207), drawer 1 (223). Before the plate and fork fine-tunes
+(v7): 19 — plate 8, spoon 5, fork 4, cup 2. Placement error, placed objects: medians spoon 0.36, plate 0.39, fork
+0.44, cup 0.29 cm; largest 1.49 cm (v7: 2.48 cm).
 
 Mechanisms, tuning seeds 100–199 (fixed sequence, first attempts, recorded start/end states, `out/eval/chain/lever1_base/rows.json`):
 - Spoon: drawer at the spoon's start < 7.4 cm 0/7 placed, ≥ 7.4 cm 88/93. The seven short drawers (5.9–7.0 cm,
