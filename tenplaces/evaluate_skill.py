@@ -38,14 +38,14 @@ def verified_prefixes(skill: str):
 
 def run_skill_episode(policy, skill: str, seed: int, checker=None, budget=None, check_every=10, min_frames=40,
                       settle_frames=30, before=None, drawer_open=None, cup_scale=None, grader_ends=False,
-                      plate_scale=None):
+                      plate_scale=None, cutlery_scale=None):
     """before: skills the scripted controller performs first (default: every earlier skill in canonical order;
     a verified subset plan can start a skill from fewer, e.g. the cup with the plate never moved).
     drawer_open: how far the scripted drawer is pulled (default: the scene's 0.09 m) — the learned drawer opens
     8.4-9.3 cm, and the spoon policy trained at exactly 9 cm scored 5/10 at 8 cm and 0/10 at 10 cm.
-    cup_scale / plate_scale: this table with only the cup / plate that size (the rest as usual)."""
+    cup_scale / plate_scale / cutlery_scale: this table with only that object that size (the rest as usual)."""
     params = None
-    if cup_scale is not None or plate_scale is not None:
+    if cup_scale is not None or plate_scale is not None or cutlery_scale is not None:
         from . import scene_table
 
         params = scene_table.sample(seed)
@@ -53,13 +53,21 @@ def run_skill_episode(policy, skill: str, seed: int, checker=None, budget=None, 
             params.cup_scale = float(cup_scale)
         if plate_scale is not None:
             params.plate_scale = float(plate_scale)
+        if cutlery_scale is not None:
+            params.cutlery_scale = float(cutlery_scale)
     ep = TableEpisode(seed, render=True, params=params)
     if drawer_open is not None:
         ep.params.drawer_open = drawer_open
     if before is None:
         before = SKILL_NAMES[:SKILL_NAMES.index(skill)]
     if before:
-        table.run_plan(ep.ctl, ep.params, before)  # the scripted controller sets the scene up
+        from .control import IKFailure
+
+        try:
+            table.run_plan(ep.ctl, ep.params, before)  # the scripted controller sets the scene up
+        except IKFailure as e:  # no scripted start on this table: not a result for any policy
+            ep.close()
+            return {"seed": seed, "skill": skill, "success": None, "prefix_error": str(e), "frames": 0}
     obs = ep.observation()
     policy.reset()
     onehot = np.zeros(len(SKILLS), dtype=np.float32)
@@ -92,15 +100,18 @@ def run_skill_episode(policy, skill: str, seed: int, checker=None, budget=None, 
 
 
 def evaluate_skill(policy, skill: str, seeds, out_dir: Path | None = None, checker=None, label=None, before=None,
-                   budget=None, drawer_open=None, cup_scales=None, grader_ends=False, plate_scales=None):
+                   budget=None, drawer_open=None, cup_scales=None, grader_ends=False, plate_scales=None,
+                   cutlery_scales=None):
     rows = [run_skill_episode(policy, skill, s, checker=checker, before=before, budget=budget, drawer_open=drawer_open,
                               cup_scale=(cup_scales or {}).get(s), grader_ends=grader_ends,
-                              plate_scale=(plate_scales or {}).get(s))
+                              plate_scale=(plate_scales or {}).get(s), cutlery_scale=(cutlery_scales or {}).get(s))
             for s in seeds]
-    k = sum(r["success"] for r in rows)
-    summary = {"skill": skill, "label": label or skill, "episodes": len(rows), "success": k,
-               "rate": k / len(rows), "wilson95": wilson(k, len(rows)),
-               "mean_frames": float(np.mean([r["frames"] for r in rows]))}
+    valid = [r for r in rows if r["success"] is not None]
+    k = sum(r["success"] for r in valid)
+    summary = {"skill": skill, "label": label or skill, "episodes": len(valid), "success": k,
+               "rate": k / len(valid), "wilson95": wilson(k, len(valid)),
+               "mean_frames": float(np.mean([r["frames"] for r in valid])),
+               "prefix_errors": [r["seed"] for r in rows if r["success"] is None]}
     if out_dir is not None:
         out_dir.mkdir(parents=True, exist_ok=True)
         (out_dir / f"{summary['label']}_skill.json").write_text(json.dumps({"summary": summary, "rows": rows}, indent=1))
