@@ -148,9 +148,10 @@ def main():
 
     rows = ["| Time | Seed | Command | How | Result |", "|---|---|---|---|---|"]
     for start, entry, passed, cause, name in index:
-        # Named, not just "spoken": the speech-to-text is Speechmatics. The robot's replies are Speechmatics
-        # text-to-speech in every run, typed ones included - that is stated under the table, not repeated per row.
-        mode = "spoken (Speechmatics)" if entry.get("mode") == "spoken" else "typed"
+        # Both sides are Speechmatics and both are audible: a spoken command is the person's microphone
+        # transcribed by Speechmatics STT, a typed one is read aloud by a second Speechmatics TTS voice
+        # (voice_over.py). The robot answers in its own Speechmatics voice in every run.
+        mode = "spoken (Speechmatics STT)" if entry.get("mode") == "spoken" else "typed (Speechmatics TTS)"
         # A failed seed says why. "not completed" would be wrong for a run whose steps were all done.
         # A wrongly announced "cannot do" is not a dropped object. Say what the table looked like first, then why
         # it was scored a failure; demo.csv keeps the grader's own cause string untouched.

@@ -356,9 +356,11 @@ def main():
             body += f"<tr{cls}>" + "".join(f"<td>{esc(c)}</td>" for c in cells) + "</tr>"
         return ("<details><summary>Jump to any command in the reel</summary>"
                 f"<div class=\"tw\"><table><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>"
-                "<p class=\"note\">Spoken commands are Speechmatics real-time speech-to-text, captured from a live "
-                "microphone. In <b>every</b> run, typed ones included, the robot speaks its own replies with "
-                "Speechmatics text-to-speech &mdash; that is the audio on these clips: the plan it chose, the reason "
+                "<p class=\"note\">Every command in these clips is audible, and <b>all twelve runs use "
+                "Speechmatics on both sides</b>. A spoken command is the person's own microphone, transcribed live "
+                "by Speechmatics real-time speech-to-text; a typed one is read aloud by a second Speechmatics "
+                "text-to-speech voice, deliberately different from the robot's, so the two are never confused. The "
+                "robot then answers in its own Speechmatics voice in every run &mdash; the plan it chose, the reason "
                 "for a correction, and what it could not do.</p>"
                 "</details>")
 
