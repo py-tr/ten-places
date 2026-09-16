@@ -275,7 +275,7 @@ def main():
             # A refusal that still set the table is not the same failure as a dropped object. The scorer's verdict
             # stands; the row says what actually happened so the column is not read as one kind of loss.
             if cls == "no" and "refusal" in cells[-1].lower():
-                cells[-1] = cells[-1] + " &mdash; table still set"
+                cells[-1] = cells[-1] + " &mdash; every step done, nothing refused"
             demo_body += f"<tr class='{cls}'>" + "".join(
                 f"<td>{c if '&mdash;' in c else esc(c)}</td>" for c in cells) + "</tr>"
 
@@ -531,11 +531,12 @@ OpenVINO. Two further runs, recorded the same way and listed with them below: a 
 {video}
 <div class="tw"><table><thead><tr>{demo_head}</tr></thead><tbody>{demo_body}</tbody></table></div>
 
-<blockquote><p><b>The one miss is a refusal, not a motion.</b> On seed 2, &ldquo;No fork today, set the rest&rdquo;,
-the plan was right (drawer, spoon, plate, cup), all four steps were carried out, and the table ended exactly as
-asked. The impossible-part check, which runs separately to name anything no skill can do, read the phrase
-&ldquo;set the rest&rdquo; as a thing it cannot do and announced it. The scorer counts a wrong refusal as a failed
-run.</p></blockquote>
+<blockquote><p><b>The one miss is a sentence, not a motion &mdash; nothing was refused.</b> On seed 2,
+&ldquo;No fork today, set the rest&rdquo;, the plan was right (drawer, spoon, plate, cup), all four steps were
+carried out, and the table ended exactly as asked. What went wrong is the impossible-part check, which runs
+separately to name anything no skill can do: it read the phrase &ldquo;set the rest&rdquo; as one of those things
+and announced it &mdash; after having done it. The scorer counts any unasked-for claim of that kind as a failed
+run, so this run is counted against the total above rather than quietly excused.</p></blockquote>
 
 <h2>Held-out tables</h2>
 <p>Four sets of 50 randomised tables, never used for training or tuning, every selection frozen before the run and

@@ -77,9 +77,10 @@ Three videos, served from this repository — nothing embedded, nothing to expir
 | 8:35 | 11 | "Set the table, please." (live, plan changed mid-run) | spoken | done as asked |
 
 The ten tables and their ten commands were fixed in `configs/demo_seeds.json` before any of them was recorded. Seed 2
-is the one miss, and it is a refusal rather than a motion: the plan was right, all four steps were carried out and the
-table ended as asked, but the separate impossible-part check read "set the rest" as something it cannot do and said
-so. The scorer counts any unasked-for refusal as a failed run.
+is the one miss, and **nothing was refused**: the plan was right, all four steps were carried out, and the table
+ended exactly as asked. What went wrong is a sentence — the separate impossible-part check, which names anything no
+skill can do, read "set the rest" as one of those things and announced it, *after* doing it. The scorer counts any
+unasked-for claim of that kind as a failed run, so it is counted against the 9/10 above.
 
 ## How it works
 
@@ -196,7 +197,7 @@ fork, each handed from arm to arm, placed on 390 of 400.
 
 | Component | Result | Evidence |
 |---|---|---|
-| Demonstration runs: 10 tables, 10 requests fixed before recording (2 spoken, 1 changed mid-run by a second sentence sent at a fixed time), full agent on OpenVINO | 9/10 done exactly as asked; every table ended with the asked-for steps physically done. The one miss is a refusal, not a motion: on "No fork today, set the rest" the impossible-part check read "set the rest" as a thing it cannot do and said so, while the plan and all four steps were correct | `scripts/score_demo.py`, `out/video/demo_final/summary.md` |
+| Demonstration runs: 10 tables, 10 requests fixed before recording (2 spoken, 1 changed mid-run by a second sentence sent at a fixed time), full agent on OpenVINO | 9/10 done exactly as asked; every table ended with the asked-for steps physically done. The one miss is a sentence, not a motion, and nothing was refused: on "No fork today, set the rest" the plan and all four steps were correct and the table was set, but the impossible-part check read "set the rest" as a thing it cannot do and announced that after doing it | `scripts/score_demo.py`, `out/video/demo_final/summary.md` |
 | Demonstration runs: a half-set table (drawer and spoon already done) and a live take with the plan changed by voice mid-run | 1/1 and 1/1; the live take placed all four after the camera caught a missed cup and retried | `out/video/demo_final_extra/summary.md`, `out/video/demo_live/take2/` |
 | Planner: unseen commands → correct verified plan | 8/8 on the set written before it was scored, incl. naming what no skill can do ("dim the lights"); 10/10, 5/5 and 4/6 on the three sets used while writing the prompts | `scripts/eval_planner.py` |
 | First look: steps already done are skipped | fresh tables: none read as done (50/50); half-set tables: read exactly (50/50); agent on 50 fresh tables: skipped nothing | `scripts/eval_initial_state.py`, `eval_agent_table.py --look-first` |
