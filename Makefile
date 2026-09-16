@@ -86,11 +86,12 @@ report:
 	$(PY) scripts/eval_agent_table.py --seeds $(REPORT_SEEDS) --report --backend ov-w8 --workers 4 --name ov_w8_report
 
 # The second held-out set (fresh seeds 200-249) and the robustness rows on it: the full agent, the fixed sequence at
-# the training ranges, with friction/masses/light/colours widened x1.5, and with object sizes +-10% and +-20%.
+# the training ranges, with friction/masses/light/colours widened x1.5 and x2.0, and with object sizes +-10% and +-20%.
 report-fresh:
 	$(PY) scripts/eval_agent_table.py --seeds 200 250 --backend ov-w8 --workers 4 --name ov_w8_fresh200-249
 	env TENPLACES_STRESS=1.0 $(PY) scripts/final_report.py --seeds 200 250 --rows ov_w8 --videos 0 --workers 4 --out out/eval/stress_1.0
 	env TENPLACES_STRESS=1.5 $(PY) scripts/final_report.py --seeds 200 250 --rows ov_w8 --videos 0 --workers 4 --out out/eval/stress_1.5
+	env TENPLACES_STRESS=2.0 $(PY) scripts/final_report.py --seeds 200 250 --rows ov_w8 --videos 0 --workers 4 --out out/eval/stress_2.0
 	env TENPLACES_SHAPE=0.1 $(PY) scripts/final_report.py --seeds 200 250 --rows ov_w8 --videos 0 --workers 4 --out out/eval/shape_0.1
 	env TENPLACES_SHAPE=0.2 $(PY) scripts/final_report.py --seeds 200 250 --rows ov_w8 --videos 0 --workers 4 --out out/eval/shape_0.2
 	env TENPLACES_SHAPE=0.2 TENPLACES_SHAPE_ONLY=cup $(PY) scripts/final_report.py --seeds 200 250 --rows ov_w8 --videos 0 \
@@ -128,8 +129,9 @@ eval-planner:
 	$(PY) scripts/eval_amend.py --set heldout
 	$(PY) scripts/eval_amend.py --set dev
 
-# make recover SEED=3 — knock the plate off its mat mid-run. A known failure with the learned system (README "Disturbances"): the camera
-# misses it unless it slides back toward its start, and the plate policy never re-placed a displaced plate (0/44).
+# make recover SEED=3 — knock the plate off its mat mid-run. A known failure with the learned system (README "Limitations",
+# docs/findings.md "Disturbance repair"): the camera misses it unless it slides back toward its start, and the plate
+# policy put a displaced plate back on 2 of 75 knocks.
 recover:
 	$(PY) scripts/run_agent.py --command "set the table" --seed $(SEED) --push "after-plate:plate:0:-0.07" \
 		--video out/video/recover_s$(SEED).mp4

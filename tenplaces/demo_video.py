@@ -86,7 +86,7 @@ class DemoRecorder:
             s["checks"].append((e["skill"], False))
             s["notes"].append(f"camera: {e['skill']} no longer in place → redo")
         elif e["kind"] == "gave_up":
-            s["notes"].append(f"{e['skill']}: gave up after {e['repairs']} repair(s)")
+            s["notes"].append(f"{e['skill']}: stopped after {e['repairs']} repair attempt(s)")
         elif e["kind"] == "stop":
             s["current"] = "stopped by voice"
         elif e["kind"] == "skill_start":

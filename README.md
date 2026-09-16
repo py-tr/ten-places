@@ -13,7 +13,8 @@ checks every step. Every model runs on an Intel CPU with OpenVINO; speech goes t
   skills (joint interpolation). Inverse kinematics only generates training demonstrations; it moves nothing at run
   time (`docs/findings.md`).
 - Hardware: an Intel Core i5-13600KF desktop CPU (no Core Ultra available); every OpenVINO optimisation below is
-  measured on it.
+  measured on it. Everything that runs the robot runs on that CPU. Training and the PyTorch reference row in the
+  results table used an NVIDIA RTX 4060 Ti; no GPU is used at run time.
 - Hierarchical VLA — small learned policies under a larger VLM: the VLM reads the command and the top camera and
   plans; one ACT policy per skill (ACT is one of the challenge's named candidate policies) drives both arms from three
   cameras at 25 Hz. The plan selects and
@@ -24,7 +25,7 @@ checks every step. Every model runs on an Intel CPU with OpenVINO; speech goes t
 
 Intel online challenge *Bimanual VLA Manipulation with Multi-Modal Reasoning*, AI Infra Summit Hackathon 2026.
 
-Seeds: held-out evaluation 0–49 and 200–249, never used for training; two early choices made on seeds 0–29 were
+Seeds: held-out evaluation 0–49, 200–249, 250–299 and 850–899, never used for training; two early choices made on seeds 0–29 were
 re-checked on tuning seeds and held (`docs/findings.md`). Tuning 100–199 and 300–399; demonstrations 1000+. Every number below names the script or result file it comes from.
 
 ## How it works
@@ -149,7 +150,7 @@ fork, each handed from arm to arm, placed on 390 of 400.
 | Camera classifier on learned-policy states | false "drawer done" 3/363, false "spoon done" 1/671 | `docs/findings.md` |
 | Scripted demonstrator (training data) | 60/60 full tables, 72/72 verified subset plans | `make spike-table` |
 
-Every change from 0 to 43 of 50 tables, what it measured, what did not work: [`docs/findings.md`](docs/findings.md).
+Every change from 0 of 10 tables to 183 of 200, what it measured, what did not work: [`docs/findings.md`](docs/findings.md).
 
 ## OpenVINO on an Intel Core i5-13600KF
 
@@ -190,8 +191,8 @@ Shipped: the pinned split (6% late). Hyper-threading on measured 0% in this run;
 | … at 25 Hz, P-cores, pinned | 56.0 W | 25 | 1.52 J |
 
 Optimisation results:
-- **Precision by task success, not output error.** INT8 weights keep full-table success (40 vs 41 of 50 for
-  PyTorch, +3 / −4, p = 1.0). INT8
+- **Precision by task success, not output error.** INT8 weights keep full-table success: on the shipped
+  configuration, held-out seeds 0–49, 44/50 against 47/50 for PyTorch (+1 / −4, McNemar p = 0.38). INT8
   activations in the transformer lose it (hand-off checkpoint: 7/20 against 13/20 FP32, 14/20 INT8 weights; same
   seeds). INT4 weights (23 MB instead of 33): four skills hold, the cup of that time drifts ~0.05 rad and fails every table (0/50
   against 41/50, tuning seeds); no faster than INT8 on this CPU in the same run (16.8–21.3 against 16.8–19.3 ms,
