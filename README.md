@@ -193,8 +193,9 @@ Shipped: the pinned split (6% late). Hyper-threading on measured 0% in this run;
 | … at 25 Hz, P-cores, pinned | 56.0 W | 25 | 1.52 J |
 
 Optimisation results:
-- **Precision by task success, not output error.** INT8 weights keep full-table success: on the shipped
-  configuration, held-out seeds 0–49, 44/50 against 47/50 for PyTorch (+1 / −4, McNemar p = 0.38). INT8
+- **Precision by task success, not output error.** INT8 weights keep full-table success: the fixed five-step
+  sequence on held-out seeds 0–49, 48/50 against 45/50 for PyTorch (+3 / −0 on seeds 25, 26, 40, exact McNemar
+  p = 0.25 — no measurable difference either way). INT8
   activations in the transformer lose it (hand-off checkpoint: 7/20 against 13/20 FP32, 14/20 INT8 weights; same
   seeds). INT4 weights (23 MB instead of 33): four skills hold, the cup of that time drifts ~0.05 rad and fails every table (0/50
   against 41/50, tuning seeds); no faster than INT8 on this CPU in the same run (16.8–21.3 against 16.8–19.3 ms,
