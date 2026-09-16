@@ -431,7 +431,7 @@ and check their own work. Every model runs on one Intel CPU.</p>
 <div class="hn"><b>{ak}/{an}</b><span>tables it had never seen, set completely</span></div>
 <div class="hn"><b>{d0k}/{d0n}</b><span>pre-registered demonstrations done as asked</span></div>
 <div class="hn"><b>{min(w8_ms):.0f} ms</b><span>per policy step, OpenVINO INT8</span></div>
-<div class="hn"><b>0</b><span>GPUs at run time</span></div>
+<div class="hn"><b>{cutlery}/{len(agent_all) * 2}</b><span>spoon and fork placed after a hand-off</span></div>
 </div>
 </div></header>
 
@@ -450,7 +450,7 @@ simulator object poses.</p>
 <div class="nums">
  <div class="num"><b>{ak} / {an}</b><span>held-out tables set completely, four sets of 50</span></div>
  <div class="num"><b>{PROSE['policy_share']}</b><span>of control steps come from the learned policies</span></div>
- <div class="num"><b>2</b><span>mid-air hand-offs per table, friction grasps only</span></div>
+ <div class="num"><b>{worst:.2f} cm</b><span>worst placement error over {an} tables, inside a 2.5 cm tolerance</span></div>
  <div class="num"><b>{min(w8_ms):.1f}&ndash;{max(w8_ms):.1f} ms</b><span>per policy step on the CPU, OpenVINO INT8
  weights</span></div>
 </div>
