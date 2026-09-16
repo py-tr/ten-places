@@ -93,9 +93,16 @@ def main():
                 frame = chips(frame, params[seed])
             if t >= n - args.fps:  # last second: outcome
                 ok = outcome.get(seed, False)
-                frame = stamp(frame, "PASS" if ok else "FAIL", (80, 230, 80) if ok else (240, 70, 70), big=True)
+                # A run counts as failed on either of the scorer's two conditions: a step the command asked for
+                # was not physically done, or the robot refused something it was not asked about. The tally is the
+                # same either way; the stamp says which, so a refusal is not read as a dropped object.
+                refusal_only = not ok and cause.get(seed, "").strip() == "wrong refusal"
+                word = "PASS" if ok else ("REFUSED" if refusal_only else "FAIL")
+                colour = (80, 230, 80) if ok else ((235, 155, 60) if refusal_only else (240, 70, 70))
+                frame = stamp(frame, word, colour, big=True)
                 if not ok and cause.get(seed):
-                    frame = stamp(frame, cause[seed], (240, 200, 200), big=True, line=1)
+                    note = "table still set" if refusal_only else cause[seed]
+                    frame = stamp(frame, note, (240, 210, 180) if refusal_only else (240, 200, 200), big=True, line=1)
             r, c = divmod(i, args.cols)
             grid[r * h:(r + 1) * h, c * w:(c + 1) * w] = frame
         if t >= n - args.fps:
