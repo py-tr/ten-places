@@ -354,6 +354,10 @@ def main():
             body += f"<tr{cls}>" + "".join(f"<td>{esc(c)}</td>" for c in cells) + "</tr>"
         return ("<details><summary>Jump to any command in the reel</summary>"
                 f"<div class=\"tw\"><table><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>"
+                "<p class=\"note\">Spoken commands are Speechmatics real-time speech-to-text, captured from a live "
+                "microphone. In <b>every</b> run, typed ones included, the robot speaks its own replies with "
+                "Speechmatics text-to-speech &mdash; that is the audio on these clips: the plan it chose, the reason "
+                "for a correction, and what it could not do.</p>"
                 "</details>")
 
     reel_idx = reel_index()

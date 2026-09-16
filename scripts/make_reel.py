@@ -148,7 +148,9 @@ def main():
 
     rows = ["| Time | Seed | Command | How | Result |", "|---|---|---|---|---|"]
     for start, entry, passed, cause, name in index:
-        mode = "spoken" if entry.get("mode") == "spoken" else "typed"
+        # Named, not just "spoken": the speech-to-text is Speechmatics. The robot's replies are Speechmatics
+        # text-to-speech in every run, typed ones included - that is stated under the table, not repeated per row.
+        mode = "spoken (Speechmatics)" if entry.get("mode") == "spoken" else "typed"
         # A failed seed says why. "not completed" would be wrong for a run whose steps were all done.
         result = "-" if passed is None else ("done as asked" if passed else (cause or "not completed"))
         extra = " (half-set table)" if name == "extra" else (" (live, plan changed mid-run)" if name == "live" else "")

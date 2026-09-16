@@ -64,17 +64,21 @@ Three videos, served from this repository — nothing embedded, nothing to expir
 | Time | Seed | Command | How | Result |
 |---|---|---|---|---|
 | 0:00 | 0 | "Set the table." | typed | done as asked |
-| 1:01 | 1 | "Could you set everything out for dinner?" | spoken | done as asked |
+| 1:01 | 1 | "Could you set everything out for dinner?" | spoken (Speechmatics) | done as asked |
 | 2:05 | 2 | "No fork today, set the rest." | typed | **wrong refusal** |
 | 2:53 | 3 | "I'm having soup tonight." | typed | done as asked |
 | 3:26 | 4 | "Just the plate and the cup." | typed | done as asked |
 | 4:00 | 5 | "Set the table." + "Skip the cup." mid-run | typed | done as asked |
 | 4:58 | 6 | "Set the table and light a candle." | typed | done as asked |
 | 6:00 | 7 | "Just my cup, thanks." | typed | done as asked |
-| 6:14 | 8 | "Put out the spoon and the plate." | spoken | done as asked |
+| 6:14 | 8 | "Put out the spoon and the plate." | spoken (Speechmatics) | done as asked |
 | 6:57 | 9 | "Set the table." | typed | done as asked |
 | 8:01 | 10 | "Set the table." (half-set table) | typed | done as asked |
-| 8:35 | 11 | "Set the table, please." (live, plan changed mid-run) | spoken | done as asked |
+| 8:35 | 11 | "Set the table, please." (live, plan changed mid-run) | spoken (Speechmatics) | done as asked |
+
+*Spoken commands are Speechmatics real-time speech-to-text, captured from a live microphone. In **every** run, the
+typed ones included, the robot speaks its own replies with Speechmatics text-to-speech — that is the audio on these
+clips: the plan it chose, the reason for a correction, and what it could not do.*
 
 The ten tables and their ten commands were fixed in `configs/demo_seeds.json` before any of them was recorded. Seed 2
 is the one miss, and **nothing was refused**: the plan was right, all four steps were carried out, and the table
