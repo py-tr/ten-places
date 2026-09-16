@@ -66,10 +66,11 @@ tbody tr.no { background:var(--ambersoft); }
 summary { font-weight:600; color:var(--teal); }
 blockquote { border-left-color:var(--amber); background:var(--ambersoft); }
 figure.shot { margin:1.4em 0; }
-figure.shot img, figure.shot iframe {
+figure.shot img, figure.shot iframe, figure.shot video {
   display:block; width:100%; height:auto; max-width:100%; border:1px solid var(--line); border-radius:12px;
   background:var(--shade);
 }
+figure.shot video { background:#000; }
 figure.shot iframe { aspect-ratio:16/9; border:0; }
 figure.narrow { max-width:26rem; }
 figure.wide { overflow-x:auto; }
@@ -125,6 +126,7 @@ simulator object poses.</p>
 verified plan with all five steps done and the line: no skill for, light a candle.">
 <figcaption>Demonstration seed 6. The command was &ldquo;Set the table and light a candle.&rdquo; &mdash; the five
 steps it can do are done, and the candle is named as something no skill does.</figcaption></figure>
+<figure class="shot"><video controls preload="metadata" poster="hero_web.jpg"><source src="demo_run.mp4" type="video/mp4">Your browser cannot play this video; download it at <a href="demo_run.mp4">demo_run.mp4</a>.</video><figcaption>One run end to end, 60 seconds, with its own audio: the command is spoken into a live microphone, the plan is changed out loud part-way through, and the cup is missed and retried without anyone touching anything.</figcaption></figure>
 
 <div class="nums">
  <div class="num"><b>183 / 200</b><span>held-out tables set completely, four sets of 50</span></div>
@@ -173,6 +175,8 @@ except seed 2, which is stamped wrong refusal.">
 <em>wrong refusal</em> planned and ran every step correctly and ended with the table set; what failed was the
 separate check on impossible requests, which announced it could not &ldquo;set the rest&rdquo;. The scorer counts
 any unasked-for refusal as a failed run.</figcaption></figure>
+<figure class="shot"><video controls preload="metadata" poster="grid_web.jpg"><source src="demo_grid.mp4" type="video/mp4">Your browser cannot play this video; download it at <a href="demo_grid.mp4">demo_grid.mp4</a>.</video><figcaption>All twelve demonstration runs at once, each on its own randomised table, stamped as it ends.</figcaption></figure>
+<figure class="shot"><video controls preload="metadata" poster="hero_web.jpg"><source src="demo_reel.mp4" type="video/mp4">Your browser cannot play this video; download it at <a href="demo_reel.mp4">demo_reel.mp4</a>.</video><figcaption>The same twelve runs one after another, full size and unabridged, 9.6 minutes: every command, every placement and every retry, including the run that refused wrongly.</figcaption></figure>
 
 <div class="tw"><table><thead><tr><th>seed</th><th>how</th><th>command (heard)</th><th>plan</th><th>done</th><th>said it cannot</th><th>first plan</th><th>result</th></tr></thead><tbody><tr class='ok'><td>0</td><td>typed</td><td>Set the table.</td><td>drawer &rarr; spoon &rarr; plate &rarr; fork &rarr; cup</td><td>drawer, spoon, plate, fork, cup</td><td>&ndash;</td><td>8.0 s</td><td>PASS</td></tr><tr class='ok'><td>1</td><td>spoken</td><td>Could you set everything out for dinner? (heard: Could you set everything out for dinner ?)</td><td>drawer &rarr; spoon &rarr; plate &rarr; fork &rarr; cup</td><td>drawer, spoon, plate, fork, cup</td><td>&ndash;</td><td>8.2 s</td><td>PASS</td></tr><tr class='no'><td>2</td><td>typed</td><td>No fork today, set the rest.</td><td>drawer &rarr; spoon &rarr; plate &rarr; cup</td><td>drawer, spoon, plate, cup</td><td>set the rest</td><td>7.8 s</td><td>FAIL: wrong refusal &mdash; table still set</td></tr><tr class='ok'><td>3</td><td>typed</td><td>I&#x27;m having soup tonight.</td><td>drawer &rarr; spoon</td><td>drawer, spoon</td><td>&ndash;</td><td>6.4 s</td><td>PASS</td></tr><tr class='ok'><td>4</td><td>typed</td><td>Just the plate and the cup.</td><td>drawer &rarr; plate &rarr; cup</td><td>drawer, plate, cup</td><td>&ndash;</td><td>6.3 s</td><td>PASS</td></tr><tr class='ok'><td>5</td><td>typed</td><td>Set the table. + said &ldquo;Skip the cup.&rdquo;</td><td>drawer &rarr; spoon &rarr; plate &rarr; fork &rarr; cup</td><td>drawer, spoon, plate, fork</td><td>&ndash;</td><td>8.1 s</td><td>PASS</td></tr><tr class='ok'><td>6</td><td>typed</td><td>Set the table and light a candle.</td><td>drawer &rarr; spoon &rarr; plate &rarr; fork &rarr; cup</td><td>drawer, spoon, plate, fork, cup</td><td>light a candle</td><td>11.8 s</td><td>PASS</td></tr><tr class='ok'><td>7</td><td>typed</td><td>Just my cup, thanks.</td><td>cup</td><td>cup</td><td>&ndash;</td><td>7.5 s</td><td>PASS</td></tr><tr class='ok'><td>8</td><td>spoken</td><td>Put out the spoon and the plate.</td><td>drawer &rarr; spoon &rarr; plate</td><td>drawer, spoon, plate</td><td>&ndash;</td><td>7.2 s</td><td>PASS</td></tr><tr class='ok'><td>9</td><td>typed</td><td>Set the table.</td><td>drawer &rarr; spoon &rarr; plate &rarr; fork &rarr; cup</td><td>drawer, spoon, plate, fork, cup</td><td>&ndash;</td><td>10.6 s</td><td>PASS</td></tr><tr class='ok'><td>10</td><td>typed</td><td>Set the table. [table prepared: drawer, spoon]</td><td>plate &rarr; fork &rarr; cup (seen done: drawer, spoon)</td><td>drawer, spoon, plate, fork, cup</td><td>&ndash;</td><td>7.8 s</td><td>PASS</td></tr><tr class='ok'><td>11</td><td>spoken</td><td>Set the table, please.</td><td>drawer &rarr; spoon &rarr; plate &rarr; fork &rarr; cup</td><td>drawer, spoon, plate, cup</td><td>&ndash;</td><td>9.1 s</td><td>PASS</td></tr></tbody></table></div>
 

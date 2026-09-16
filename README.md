@@ -5,6 +5,12 @@ cutlery drawer open and hands the spoon and the fork across to arm B, which plac
 vision-language model plans; one learned ACT policy per skill drives both arms from three cameras; a camera classifier
 checks every step. Every model runs on an Intel CPU with OpenVINO; speech goes through Speechmatics.
 
+![Arm A lifts the spoon out of the drawer, turns it, and passes it across to arm B, which places it on the table](docs/handoff.gif)
+
+*The hand-off, ten seconds from the run below. It is not a flourish: arm A sits at x = −0.30 m and arm B at +0.30 m,
+and over 50 held-out tables inverse kinematics reaches the other arm's targets on 0 of 50. Cutlery from A's drawer
+that belongs on B's side has to change hands mid-air.*
+
 - **183 of 200 held-out tables set completely** — four sets of 50 randomised tables (45, 46, 46, 46), the shipped
   configuration, each run once.
 - Grasps are friction contact only (~17 N gripper). No weld or attach constraint.
@@ -27,6 +33,38 @@ Intel online challenge *Bimanual VLA Manipulation with Multi-Modal Reasoning*, A
 
 Seeds: held-out evaluation 0–49, 200–249, 250–299 and 850–899, never used for training; two early choices made on seeds 0–29 were
 re-checked on tuning seeds and held (`docs/findings.md`). Tuning 100–199 and 300–399; demonstrations 1000+. Every number below names the script or result file it comes from.
+
+## Watch it
+
+Three videos, served from this repository — nothing embedded, nothing to expire. They play in the browser on the
+[project page](https://py-tr.github.io/ten-places/); the links here are the files themselves.
+
+- **[One full run — 1:00](docs/demo_run.mp4)** — the command is spoken into a live microphone, the plan is changed out
+  loud part-way through, and the cup is missed and retried. Nothing is touched while it runs.
+- **[All twelve runs at once — 0:30](docs/demo_grid.mp4)** — every demonstration table side by side, each stamped as
+  it ends.
+- **[All twelve runs one after another — 9:36](docs/demo_reel.mp4)** — full size, unabridged, each with its own
+  audio. Built by `scripts/make_reel.py`, which also prints this index:
+
+| Time | Seed | Command | How | Result |
+|---|---|---|---|---|
+| 0:00 | 0 | "Set the table." | typed | done as asked |
+| 1:01 | 1 | "Could you set everything out for dinner?" | spoken | done as asked |
+| 2:05 | 2 | "No fork today, set the rest." | typed | **wrong refusal** |
+| 2:53 | 3 | "I'm having soup tonight." | typed | done as asked |
+| 3:26 | 4 | "Just the plate and the cup." | typed | done as asked |
+| 4:00 | 5 | "Set the table." + scripted "Skip the cup." mid-run | typed | done as asked |
+| 4:58 | 6 | "Set the table and light a candle." | typed | done as asked |
+| 6:00 | 7 | "Just my cup, thanks." | typed | done as asked |
+| 6:14 | 8 | "Put out the spoon and the plate." | spoken | done as asked |
+| 6:57 | 9 | "Set the table." | typed | done as asked |
+| 8:01 | 10 | "Set the table." (half-set table) | typed | done as asked |
+| 8:35 | 11 | "Set the table, please." (live, plan changed mid-run) | spoken | done as asked |
+
+The ten tables and their ten commands were fixed in `configs/demo_seeds.json` before any of them was recorded. Seed 2
+is the one miss, and it is a refusal rather than a motion: the plan was right, all four steps were carried out and the
+table ended as asked, but the separate impossible-part check read "set the rest" as something it cannot do and said
+so. The scorer counts any unasked-for refusal as a failed run.
 
 ## How it works
 

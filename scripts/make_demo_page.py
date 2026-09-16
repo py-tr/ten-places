@@ -37,6 +37,11 @@ PLACED = ["spoon", "plate", "fork", "cup"]
 SKILL_BENCH = ["drawer", "spoon", "plate", "fork", "cup"]
 STILLS = VIDEO / "stills"
 IMAGES = ["hero_web.jpg", "handoff_web.jpg", "grid_web.jpg"]
+# The three videos the page plays, copied into docs/ like the stills: Pages serves that folder, out/ is git-ignored,
+# and *.mp4 is git-ignored too with a single !docs/*.mp4 re-including exactly these three.
+VIDEOS = [("demo_run.mp4", VIDEO / "demo_live/take2/voiced/seed11.mp4"),
+          ("demo_grid.mp4", VIDEO / "grid_final.mp4"),
+          ("demo_reel.mp4", VIDEO / "reel.mp4")]
 
 # Figures that exist only in the prose of docs/findings.md / README.md. Nothing else on the page is typed in.
 PROSE = {
@@ -306,6 +311,34 @@ def main():
         shutil.copyfile(STILLS / n, docs / n)
     has = set(imgs)
 
+    vids = []
+    for name, src in VIDEOS:
+        if src.exists():
+            docs.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(src, docs / name)
+            vids.append(name)
+    hasv = set(vids)
+
+    def clip(name, poster, caption):
+        """A <video> the page serves itself. No embed, no third party, nothing to expire."""
+        if name not in hasv:
+            return ""
+        pos = f' poster="{poster}"' if poster in has else ""
+        return (f'<figure class="shot"><video controls preload="metadata"{pos}>'
+                f'<source src="{name}" type="video/mp4">'
+                f'Your browser cannot play this video; download it at <a href="{name}">{name}</a>.'
+                f'</video><figcaption>{caption}</figcaption></figure>')
+
+    run_clip = clip("demo_run.mp4", "hero_web.jpg",
+                    "One run end to end, 60 seconds, with its own audio: the command is spoken into a live "
+                    "microphone, the plan is changed out loud part-way through, and the cup is missed and retried "
+                    "without anyone touching anything.")
+    grid_clip = clip("demo_grid.mp4", "grid_web.jpg",
+                     "All twelve demonstration runs at once, each on its own randomised table, stamped as it ends.")
+    reel_clip = clip("demo_reel.mp4", "hero_web.jpg",
+                     "The same twelve runs one after another, full size and unabridged, 9.6 minutes: every command, "
+                     "every placement and every retry, including the run that refused wrongly.")
+
     hero = ("""<figure class="shot">
 <img src="hero_web.jpg" width="1440" height="720" alt="Two arms at a fully set table; the side panel lists the
 verified plan with all five steps done and the line: no skill for, light a candle.">
@@ -388,10 +421,11 @@ tbody tr.no { background:var(--ambersoft); }
 summary { font-weight:600; color:var(--teal); }
 blockquote { border-left-color:var(--amber); background:var(--ambersoft); }
 figure.shot { margin:1.4em 0; }
-figure.shot img, figure.shot iframe {
+figure.shot img, figure.shot iframe, figure.shot video {
   display:block; width:100%; height:auto; max-width:100%; border:1px solid var(--line); border-radius:12px;
   background:var(--shade);
 }
+figure.shot video { background:#000; }
 figure.shot iframe { aspect-ratio:16/9; border:0; }
 figure.narrow { max-width:26rem; }
 figure.wide { overflow-x:auto; }
@@ -455,6 +489,7 @@ friction contact only ({PROSE['grip_n']} gripper), and at run time the robot see
 simulator object poses.</p>
 
 {hero}
+{run_clip}
 
 <div class="nums">
  <div class="num"><b>{ak} / {an}</b><span>held-out tables set completely, four sets of 50</span></div>
@@ -499,6 +534,8 @@ mid-run by a scripted sentence &mdash; and each was then run once by the full ag
 recorded the same way and listed with them below: a table already half set ({half_set}), and a live take with the
 plan changed by voice while the arms were moving ({live_take}).</p>
 {grid}
+{grid_clip}
+{reel_clip}
 {video}
 <div class="tw"><table><thead><tr>{demo_head}</tr></thead><tbody>{demo_body}</tbody></table></div>
 
@@ -603,8 +640,9 @@ Hackathon 2026.</footer>
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(html, encoding="ascii")
     kb = p.stat().st_size / 1024 + sum((docs / n).stat().st_size for n in imgs) / 1024
+    mb = sum((docs / n).stat().st_size for n in vids) / 1024 / 1024
     print(f"{p}: agent {ak}/{an}, fixed {fk}/{fn}, {len(per_seed)} per-seed rows, demos {dk}/{dn}, "
-          f"{len(imgs)} images, {kb:.0f} kB total")
+          f"{len(imgs)} images ({kb:.0f} kB), {len(vids)} videos ({mb:.1f} MB)")
 
 
 if __name__ == "__main__":

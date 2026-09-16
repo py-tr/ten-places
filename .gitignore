@@ -10,6 +10,8 @@ data/
 checkpoints/
 models/
 *.mp4
+# the three videos the README and the Pages site play are kept, in docs/ only
+!docs/*.mp4
 third_party/SO-ARM100/
 # Working drafts for the submission (form text, video script, slide outline) stay local.
 docs/submission.md
