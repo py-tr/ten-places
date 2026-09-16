@@ -1,0 +1,42 @@
+{
+ "candidate": "out/train/cup_stall2/cup/checkpoints/007500/pretrained_model",
+ "A": {
+  "cup_first": [
+   9,
+   94
+  ],
+  "paired": [
+   0,
+   85
+  ],
+  "p": 0.0,
+  "full": [
+   14,
+   87
+  ],
+  "pass": false
+ },
+ "B": {
+  "trained_size_100-149": 12,
+  "cup0.2_confirmation": 30,
+  "pass": false
+ },
+ "C": {
+  "plate": [
+   94,
+   95
+  ],
+  "fork": [
+   94,
+   96
+  ],
+  "spoon": [
+   97,
+   97
+  ],
+  "pass": true
+ },
+ "decided_at": "2026-09-16T02:59",
+ "too_late_to_ship": false,
+ "pass": false
+}

@@ -217,6 +217,12 @@ whose scripted prefix fails IK is dropped from both arms and listed).
 - The takeover rule this leaves: take over only from a state that never occurs in a successful demonstration. The
   plate's slip (the plate rose, then fell back) and the fork's late frames on failing tables meet it; twelve still
   frames at the close do not.
+- Second attempt with the trigger fixed (a still stall must last 40 frames, longer than the demonstrated closing
+  pause): the trigger behaved — 60 takeovers, 25 by slip against 9 before, median frame 90–100 against 61 — and the
+  candidate collapsed the same way: cup first attempt 9 vs 94 in the fixed sequence, cup alone 12/50 at the trained
+  size. So the trigger was not the whole cause. What the cup's takeover does is restart the skill from wherever the
+  policy stopped, often with the cup against the closed pads; the plate's takeover works because its slip leaves the
+  plate flat on the table. A takeover for the cup would have to continue the grasp, as the fork's does, not restart it.
 
 **Plate without the spoon step.** Demo seed 4 ("Just the plate and the cup.") lost the plate four times. The plate
 after the drawer alone and after drawer + spoon (scripted prefix, seeds 100–129, `eval_skill_context.py --deployed`):
