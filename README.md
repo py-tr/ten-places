@@ -20,6 +20,12 @@ that belongs on B's side has to change hands mid-air.*
 | **15.5–15.8 ms** | per policy step on the CPU, OpenVINO INT8 weights |
 | **390 / 400** | spoon and fork placed after a hand-off between the arms |
 
+> ### → [py-tr.github.io/ten-places](https://py-tr.github.io/ten-places/)
+>
+> **Start here if you only have a few minutes.** All three videos play in the browser, the 9½-minute reel has a
+> jump-to-command index, and all 200 held-out tables are listed seed by seed with their placement errors. Every
+> figure on that page is read out of a result file in this repository when the page is built — none is typed in.
+
 - **183 of 200 held-out tables set completely** — four sets of 50 randomised tables (45, 46, 46, 46), the shipped
   configuration, each run once.
 - Grasps are friction contact only (~17 N gripper). No weld or attach constraint.
@@ -62,7 +68,7 @@ Three videos, served from this repository — nothing embedded, nothing to expir
 | 2:05 | 2 | "No fork today, set the rest." | typed | **wrong refusal** |
 | 2:53 | 3 | "I'm having soup tonight." | typed | done as asked |
 | 3:26 | 4 | "Just the plate and the cup." | typed | done as asked |
-| 4:00 | 5 | "Set the table." + scripted "Skip the cup." mid-run | typed | done as asked |
+| 4:00 | 5 | "Set the table." + "Skip the cup." mid-run | typed | done as asked |
 | 4:58 | 6 | "Set the table and light a candle." | typed | done as asked |
 | 6:00 | 7 | "Just my cup, thanks." | typed | done as asked |
 | 6:14 | 8 | "Put out the spoon and the plate." | spoken | done as asked |
@@ -190,14 +196,14 @@ fork, each handed from arm to arm, placed on 390 of 400.
 
 | Component | Result | Evidence |
 |---|---|---|
-| Demonstration runs: 10 tables, 10 requests fixed before recording (2 spoken, 1 changed mid-run by a scripted sentence), full agent on OpenVINO | 9/10 done exactly as asked; every table ended with the asked-for steps physically done. The one miss is a refusal, not a motion: on "No fork today, set the rest" the impossible-part check read "set the rest" as a thing it cannot do and said so, while the plan and all four steps were correct | `scripts/score_demo.py`, `out/video/demo_final/summary.md` |
+| Demonstration runs: 10 tables, 10 requests fixed before recording (2 spoken, 1 changed mid-run by a second sentence sent at a fixed time), full agent on OpenVINO | 9/10 done exactly as asked; every table ended with the asked-for steps physically done. The one miss is a refusal, not a motion: on "No fork today, set the rest" the impossible-part check read "set the rest" as a thing it cannot do and said so, while the plan and all four steps were correct | `scripts/score_demo.py`, `out/video/demo_final/summary.md` |
 | Demonstration runs: a half-set table (drawer and spoon already done) and a live take with the plan changed by voice mid-run | 1/1 and 1/1; the live take placed all four after the camera caught a missed cup and retried | `out/video/demo_final_extra/summary.md`, `out/video/demo_live/take2/` |
 | Planner: unseen commands → correct verified plan | 8/8 on the set written before it was scored, incl. naming what no skill can do ("dim the lights"); 10/10, 5/5 and 4/6 on the three sets used while writing the prompts | `scripts/eval_planner.py` |
 | First look: steps already done are skipped | fresh tables: none read as done (50/50); half-set tables: read exactly (50/50); agent on 50 fresh tables: skipped nothing | `scripts/eval_initial_state.py`, `eval_agent_table.py --look-first` |
 | VLA baseline: SmolVLA (450M) fine-tuned on the same 100 cup demonstrations, 30 tuning tables, all seven starts | 63/210 cups placed (ACT, same data: 167/210; ACT cup with context demonstrations: 198/210); 6.6 s per chunk on this CPU against 16 ms | `scripts/train_smolvla.py`, `out/eval/context/cup_smolvla005000_*` |
 | Mid-run spoken changes understood | 8/10 on sentences written before the run | `scripts/eval_amend.py --set fresh` |
 | Camera classifier on learned-policy states | false "drawer done" 3/363, false "spoon done" 1/671 | `docs/findings.md` |
-| Scripted demonstrator (training data) | 60/60 full tables, 72/72 verified subset plans | `make spike-table` |
+| Hand-written demonstrator (training data) | 60/60 full tables, 72/72 verified subset plans | `make spike-table` |
 
 Every change from 0 of 10 tables to 183 of 200, what it measured, what did not work: [`docs/findings.md`](docs/findings.md).
 
@@ -296,15 +302,15 @@ Optimisation results:
 
 ## Training
 
-- Demonstrations: a scripted controller with privileged state (IK for the 5-DOF arm, closed-loop drawer pull). Never
+- Demonstrations: a hand-written controller with privileged state (IK for the 5-DOF arm, closed-loop drawer pull). Never
   used at run time.
 - One LeRobot ACT policy per skill, fine-tuned on demonstrations from every start a verified plan can produce, on
-  layouts weighted toward the hard cases, and on takeover episodes (learned policy starts, scripted controller
+  layouts weighted toward the hard cases, and on takeover episodes (learned policy starts, hand-written controller
   finishes). The cup also on sizes ×0.77–1.25.
 - Takeovers from the policies' own failures, found by running each policy alone first: the plate from the moment its
   grasp slips (the rim wall under one pad); the fork from wherever its hand-off stopped — B holding it, A holding it
-  short of the exchange point — with the scripted controller continuing, not restarting (`docs/findings.md`).
-- Camera classifier: scripted runs labelled by the simulator, incl. drawer pulls that stop short, so "drawer done"
+  short of the exchange point — with the hand-written controller continuing, not restarting (`docs/findings.md`).
+- Camera classifier: demonstrator runs labelled by the simulator, incl. drawer pulls that stop short, so "drawer done"
   means open far enough for the cutlery.
 
 ## Run it
@@ -314,7 +320,7 @@ make third-party      # the official SO-101 model (TheRobotStudio/SO-ARM100) at 
 pip install -r requirements-lock.txt
 make models HF_SKILLS_REPO=py-tr/ten-places   # trained skills + classifier, and the OpenVINO planner (~4.4 GB)
 make test             # 192 tests
-make watch SEED=3                                        # scripted controller, live 3D viewer
+make watch SEED=3                                        # hand-written controller, live 3D viewer
 make watch-agent CMD="just the plate and the cup" SEED=3 # VLM plan + learned policies, live
 make agent CMD="set the table, but skip the cup" SEED=3  # rendered to out/video/ with the plan panel
 make bench                                               # OpenVINO benchmark of the five deployed policies
@@ -362,7 +368,7 @@ python scripts/run_agent.py --mic --listen --speak --seed 3 --video out/video/vo
 ```
 tenplaces/scene.py, scene_table.py   procedural MJCF: arms, pads, table, props, cameras
 tenplaces/ik.py, control.py          fingers-down IK for the 5-DOF SO-101; two-arm motion (demonstrator only)
-tenplaces/oracle/                    scripted privileged-state controllers (demonstrations only)
+tenplaces/oracle/                    hand-written privileged-state controllers (demonstrations only)
 tenplaces/env.py, env_table.py       25 Hz episode environments, demo recording, hand-over between skills
 tenplaces/planner.py                 VLM planner (OpenVINO GenAI) + symbolic verifier
 tenplaces/state_classifier.py        camera-only task-state classifier (OpenVINO)

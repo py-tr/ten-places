@@ -153,7 +153,9 @@ def main():
         result = "-" if passed is None else ("done as asked" if passed else (cause or "not completed"))
         extra = " (half-set table)" if name == "extra" else (" (live, plan changed mid-run)" if name == "live" else "")
         if entry.get("say"):
-            extra += f' + scripted "{entry["say"]}" mid-run'
+            # The How column already says typed or spoken, so it carries the distinction from the live take
+            # without the word "scripted" sitting next to a demonstration run and reading as "staged".
+            extra += f' + "{entry["say"]}" mid-run'
         rows.append(f"| {int(start) // 60}:{int(start) % 60:02d} | {entry['seed']} | \"{entry['command']}\"{extra} "
                     f"| {mode} | {result} |")
     print("\n".join(rows))

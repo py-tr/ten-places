@@ -518,6 +518,25 @@ simulator object poses.</p>
  weights</span></div>
 </div>
 
+<h2>Demonstration runs</h2>
+<p><b>{d0k} of {d0n}</b> pre-registered runs did exactly what was asked. The ten tables and their ten requests were
+fixed in <code>configs/demo_seeds.json</code> before any of them was recorded &mdash; two spoken, one changed
+mid-run by a second sentence sent at a fixed time &mdash; and each was then run once by the full agent on
+OpenVINO. Two further runs, recorded the same way and listed with them below: a table already half set
+({half_set}), and a live take with the plan changed by voice while the arms were moving ({live_take}).</p>
+{grid}
+{grid_clip}
+{reel_clip}
+{reel_idx}
+{video}
+<div class="tw"><table><thead><tr>{demo_head}</tr></thead><tbody>{demo_body}</tbody></table></div>
+
+<blockquote><p><b>The one miss is a refusal, not a motion.</b> On seed 2, &ldquo;No fork today, set the rest&rdquo;,
+the plan was right (drawer, spoon, plate, cup), all four steps were carried out, and the table ended exactly as
+asked. The impossible-part check, which runs separately to name anything no skill can do, read the phrase
+&ldquo;set the rest&rdquo; as a thing it cannot do and announced it. The scorer counts a wrong refusal as a failed
+run.</p></blockquote>
+
 <h2>Held-out tables</h2>
 <p>Four sets of 50 randomised tables, never used for training or tuning, every selection frozen before the run and
 each table run once. The full agent plans, checks after each skill, retries and re-queues; the fixed five-step
@@ -545,25 +564,6 @@ sequence runs the same policies in a fixed order on the same tables.</p>
 <div class="tw"><table><thead><tr><th>Seed</th><th>Set</th><th>Result</th><th>Steps</th>
 <th>First step undone</th><th>Placement error (cm)</th></tr></thead>
 <tbody>{''.join(per_seed)}</tbody></table></div></details>
-
-<h2>Demonstration runs</h2>
-<p><b>{d0k} of {d0n}</b> pre-registered runs did exactly what was asked. The ten tables and their ten requests were
-fixed in <code>configs/demo_seeds.json</code> before any of them was recorded &mdash; two spoken, one changed
-mid-run by a scripted sentence &mdash; and each was then run once by the full agent on OpenVINO. Two further runs,
-recorded the same way and listed with them below: a table already half set ({half_set}), and a live take with the
-plan changed by voice while the arms were moving ({live_take}).</p>
-{grid}
-{grid_clip}
-{reel_clip}
-{reel_idx}
-{video}
-<div class="tw"><table><thead><tr>{demo_head}</tr></thead><tbody>{demo_body}</tbody></table></div>
-
-<blockquote><p><b>The one miss is a refusal, not a motion.</b> On seed 2, &ldquo;No fork today, set the rest&rdquo;,
-the plan was right (drawer, spoon, plate, cup), all four steps were carried out, and the table ended exactly as
-asked. The impossible-part check, which runs separately to name anything no skill can do, read the phrase
-&ldquo;set the rest&rdquo; as a thing it cannot do and announced it. The scorer counts a wrong refusal as a failed
-run.</p></blockquote>
 
 {handoff}
 
@@ -621,7 +621,7 @@ loop that closed the gap was the same every time.</p>
 <li><b>Let it fail, then watch where.</b> Run one policy alone over thousands of tables and keep the states it
 fails in &mdash; the plate's grasp slipping off the rim wall, the fork stalled mid hand-off with one arm still
 holding it.</li>
-<li><b>Take over from the failure, do not restart.</b> The scripted controller continues from the exact state the
+<li><b>Take over from the failure, do not restart.</b> The hand-written controller continues from the exact state the
 policy left, and that continuation becomes training data. Restarting instead is what killed the cup version of this:
 it learned to let go of a good grasp, and collapsed.</li>
 <li><b>Write the gate before the result.</b> Every candidate had a numeric bar, set on tuning seeds before it ran.
