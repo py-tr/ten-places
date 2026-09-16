@@ -270,8 +270,17 @@ Optimisation results:
 - **Devices.** The benchmark and evaluation scripts take `--device`; `benchmark.py` lists the OpenVINO devices. The
   hybrid-core placement is CPU-only; Core Ultra iGPU/NPU paths untested (no Core Ultra available).
 - **Intel Physical AI terms.** Hierarchical VLA: VLM as the reasoning layer, ACT as the action expert — the policy
-  family Physical AI Studio exports to OpenVINO. Export here: `ov.convert_model` + NNCF (`tenplaces/ov_backend.py`);
-  Physical AI Studio targets Linux, this machine runs Windows.
+  family Physical AI Studio exports to OpenVINO.
+- **On the rest of the Intel Physical AI stack**, and why two parts of it are not here:
+  - *Physical AI Studio* is the development environment for exactly this kind of VLA workflow, and it targets
+    Ubuntu 24.04; this build is on Windows, so its export step is done directly — `ov.convert_model` + NNCF in
+    `tenplaces/ov_backend.py`, producing the same OpenVINO IR the Studio would. Every model on the machine runs
+    through OpenVINO regardless.
+  - *Anomalib* is Intel's visual anomaly- and defect-detection library, and it belongs to the defect-inspection
+    challenge rather than to this one. Nothing in setting a dinner table is an anomaly-detection problem: the
+    per-step check is "is the plate on the mat" — five independent done/not-done flags read from one top-camera
+    frame, so it is a fine-tuned ResNet18 with five outputs, on OpenVINO (`tenplaces/state_classifier.py`).
+    Adding Anomalib would have been a dependency that does no work.
 - **Model cache, measured.** OpenVINO `CACHE_DIR`: each skill policy ready in 0.16–0.17 s instead of 0.83–0.86 s
   (5×); the 4B planner loads slower from its 3 GB cache (8.8 s) than it compiles from its IR (4.7 s). Not used yet:
   policies would save ~3.4 s per launch, the planner would lose ~4 s (`scripts/bench_compile_cache.py`,
