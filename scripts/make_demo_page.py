@@ -266,7 +266,13 @@ def main():
     for _, _, src, _, rows in dsets:
         for cells in rows:
             cls = "ok" if cells[-1].strip() == "PASS" else "no"
-            demo_body += f"<tr class='{cls}'>" + "".join(f"<td>{esc(c)}</td>" for c in cells) + "</tr>"
+            cells = list(cells)
+            # A refusal that still set the table is not the same failure as a dropped object. The scorer's verdict
+            # stands; the row says what actually happened so the column is not read as one kind of loss.
+            if cls == "no" and "refusal" in cells[-1].lower():
+                cells[-1] = cells[-1] + " &mdash; table still set"
+            demo_body += f"<tr class='{cls}'>" + "".join(
+                f"<td>{c if '&mdash;' in c else esc(c)}</td>" for c in cells) + "</tr>"
 
     # ---- the Intel CPU -----------------------------------------------------------------------------------------
     torch_ms, w8_ms, ir = bench_latency()
@@ -309,7 +315,10 @@ steps it can do are done, and the candle is named as something no skill does.</f
     grid = ("""<figure class="shot wide">
 <img src="grid_web.jpg" width="2400" height="480" alt="Ten demonstration runs tiled in two rows, each stamped PASS
 except seed 2, which is stamped wrong refusal.">
-<figcaption>All ten pre-registered runs, pass or fail, each with its own randomised table.</figcaption></figure>"""
+<figcaption>All ten pre-registered runs, pass or fail, each with its own randomised table. The one marked
+<em>wrong refusal</em> planned and ran every step correctly and ended with the table set; what failed was the
+separate check on impossible requests, which announced it could not &ldquo;set the rest&rdquo;. The scorer counts
+any unasked-for refusal as a failed run.</figcaption></figure>"""
             if "grid_web.jpg" in has else "")
     handoff = ("""<figure class="shot narrow">
 <img src="handoff_web.jpg" width="960" height="720" alt="Wrist camera view of a gripper closing on the spoon as it
