@@ -92,12 +92,13 @@ change the plan after the current step, verified like any plan. Replies by Speec
 
 | Run | Full tables (95% CI) | Mean steps of 5 | Drawer | Spoon | Plate | Fork | Cup |
 |---|---|---|---|---|---|---|---|
-| **Full agent, OpenVINO** (re-checks, retries, re-queues failed steps) | **47/50 (84–98%)** | 4.90 | 50 | 48 | 50 | 49 | 48 |
-| Fixed five-step sequence (drawer, plate, fork, cup retried once), OpenVINO INT8 weights | 44/50 (76–94%) | 4.86 | 50 | 47 | 49 | 49 | 48 |
-| Fixed five-step sequence, PyTorch reference (CUDA GPU) | 47/50 (84–98%) | 4.94 | 50 | 49 | 49 | 50 | 49 |
+| **Full agent, OpenVINO** (re-checks, retries, re-queues failed steps) | **45/50 (79–96%)** | 4.86 | 50 | 48 | 48 | 49 | 48 |
+| Fixed five-step sequence (drawer, plate, fork, cup retried once), OpenVINO INT8 weights | 48/50 (87–99%) | 4.92 | 50 | 49 | 49 | 50 | 48 |
+| Fixed five-step sequence, PyTorch reference (CUDA GPU) | 45/50 (79–96%) | 4.86 | 50 | 49 | 48 | 49 | 47 |
 
 - Success does not depend on inference speed (the simulation waits for each action): GPU and CPU rows differ only in
-  the numbers the networks compute. OpenVINO INT8 vs PyTorch per seed: +1 / −4, McNemar p = 0.38.
+  the numbers the networks compute. OpenVINO INT8 vs PyTorch, the same 50 tables: +3 / −0 (seeds 25, 26, 40), exact
+  McNemar p = 0.25 — no measurable difference either way.
 - Configuration chosen on tuning seeds (fixed sequence with retries, seeds 100–199: 81/100 with the fork fine-tuned
   on its own stuck hand-offs, 76/100 before; `docs/findings.md`).
 

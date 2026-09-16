@@ -154,6 +154,6 @@ watch-agent:
 # Intel deliverable 4: the 10 pre-registered demonstration runs (configs/demo_seeds.json, out/video/demo/seed<N>.*)
 # scored against their commands and tiled into one video with PASS/FAIL stamps.
 grid:
-	$(PY) scripts/score_demo.py
-	$(PY) scripts/make_grid_video.py --dir out/video/demo --label demo --out out/video/grid_demo.mp4 \
+	$(PY) scripts/score_demo.py --config configs/demo_seeds.json --dir out/video/demo_final
+	$(PY) scripts/make_grid_video.py --dir out/video/demo_final --label demo --out out/video/grid_final.mp4 \
 		--caption "requests done exactly as asked"
