@@ -21,7 +21,19 @@ import numpy as np
 
 
 def _require_key() -> str:
+    """The key, in order: the real environment, then a .env file at the repo root, then (Windows) the user
+    environment. The environment wins, so an exported variable is never overridden by a stale file. .env is
+    git-ignored; .env.example is the committed template.
+    """
     key = os.environ.get("SPEECHMATICS_API_KEY")
+    if not key:
+        env_file = Path(__file__).resolve().parent.parent / ".env"
+        if env_file.is_file():
+            for line in env_file.read_text(encoding="utf-8").splitlines():
+                name, sep, value = line.strip().partition("=")
+                if sep and name.strip() == "SPEECHMATICS_API_KEY":
+                    key = value.strip().strip('"').strip("'") or None
+                    break
     if not key and os.name == "nt":  # set with `setx` after this process started: read the user environment
         import winreg
 

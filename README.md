@@ -332,9 +332,34 @@ make grid                                                # score the 10 demo run
 `requirements-lock.txt`: the exact environment of every number (Python 3.13, openvino 2026.3.1, openvino-genai
 2026.3.1, nncf 3.3.0, mujoco 3.13.0, lerobot 0.6.1; torch for training only).
 
-Voice (`SPEECHMATICS_API_KEY`):
+### Voice
+
+Speech is the only part of the system that leaves the machine, and only when you ask for it — typed commands need
+no key and no network. A Speechmatics key is free from [portal.speechmatics.com](https://portal.speechmatics.com/),
+and the free tier covers every demonstration in this repository.
 
 ```
+cp .env.example .env                 # Windows: Copy-Item .env.example .env
+```
+
+Then put the key in `.env`:
+
+```
+SPEECHMATICS_API_KEY=your-key-here
+```
+
+Or skip the file and set it in the shell:
+
+```
+$env:SPEECHMATICS_API_KEY = "your-key-here"    # PowerShell, this session only
+export SPEECHMATICS_API_KEY=your-key-here      # bash / zsh
+```
+
+The key is read from the environment first, then `.env`, then the Windows user environment — so an exported
+variable always beats a stale file. `.env` is git-ignored; `.env.example` is the committed template.
+
+```
+make voice SEED=3                                        # speak the command, keep talking while it works
 python scripts/run_agent.py --mic --listen --speak --seed 3 --video out/video/voice_s3.mp4
 ```
 
