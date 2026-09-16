@@ -1,5 +1,7 @@
 # Ten Places
 
+**[Project page](https://py-tr.github.io/ten-places/)** · **[Models on Hugging Face](https://huggingface.co/py-tr/ten-places)** · **[Engineering record](docs/findings.md)** · Intel track, AI Infra Summit Hackathon 2026
+
 A request — "set the table, but skip the cup", said or typed — becomes a set dinner table: in MuJoCo, arm A pulls the
 cutlery drawer open and hands the spoon and the fork across to arm B, which places them, the plate and the cup. A
 vision-language model plans; one learned ACT policy per skill drives both arms from three cameras; a camera classifier
@@ -10,6 +12,13 @@ checks every step. Every model runs on an Intel CPU with OpenVINO; speech goes t
 *The hand-off, ten seconds from the run below. It is not a flourish: arm A sits at x = −0.30 m and arm B at +0.30 m,
 and over 50 held-out tables inverse kinematics reaches the other arm's targets on 0 of 50. Cutlery from A's drawer
 that belongs on B's side has to change hands mid-air.*
+
+| | |
+|---|---|
+| **183 / 200** | held-out tables set completely — four sets of 50, never used for training or tuning |
+| **9 / 10** | pre-registered demonstrations done exactly as asked |
+| **15.5–15.8 ms** | per policy step on the CPU, OpenVINO INT8 weights |
+| **390 / 400** | spoon and fork placed after a hand-off between the arms |
 
 - **183 of 200 held-out tables set completely** — four sets of 50 randomised tables (45, 46, 46, 46), the shipped
   configuration, each run once.

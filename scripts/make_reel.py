@@ -146,8 +146,7 @@ def main():
         subprocess.run(cmd, check=True)
         print(f"\n{args.out}  ({t / 60:.1f} min, {len(parts) // 2} runs)\n")
 
-    print("| Time | Seed | Command | How | Result |")
-    print("|---|---|---|---|---|")
+    rows = ["| Time | Seed | Command | How | Result |", "|---|---|---|---|---|"]
     for start, entry, passed, cause, name in index:
         mode = "spoken" if entry.get("mode") == "spoken" else "typed"
         # A failed seed says why. "not completed" would be wrong for a run whose steps were all done.
@@ -155,8 +154,15 @@ def main():
         extra = " (half-set table)" if name == "extra" else (" (live, plan changed mid-run)" if name == "live" else "")
         if entry.get("say"):
             extra += f' + scripted "{entry["say"]}" mid-run'
-        print(f"| {int(start) // 60}:{int(start) % 60:02d} | {entry['seed']} | \"{entry['command']}\"{extra} "
-              f"| {mode} | {result} |")
+        rows.append(f"| {int(start) // 60}:{int(start) % 60:02d} | {entry['seed']} | \"{entry['command']}\"{extra} "
+                    f"| {mode} | {result} |")
+    print("\n".join(rows))
+
+    # Written, not just printed: the landing page reads this file at build time and renders it under the reel, so
+    # the index is never retyped by hand in two places. --index-only refreshes it without re-encoding the video.
+    idx = Path(args.out).parent / "reel_index.md"
+    idx.write_text("\n".join(rows) + "\n", encoding="utf-8")
+    print(f"\n{idx}")
 
 
 if __name__ == "__main__":

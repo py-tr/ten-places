@@ -339,6 +339,25 @@ def main():
                      "The same twelve runs one after another, full size and unabridged, 9.6 minutes: every command, "
                      "every placement and every retry, including the run that refused wrongly.")
 
+    def reel_index():
+        """The reel's own timestamp index (scripts/make_reel.py writes it), so a 9.6-minute video is navigable."""
+        p = VIDEO / "reel_index.md"
+        if "demo_reel.mp4" not in hasv or not p.exists():
+            return ""
+        rows = md_rows(p)
+        if len(rows) < 2:
+            return ""
+        head = "".join(f"<th>{esc(c)}</th>" for c in rows[0])
+        body = ""
+        for cells in rows[1:]:
+            cls = "" if "done as asked" in cells[-1] else " class='no'"
+            body += f"<tr{cls}>" + "".join(f"<td>{esc(c)}</td>" for c in cells) + "</tr>"
+        return ("<details><summary>Jump to any command in the reel</summary>"
+                f"<div class=\"tw\"><table><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>"
+                "</details>")
+
+    reel_idx = reel_index()
+
     hero = ("""<figure class="shot">
 <img src="hero_web.jpg" width="1440" height="720" alt="Two arms at a fully set table; the side panel lists the
 verified plan with all five steps done and the line: no skill for, light a candle.">
@@ -536,6 +555,7 @@ plan changed by voice while the arms were moving ({live_take}).</p>
 {grid}
 {grid_clip}
 {reel_clip}
+{reel_idx}
 {video}
 <div class="tw"><table><thead><tr>{demo_head}</tr></thead><tbody>{demo_body}</tbody></table></div>
 
