@@ -324,35 +324,60 @@ are no simulator object poses, only cameras and joint angles.</figcaption></figu
     css = """
 :root {
   color-scheme: light dark;
-  --bg:#fcfcfc; --fg:#16181d; --mut:#5c6370; --line:#e2e4e9; --card:#fff;
-  --ok:#0a6c3d; --no:#a3202b; --accent:#1c4f8f; --shade:rgba(20,22,28,.04);
+  --bg:#f1f4f6; --fg:#16212b; --mut:#4a5c6b; --faint:#71838f; --line:#d4dce1; --line2:#bfcad1;
+  --card:#fff; --sunk:#e7ecef;
+  --teal:#1f7381; --tealsoft:#e2eff1; --amber:#b4671a; --ambersoft:#fbeedd;
+  --ok:#3d7a52; --no:#a3202b; --accent:#1f7381; --shade:rgba(20,22,28,.04);
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg:#101216; --fg:#e7e9ee; --mut:#9aa1ae; --line:#272b33; --card:#171a20;
-    --ok:#5bd08d; --no:#f0868f; --accent:#8fb6e8; --shade:rgba(255,255,255,.04);
+    --bg:#10161c; --fg:#e6edf3; --mut:#9db0be; --faint:#748796; --line:#26323c; --line2:#33424e;
+    --card:#18212a; --sunk:#131b22;
+    --teal:#5fb6c4; --tealsoft:#152b31; --amber:#e0913a; --ambersoft:#2e2213;
+    --ok:#6fbc87; --no:#e07a6b; --accent:#5fb6c4; --shade:rgba(255,255,255,.04);
   }
 }
 * { box-sizing:border-box; }
 body {
-  margin:0 auto; padding:40px 20px 80px; max-width:58rem; background:var(--bg); color:var(--fg);
-  font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  margin:0; padding:0 0 80px; background:var(--bg); color:var(--fg);
+  font:16px/1.6 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   -webkit-text-size-adjust:100%;
 }
-h1 { font-size:2.1rem; line-height:1.15; margin:0 0 .15em; letter-spacing:-.02em; }
-h2 { font-size:1.2rem; margin:3rem 0 .6rem; letter-spacing:-.01em; }
-h2::before { content:""; display:block; width:2rem; border-top:2px solid var(--accent); margin-bottom:.7rem; }
-h3 { font-size:1rem; margin:1.8rem 0 .4rem; }
+.wrap { max-width:60rem; margin:0 auto; padding:0 20px; }
+header.top { background:var(--card); border-bottom:1px solid var(--line); margin-bottom:34px; }
+header.top .wrap { padding-top:38px; padding-bottom:30px; }
+.eyebrow { font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace; font-size:.72rem;
+  text-transform:uppercase; letter-spacing:.11em; color:var(--teal); margin-bottom:12px; }
+h1 { font-family:Archivo,"IBM Plex Sans",sans-serif; font-size:clamp(2rem,5vw,2.9rem); line-height:1.08;
+  margin:0 0 .2em; letter-spacing:-.03em; font-weight:700; }
+h2 { font-family:Archivo,"IBM Plex Sans",sans-serif; font-size:1.34rem; margin:3.2rem 0 .7rem;
+  letter-spacing:-.02em; font-weight:700; display:flex; align-items:center; gap:.6rem; }
+h2::before { content:""; width:.55rem; height:1.5rem; border-radius:2px; background:var(--teal); flex:none; }
+h3 { font-family:Archivo,"IBM Plex Sans",sans-serif; font-size:1.02rem; margin:1.9rem 0 .4rem; font-weight:600; }
 p { margin:.7em 0; }
 .sub { color:var(--mut); font-size:1.05rem; margin:0 0 1.4em; }
 .lead { font-size:1.08rem; }
 .mut { color:var(--mut); }
 .note { color:var(--mut); font-size:.9rem; }
 a { color:var(--accent); }
-.nums { display:grid; grid-template-columns:repeat(auto-fit,minmax(10.5rem,1fr)); gap:10px; margin:1.6em 0; }
-.num { border:1px solid var(--line); border-radius:12px; padding:14px; background:var(--card); }
-.num b { display:block; font-size:1.55rem; line-height:1.15; letter-spacing:-.02em; }
-.num span { display:block; color:var(--mut); font-size:.86rem; margin-top:.35em; }
+.hero-nums { display:grid; grid-template-columns:repeat(auto-fit,minmax(11rem,1fr)); gap:1px;
+  background:var(--line); border:1px solid var(--line); border-radius:10px; overflow:hidden; margin-top:26px; }
+.hn { background:var(--card); padding:15px 17px; }
+.hn b { display:block; font-family:Archivo,sans-serif; font-size:1.85rem; line-height:1.1;
+  letter-spacing:-.03em; font-variant-numeric:tabular-nums; color:var(--teal); }
+.hn span { display:block; color:var(--mut); font-size:.81rem; margin-top:.3em; }
+.nums { display:grid; grid-template-columns:repeat(auto-fit,minmax(10.5rem,1fr)); gap:1px;
+  background:var(--line); border:1px solid var(--line); border-radius:10px; overflow:hidden; margin:1.6em 0; }
+.num { padding:15px 17px; background:var(--card); }
+.num b { display:block; font-family:Archivo,sans-serif; font-size:1.6rem; line-height:1.15;
+  letter-spacing:-.025em; font-variant-numeric:tabular-nums; }
+.num span { display:block; color:var(--mut); font-size:.84rem; margin-top:.35em; }
+th { background:var(--sunk); }
+tbody tr.ok td:first-child { box-shadow:inset 3px 0 0 var(--ok); }
+tbody tr.no td:first-child { box-shadow:inset 3px 0 0 var(--no); }
+tbody tr.no { background:var(--ambersoft); }
+summary { font-weight:600; color:var(--teal); }
+blockquote { border-left-color:var(--amber); background:var(--ambersoft); }
 figure.shot { margin:1.4em 0; }
 figure.shot img, figure.shot iframe {
   display:block; width:100%; height:auto; max-width:100%; border:1px solid var(--line); border-radius:12px;
@@ -392,10 +417,25 @@ footer { margin-top:4rem; padding-top:1.2rem; border-top:1px solid var(--line); 
 <title>Ten Places &mdash; two SO-101 arms set a dinner table</title>
 <meta name="description" content="A spoken or typed command becomes a set dinner table in MuJoCo: two SO-101 arms,
 a vision-language planner over five learned ACT policies, every model on an Intel CPU with OpenVINO.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap">
 <style>{css}</style>
 
-<h1>Ten Places</h1>
-<p class="sub">Two SO-101 arms set a dinner table from a sentence. Every model runs on an Intel CPU.</p>
+<header class="top"><div class="wrap">
+<div class="eyebrow">Intel track &middot; AI Infra Summit Hackathon 2026</div>
+<h1>&ldquo;Set the table.&rdquo;</h1>
+<p class="sub">Say it out loud or type it. Two SO-101 arms work out what you meant, hand the cutlery between them,
+and check their own work. Every model runs on one Intel CPU.</p>
+<div class="hero-nums">
+<div class="hn"><b>{ak}/{an}</b><span>tables it had never seen, set completely</span></div>
+<div class="hn"><b>{d0k}/{d0n}</b><span>pre-registered demonstrations done as asked</span></div>
+<div class="hn"><b>{min(w8_ms):.0f} ms</b><span>per policy step, OpenVINO INT8</span></div>
+<div class="hn"><b>0</b><span>GPUs at run time</span></div>
+</div>
+</div></header>
+
+<div class="wrap">
 
 <p class="lead">Say or type <em>&ldquo;set the table&rdquo;</em>, or <em>&ldquo;no fork today, set the
 rest&rdquo;</em>. In MuJoCo, arm A pulls the cutlery drawer open and hands the spoon and the fork across to arm B,
@@ -540,6 +580,7 @@ tried, what it measured, and what did not work.</li>
 <footer>Every number on this page is read at build time out of a result file in the repository by
 <code>scripts/make_demo_page.py</code>; none is typed in. Built for the Intel track of the AI Infra Summit
 Hackathon 2026.</footer>
+</div>
 </html>
 """
     if not html.isascii():
