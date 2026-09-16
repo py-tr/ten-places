@@ -1,7 +1,7 @@
 """Publish the trained weights a clean clone needs (once, logged in with `hf auth login`).
 
-    python scripts/upload_models.py --repo <user>/<repo> --dry-run     # list what would be uploaded
-    python scripts/upload_models.py --repo <user>/<repo>               # create the model repo and upload
+    python scripts/upload_models.py --repo py-tr/ten-places --dry-run     # list what would be uploaded
+    python scripts/upload_models.py --repo py-tr/ten-places               # create the model repo and upload
 
 Uploads the five deployed skill checkpoints (out/eval/selected_checkpoints.json, plus the cup), each with its
 OpenVINO IR, and the camera classifier, at the same relative paths, so `make models` puts them back where every

@@ -2,8 +2,8 @@
 the trained skill policies (with their OpenVINO IR) and the camera classifier from the project's model repo, and the
 planner from Intel's public OpenVINO/Qwen3-VL-4B-Instruct-int4-ov (~4.4 GB in total).
 
-    make models HF_SKILLS_REPO=<user>/<repo>
-    python scripts/download_models.py --skills-repo <user>/<repo> [--skip-planner]
+    make models HF_SKILLS_REPO=py-tr/ten-places
+    python scripts/download_models.py --skills-repo py-tr/ten-places [--skip-planner]
 """
 import argparse
 import os

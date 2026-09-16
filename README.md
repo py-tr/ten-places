@@ -263,7 +263,7 @@ Optimisation results:
 ```
 make third-party      # the official SO-101 model (TheRobotStudio/SO-ARM100) at the pinned commit
 pip install -r requirements-lock.txt
-make models HF_SKILLS_REPO=<user>/<repo>   # trained skills + classifier, and the OpenVINO planner (~4.4 GB)
+make models HF_SKILLS_REPO=py-tr/ten-places   # trained skills + classifier, and the OpenVINO planner (~4.4 GB)
 make test             # 192 tests
 make watch SEED=3                                        # scripted controller, live 3D viewer
 make watch-agent CMD="just the plate and the cup" SEED=3 # VLM plan + learned policies, live

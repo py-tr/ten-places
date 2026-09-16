@@ -19,7 +19,7 @@ third-party:
 	skills-v2 report state-data state-clf eval-planner agent grid eval-context ctx-demos skills-ctx voice recover
 
 # Trained weights for a clean clone: the skills and the classifier from the project's model repo (made with
-# scripts/upload_models.py), the planner from Intel's OpenVINO repo. make models HF_SKILLS_REPO=<user>/<repo>
+# scripts/upload_models.py), the planner from Intel's OpenVINO repo. make models HF_SKILLS_REPO=py-tr/ten-places
 HF_SKILLS_REPO ?=
 models:
 	$(PY) scripts/download_models.py --skills-repo "$(HF_SKILLS_REPO)"
