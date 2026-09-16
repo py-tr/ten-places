@@ -56,6 +56,9 @@ def _lookat_quat(pos, target, up=(0, 0, 1)):
 
 def _prepare_arm(friction: float) -> mujoco.MjSpec:
     """Load one SO-101 and replace the finger meshes' convex-hull collisions with box pads."""
+    if not SO101_XML.is_file():  # a fresh checkout has no third_party/: say so, rather than fail inside the parser
+        raise FileNotFoundError(f"the SO-101 model is not at {SO101_XML}; run `make third-party` to clone it "
+                                "(TheRobotStudio/SO-ARM100, Apache-2.0) at the pinned commit")
     arm = mujoco.MjSpec.from_file(str(SO101_XML))
     for g in arm.geoms:
         if g.parent.name in FINGER_BODIES and g.group == 3:
