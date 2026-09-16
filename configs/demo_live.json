@@ -4,6 +4,6 @@
  "seeds": [
   {"seed": 11, "command": "Set the table, please.", "mode": "spoken", "live_say": "Actually, skip the fork.",
    "say_when": "after the terminal shows skill_start for the spoon", "expected_steps": ["drawer", "spoon", "plate", "cup"],
-   "take": null}
+   "take": 2}
  ]
 }
