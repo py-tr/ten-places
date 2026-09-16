@@ -275,7 +275,9 @@ def main():
             # A refusal that still set the table is not the same failure as a dropped object. The scorer's verdict
             # stands; the row says what actually happened so the column is not read as one kind of loss.
             if cls == "no" and "refusal" in cells[-1].lower():
-                cells[-1] = cells[-1] + " &mdash; every step done, nothing refused"
+                cells[-1] = ("table set correctly, every step done &mdash; scored a failure because it wrongly "
+                             "announced it could not &ldquo;set the rest&rdquo; (grader's cause: "
+                             + cells[-1] + ")")
             demo_body += f"<tr class='{cls}'>" + "".join(
                 f"<td>{c if '&mdash;' in c else esc(c)}</td>" for c in cells) + "</tr>"
 

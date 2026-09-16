@@ -65,7 +65,7 @@ Three videos, served from this repository — nothing embedded, nothing to expir
 |---|---|---|---|---|
 | 0:00 | 0 | "Set the table." | typed | done as asked |
 | 1:01 | 1 | "Could you set everything out for dinner?" | spoken (Speechmatics) | done as asked |
-| 2:05 | 2 | "No fork today, set the rest." | typed | **wrong refusal** |
+| 2:05 | 2 | "No fork today, set the rest." | typed | **table set correctly** — scored a failure for wrongly saying it could not "set the rest" |
 | 2:53 | 3 | "I'm having soup tonight." | typed | done as asked |
 | 3:26 | 4 | "Just the plate and the cup." | typed | done as asked |
 | 4:00 | 5 | "Set the table." + "Skip the cup." mid-run | typed | done as asked |

@@ -152,7 +152,16 @@ def main():
         # text-to-speech in every run, typed ones included - that is stated under the table, not repeated per row.
         mode = "spoken (Speechmatics)" if entry.get("mode") == "spoken" else "typed"
         # A failed seed says why. "not completed" would be wrong for a run whose steps were all done.
-        result = "-" if passed is None else ("done as asked" if passed else (cause or "not completed"))
+        # A wrongly announced "cannot do" is not a dropped object. Say what the table looked like first, then why
+        # it was scored a failure; demo.csv keeps the grader's own cause string untouched.
+        if passed is None:
+            result = "-"
+        elif passed:
+            result = "done as asked"
+        elif "refusal" in (cause or "").lower():
+            result = 'table set correctly - scored a failure for wrongly saying it could not "set the rest"'
+        else:
+            result = cause or "not completed"
         extra = " (half-set table)" if name == "extra" else (" (live, plan changed mid-run)" if name == "live" else "")
         if entry.get("say"):
             # The How column already says typed or spoken, so it carries the distinction from the live take
