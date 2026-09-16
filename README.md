@@ -63,18 +63,18 @@ Three videos, served from this repository — nothing embedded, nothing to expir
 
 | Time | Seed | Command | How | Result |
 |---|---|---|---|---|
-| 0:00 | 0 | "Set the table." | typed (Speechmatics TTS) | done as asked |
-| 1:01 | 1 | "Could you set everything out for dinner?" | spoken (Speechmatics STT) | done as asked |
-| 2:05 | 2 | "No fork today, set the rest." | typed (Speechmatics TTS) | table set correctly - scored a failure for wrongly saying it could not "set the rest" |
-| 2:53 | 3 | "I'm having soup tonight." | typed (Speechmatics TTS) | done as asked |
-| 3:26 | 4 | "Just the plate and the cup." | typed (Speechmatics TTS) | done as asked |
-| 4:00 | 5 | "Set the table." + "Skip the cup." mid-run | typed (Speechmatics TTS) | done as asked |
-| 4:58 | 6 | "Set the table and light a candle." | typed (Speechmatics TTS) | done as asked |
-| 6:00 | 7 | "Just my cup, thanks." | typed (Speechmatics TTS) | done as asked |
-| 6:14 | 8 | "Put out the spoon and the plate." | spoken (Speechmatics STT) | done as asked |
-| 6:57 | 9 | "Set the table." | typed (Speechmatics TTS) | done as asked |
-| 8:01 | 10 | "Set the table." (half-set table) | typed (Speechmatics TTS) | done as asked |
-| 8:35 | 11 | "Set the table, please." (live, plan changed mid-run) | spoken (Speechmatics STT) | done as asked |
+| 0:00 | 0 | "Set the table." | typed, read aloud (Speechmatics TTS) | done as asked |
+| 1:01 | 1 | "Could you set everything out for dinner?" | live microphone (Speechmatics STT) | done as asked |
+| 2:05 | 2 | "No fork today, set the rest." | typed, read aloud (Speechmatics TTS) | table set correctly - scored a failure for wrongly saying it could not "set the rest" |
+| 2:53 | 3 | "I'm having soup tonight." | typed, read aloud (Speechmatics TTS) | done as asked |
+| 3:26 | 4 | "Just the plate and the cup." | typed, read aloud (Speechmatics TTS) | done as asked |
+| 4:00 | 5 | "Set the table." + "Skip the cup." mid-run | typed, read aloud (Speechmatics TTS) | done as asked |
+| 4:58 | 6 | "Set the table and light a candle." | typed, read aloud (Speechmatics TTS) | done as asked |
+| 6:00 | 7 | "Just my cup, thanks." | typed, read aloud (Speechmatics TTS) | done as asked |
+| 6:14 | 8 | "Put out the spoon and the plate." | live microphone (Speechmatics STT) | done as asked |
+| 6:57 | 9 | "Set the table." | typed, read aloud (Speechmatics TTS) | done as asked |
+| 8:01 | 10 | "Set the table." (half-set table) | typed, read aloud (Speechmatics TTS) | done as asked |
+| 8:35 | 11 | "Set the table, please." (live, plan changed mid-run) | live microphone (Speechmatics STT) | done as asked |
 
 *Every command in these clips is audible, and **all twelve runs use Speechmatics on both sides**. A spoken command is
 the person's own microphone, transcribed live by Speechmatics real-time speech-to-text; a typed one is read aloud by a

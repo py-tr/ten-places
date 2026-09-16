@@ -151,7 +151,8 @@ def main():
         # Both sides are Speechmatics and both are audible: a spoken command is the person's microphone
         # transcribed by Speechmatics STT, a typed one is read aloud by a second Speechmatics TTS voice
         # (voice_over.py). The robot answers in its own Speechmatics voice in every run.
-        mode = "spoken (Speechmatics STT)" if entry.get("mode") == "spoken" else "typed (Speechmatics TTS)"
+        mode = ("live microphone (Speechmatics STT)" if entry.get("mode") == "spoken"
+                else "typed, read aloud (Speechmatics TTS)")
         # A failed seed says why. "not completed" would be wrong for a run whose steps were all done.
         # A wrongly announced "cannot do" is not a dropped object. Say what the table looked like first, then why
         # it was scored a failure; demo.csv keeps the grader's own cause string untouched.
