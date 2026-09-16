@@ -1,0 +1,11 @@
+{
+ "label": "ov_fp32",
+ "episodes": 20,
+ "success": 13,
+ "rate": 0.65,
+ "wilson95": [
+  0.433,
+  0.819
+ ],
+ "policy_ms_mean": 2.6577676394954324
+}

@@ -1,0 +1,11 @@
+{
+ "label": "ov_a8w8_backbone",
+ "episodes": 20,
+ "success": 12,
+ "rate": 0.6,
+ "wilson95": [
+  0.387,
+  0.781
+ ],
+ "policy_ms_mean": 2.3845444741891697
+}

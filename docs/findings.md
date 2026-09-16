@@ -172,7 +172,7 @@ at the rim wall, plate flat, moved < 1.5 cm.
 reaching and missing, 4; on its side or lying on another object 4; not grasped 2. The retry recovers 1.
 - Temporal ensembling for the fork instead of whole 50-action chunks (config only, gate ≥ 92 first attempts):
   79 vs 86 (+2 / −9, p = 0.065). Worse, as on 2026-09-13. Off.
-- Which tables fail (`out/data_fix/fork_pass1.py`): the deployed fork alone for its budget after a scripted drawer,
+- Which tables fail (`scripts/fork_pass1.py`): the deployed fork alone for its budget after a scripted drawer,
   spoon and plate, seeds 20000+: 134 of 5986 (2.2%). Replayed with end states: 133 reproduce; held by B 44, by A 16,
   by both 14, on its side 27, never lifted 18, dropped flat 14.
 - Scripted continuation from the policy's state (`oracle.table.cutlery_takeover`): B holds the fork — A lets go and

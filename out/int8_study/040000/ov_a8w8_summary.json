@@ -1,0 +1,11 @@
+{
+ "label": "ov_a8w8",
+ "episodes": 20,
+ "success": 7,
+ "rate": 0.35,
+ "wilson95": [
+  0.181,
+  0.567
+ ],
+ "policy_ms_mean": 2.2807147020939738
+}

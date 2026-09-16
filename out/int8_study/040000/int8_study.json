@@ -1,0 +1,50 @@
+[
+ {
+  "variant": "fp32",
+  "deviation_vs_fp32": 0.0,
+  "latency_ms_median": 33.730599796399474,
+  "build_s": 7.9,
+  "success": 13,
+  "episodes": 20,
+  "wilson95": [
+   0.433,
+   0.819
+  ]
+ },
+ {
+  "variant": "w8",
+  "deviation_vs_fp32": 0.004385299514979124,
+  "latency_ms_median": 28.583850245922804,
+  "build_s": 7.3,
+  "success": 14,
+  "episodes": 20,
+  "wilson95": [
+   0.481,
+   0.855
+  ]
+ },
+ {
+  "variant": "a8w8",
+  "deviation_vs_fp32": 0.033157482743263245,
+  "latency_ms_median": 13.807300012558699,
+  "build_s": 4.7,
+  "success": 7,
+  "episodes": 20,
+  "wilson95": [
+   0.181,
+   0.567
+  ]
+ },
+ {
+  "variant": "a8w8_backbone",
+  "deviation_vs_fp32": 0.003567851847037673,
+  "latency_ms_median": 20.175500074401498,
+  "build_s": 45.9,
+  "success": 12,
+  "episodes": 20,
+  "wilson95": [
+   0.387,
+   0.781
+  ]
+ }
+]
