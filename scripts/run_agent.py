@@ -91,14 +91,23 @@ def main():
         from tenplaces.voice import transcribe_file, transcribe_mic
 
         t = time.perf_counter()
-        show = lambda text: print(f"  … {text}", flush=True)  # noqa: E731 - partial transcripts as they arrive
+        # Each partial is kept with the moment it arrived, not only printed, so scripts/voice_over.py can replay
+        # the transcript growing as it did. Stored as seconds before the final transcript: the command recording
+        # is trimmed before it goes in the video, so its own start is not a stable reference.
+        seen = []
+
+        def show(text):  # partial transcripts as they arrive, cumulative
+            seen.append((time.perf_counter(), text))
+            print(f"  … {text}", flush=True)
         # With --video the microphone recording is kept next to it (<video>.command.wav, for scripts/voice_over.py).
         mic_wav = Path(args.video).with_suffix(".command.wav") if args.mic and args.video else None
         command, partials, ms = (transcribe_mic(on_partial=show, save_to=mic_wav) if args.mic
                                  else transcribe_file(args.audio, on_partial=show))
         if not command:
             sys.exit("no speech recognised")
+        t_final = time.perf_counter()
         spoken = {"source": "mic" if args.mic else str(args.audio), "audio": str(mic_wav or args.audio), "partials": len(partials),
+                  "partials_log": [{"before_final_s": round(t_final - ts, 3), "text": txt} for ts, txt in seen],
                   "ms_final_after_speech_end": round(ms) if ms == ms else None,
                   "s_total": round(time.perf_counter() - t, 2)}
         print(f"speechmatics: {command!r} (final {ms:.0f} ms after the speech ended)", flush=True)

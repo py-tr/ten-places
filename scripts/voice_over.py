@@ -79,7 +79,7 @@ def level(x: np.ndarray, peak: float = 0.8) -> np.ndarray:
     return x * (peak / m) if m > 0 else x
 
 
-def intro_frame(first: np.ndarray, label: str, text: str, notes=()) -> np.ndarray:
+def intro_frame(first: np.ndarray, label: str, text: str, notes=(), listening_for: str | None = None) -> np.ndarray:
     """The first frame with the panel cleared down to the command: the plan appears when the video starts.
     notes: smaller lines under it (how the audio was placed, which take)."""
     img = Image.fromarray(first)
@@ -92,9 +92,10 @@ def intro_frame(first: np.ndarray, label: str, text: str, notes=()) -> np.ndarra
     for line in _wrap(label, 46):
         d.text((x, y), line, font=_font(16), fill=(140, 200, 255))
         y += 22
-    for line in _wrap(f'"{text}"', 38):
-        d.text((x, y), line, font=_font(20), fill=(255, 255, 255))
-        y += 26
+    lines = _wrap(f'"{text}"', 38)
+    for i, line in enumerate(_wrap(listening_for, 38) if listening_for else lines):
+        d.text((x, y + i * 26), line, font=_font(20), fill=(120, 124, 132) if listening_for else (255, 255, 255))
+    y += 26 * len(lines)  # the command's space is reserved either way, so nothing below it moves when it appears
     y += 12
     for note in notes:
         for line in _wrap(note, 52):
@@ -115,13 +116,20 @@ def voice_over(stem: Path, entry: dict, out: Path, voice: str, lead_s: float = 0
     cmd = fade(level(cmd))
     reader = iio.get_reader(str(stem.with_suffix(".mp4")))
     first = reader.get_data(0)
-    n_intro = int(np.ceil((lead_s + len(cmd) / RATE + tail_s) * FPS))
+    # A spoken command belongs on the panel when Speechmatics finalised it, not before: the microphone clip plays
+    # under an empty panel, and the run's own measurement (ms after the speech ended) says when the words appear.
+    spoken_ms = (run.get("voice") or {}).get("ms_final_after_speech_end") if entry["mode"] == "spoken" else None
+    reveal_s = (lead_s + len(cmd) / RATE - 0.3 + spoken_ms / 1000) if spoken_ms is not None else None
+    n_intro = int(np.ceil(((reveal_s + tail_s) if reveal_s is not None else
+                           (lead_s + len(cmd) / RATE + tail_s)) * FPS))
     robot = load_wav(stem.with_suffix(".wav"))
     # Video time 0 is the simulated time of the video's first frame (older runs: the first control step).
     t0 = run.get("video_t_start")
     if t0 is None:
         t0 = min((e["t"] for e in run["events"] if e["kind"] == "skill_start"), default=0.5)
     notes, live_json = [], stem.with_suffix(".live.json")
+    if spoken_ms is not None:
+        notes.append(f"The command appears when the transcript was final: {spoken_ms} ms after the speech ended")
     if live_json.exists():  # said while the robot works, live: the person's own voice where it was said
         from tenplaces.listen import live_placements
 
@@ -152,7 +160,19 @@ def voice_over(stem: Path, entry: dict, out: Path, voice: str, lead_s: float = 0
     video = out / f"{stem.name}.mp4"
     writer = iio.get_writer(str(video), fps=FPS, macro_block_size=8)
     frame = intro_frame(first, label, shown, notes)
-    for _ in range(n_intro):
+    n_wait = min(n_intro, int(round(reveal_s * FPS))) if reveal_s is not None else 0
+    # The transcript as it actually grew: each partial placed at the moment it arrived, counted back from the
+    # final. Only a handful of distinct frames exist, so they are rendered once and reused.
+    log = sorted((run.get("voice") or {}).get("partials_log") or [], key=lambda p: -p["before_final_s"])
+    cache = {}
+    for i in range(n_wait):
+        left = reveal_s - i / FPS  # how long still to go before the final transcript
+        arrived = [p["text"] for p in log if p["before_final_s"] >= left]
+        key = arrived[-1] if arrived else ""
+        if key not in cache:
+            cache[key] = intro_frame(first, label, shown, notes, listening_for=key or "listening…")
+        writer.append_data(cache[key])
+    for _ in range(n_intro - n_wait):
         writer.append_data(frame)
     for f in reader:
         writer.append_data(f)
