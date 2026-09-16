@@ -35,6 +35,13 @@ demonstrations 1000+. The script or result file is named next to each number.
   LeRobot's recipe trains SmolVLA 20k steps (2.5k: 2/21 placed; 5k: 63/210) — compared at a quarter of that budget.
   One SmolVLA chunk: 6.6 s (PyTorch, this CPU); ACT: 16 ms (OpenVINO).
 
+**The hand-off is forced, not chosen.** Arm A sits at x = -0.30 m, arm B at +0.30 m (`scene.py`, `BASE_X`); the
+drawer is on A's side, the placemat and the spoon, fork and cup targets on B's. Inverse kinematics over held-out
+seeds 200-249, fingers-down poses, counting a target as reachable if any of four jaw orientations solves within
+3 mm and 0.05 rad: arm A reaches the spoon, fork, plate and cup targets on 0 of 50 tables each, and arm B reaches
+the drawer's cutlery on 0 of 50. Neither arm can do any part of the other's work, so cutlery from A's drawer
+changes hands mid-air. The reach limit is the solver's, not a rule added on top.
+
 ## From skills alone to the chain
 
 Each skill ~90–100% when started by the scripted controller; the chain of learned skills: 0 of 10 tables.

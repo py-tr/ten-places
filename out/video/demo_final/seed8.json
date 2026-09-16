@@ -1,0 +1,190 @@
+{
+ "command": "Put out the spoon and the plate.",
+ "voice": {
+  "source": "mic",
+  "audio": "out\\video\\demo_final\\seed8.command.wav",
+  "partials": 6,
+  "partials_log": [
+   {
+    "before_final_s": 2.525,
+    "text": "Put"
+   },
+   {
+    "before_final_s": 2.149,
+    "text": "Put out the"
+   },
+   {
+    "before_final_s": 1.796,
+    "text": "Put out the spoon"
+   },
+   {
+    "before_final_s": 1.46,
+    "text": "Put out the spoon and"
+   },
+   {
+    "before_final_s": 1.053,
+    "text": "Put out the spoon and the"
+   },
+   {
+    "before_final_s": 0.692,
+    "text": "Put out the spoon and the plate"
+   }
+  ],
+  "ms_final_after_speech_end": 1309,
+  "s_total": 5.29
+ },
+ "seed": 8,
+ "backend": "ov-w8",
+ "look_first": 0.95,
+ "prepared": [],
+ "video_t_start": 0.5000000000000003,
+ "live_audio": null,
+ "cores": "split",
+ "sources": {
+  "drawer": "out\\train\\chain_t2_drawer\\drawer\\checkpoints\\007500\\pretrained_model",
+  "spoon": "out\\train\\spoon_cont2\\spoon\\checkpoints\\007500\\pretrained_model",
+  "plate": "out\\train\\plate_t4\\plate\\checkpoints\\007500\\pretrained_model",
+  "fork": "out\\train\\fork_cont\\fork\\checkpoints\\007500\\pretrained_model",
+  "cup": "out\\train\\cup_sizes2\\cup\\checkpoints\\007500\\pretrained_model"
+ },
+ "exec_settings": {
+  "spoon": {
+   "temporal_coeff": 0.01
+  },
+  "drawer": {
+   "temporal_coeff": 0.01
+  },
+  "plate": {
+   "temporal_coeff": 0.01
+  },
+  "fork": {
+   "n_action_steps": 50
+  },
+  "cup": {
+   "n_action_steps": 10
+  }
+ },
+ "events": [
+  {
+   "steps": [],
+   "p": {
+    "drawer": 0.0,
+    "spoon": 0.0,
+    "plate": 0.0,
+    "fork": 0.0,
+    "cup": 0.0
+   },
+   "threshold": 0.95,
+   "kind": "seen_done",
+   "t": 0.5,
+   "wall": 1789559335.421
+  },
+  {
+   "command": "Put out the spoon and the plate.",
+   "proposed": [
+    "spoon",
+    "plate"
+   ],
+   "steps": [
+    "drawer",
+    "spoon",
+    "plate"
+   ],
+   "corrections": [
+    "added 'drawer' before 'spoon': the spoon is inside the closed drawer"
+   ],
+   "unsupported": [],
+   "ms": 7154,
+   "kind": "plan",
+   "t": 0.5,
+   "wall": 1789559342.597,
+   "said": "I'll open the drawer, then place the spoon and plate. The drawer comes first \u2014 the spoon is inside."
+  },
+  {
+   "skill": "drawer",
+   "attempt": 1,
+   "kind": "skill_start",
+   "t": 0.5,
+   "wall": 1789559342.597
+  },
+  {
+   "items": [],
+   "ms": 4570,
+   "kind": "unsupported",
+   "t": 2.7,
+   "wall": 1789559347.201
+  },
+  {
+   "skill": "drawer",
+   "done": true,
+   "ms": 6,
+   "kind": "check",
+   "t": 12.5,
+   "wall": 1789559364.965
+  },
+  {
+   "skill": "spoon",
+   "attempt": 1,
+   "kind": "skill_start",
+   "t": 13.62,
+   "wall": 1789559366.489
+  },
+  {
+   "skill": "spoon",
+   "done": true,
+   "ms": 9,
+   "kind": "check",
+   "t": 26.06,
+   "wall": 1789559389.878
+  },
+  {
+   "skill": "plate",
+   "attempt": 1,
+   "kind": "skill_start",
+   "t": 27.18,
+   "wall": 1789559391.401
+  },
+  {
+   "skill": "plate",
+   "done": true,
+   "ms": 6,
+   "kind": "check",
+   "t": 33.62,
+   "wall": 1789559404.431
+  },
+  {
+   "done": [
+    "drawer",
+    "spoon",
+    "plate"
+   ],
+   "stopped": false,
+   "graded": [
+    "drawer_open",
+    "spoon",
+    "plate"
+   ],
+   "kind": "finished",
+   "t": 33.62,
+   "wall": 1789559404.464,
+   "said": "The table is set."
+  }
+ ],
+ "grade": {
+  "drawer_open": true,
+  "spoon": true,
+  "spoon_err_m": 0.0024,
+  "fork": false,
+  "fork_err_m": 0.1787,
+  "plate": true,
+  "plate_err_m": 0.0047,
+  "cup": false,
+  "cup_err_m": 0.0606,
+  "subtasks_done": 3,
+  "success": false,
+  "failed": [
+   "fork",
+   "cup"
+  ]
+ }
+}

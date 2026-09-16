@@ -1,0 +1,139 @@
+{
+ "command": "I'm having soup tonight.",
+ "voice": null,
+ "seed": 3,
+ "backend": "ov-w8",
+ "look_first": 0.95,
+ "prepared": [],
+ "video_t_start": 0.5000000000000003,
+ "live_audio": null,
+ "cores": "split",
+ "sources": {
+  "drawer": "out\\train\\chain_t2_drawer\\drawer\\checkpoints\\007500\\pretrained_model",
+  "spoon": "out\\train\\spoon_cont2\\spoon\\checkpoints\\007500\\pretrained_model",
+  "plate": "out\\train\\plate_t4\\plate\\checkpoints\\007500\\pretrained_model",
+  "fork": "out\\train\\fork_cont\\fork\\checkpoints\\007500\\pretrained_model",
+  "cup": "out\\train\\cup_sizes2\\cup\\checkpoints\\007500\\pretrained_model"
+ },
+ "exec_settings": {
+  "spoon": {
+   "temporal_coeff": 0.01
+  },
+  "drawer": {
+   "temporal_coeff": 0.01
+  },
+  "plate": {
+   "temporal_coeff": 0.01
+  },
+  "fork": {
+   "n_action_steps": 50
+  },
+  "cup": {
+   "n_action_steps": 10
+  }
+ },
+ "events": [
+  {
+   "steps": [],
+   "p": {
+    "drawer": 0.001,
+    "spoon": 0.0,
+    "plate": 0.0,
+    "fork": 0.0,
+    "cup": 0.0
+   },
+   "threshold": 0.95,
+   "kind": "seen_done",
+   "t": 0.5,
+   "wall": 1789559786.612
+  },
+  {
+   "command": "I'm having soup tonight.",
+   "proposed": [
+    "drawer",
+    "spoon"
+   ],
+   "steps": [
+    "drawer",
+    "spoon"
+   ],
+   "corrections": [],
+   "unsupported": [],
+   "ms": 6419,
+   "kind": "plan",
+   "t": 0.5,
+   "wall": 1789559793.045,
+   "said": "I'll open the drawer, then place the spoon."
+  },
+  {
+   "skill": "drawer",
+   "attempt": 1,
+   "kind": "skill_start",
+   "t": 0.5,
+   "wall": 1789559793.045
+  },
+  {
+   "items": [],
+   "ms": 4237,
+   "kind": "unsupported",
+   "t": 2.14,
+   "wall": 1789559797.307
+  },
+  {
+   "skill": "drawer",
+   "done": true,
+   "ms": 7,
+   "kind": "check",
+   "t": 12.5,
+   "wall": 1789559814.991
+  },
+  {
+   "skill": "spoon",
+   "attempt": 1,
+   "kind": "skill_start",
+   "t": 13.62,
+   "wall": 1789559816.357
+  },
+  {
+   "skill": "spoon",
+   "done": true,
+   "ms": 5,
+   "kind": "check",
+   "t": 26.06,
+   "wall": 1789559837.87
+  },
+  {
+   "done": [
+    "drawer",
+    "spoon"
+   ],
+   "stopped": false,
+   "graded": [
+    "drawer_open",
+    "spoon"
+   ],
+   "kind": "finished",
+   "t": 26.06,
+   "wall": 1789559837.892,
+   "said": "The table is set."
+  }
+ ],
+ "grade": {
+  "drawer_open": true,
+  "spoon": true,
+  "spoon_err_m": 0.002,
+  "fork": false,
+  "fork_err_m": 0.1831,
+  "plate": false,
+  "plate_err_m": 0.0914,
+  "cup": false,
+  "cup_err_m": 0.0745,
+  "subtasks_done": 2,
+  "success": false,
+  "failed": [
+   "fork",
+   "plate",
+   "cup"
+  ]
+ }
+}
