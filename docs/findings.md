@@ -286,11 +286,13 @@ other sizes: all "never picked up", none a false "done" from the camera.
   alone, ±20% cup sizes: 99 vs 80 (+31 / −12, p = 0.005). Passed; with the other two gates holding, it replaced the
   deployed cup. The first 50-seed test not pooled in.
 
-**Lost tables, latest re-run** (full agent, OpenVINO, `out/eval/agent_table/ov_w8_report9.json`,
-`ov_w8_fresh200-249_v9.json`; a table counts at its first step, in task order, still undone at the end): 8 of 100 —
-spoon 4 (24, 37, 214, 243), cup 2 (41, 233), plate 1 (207), drawer 1 (223). Before the plate and fork fine-tunes
-(v7): 19 — plate 8, spoon 5, fork 4, cup 2. Placement error, placed objects: medians spoon 0.36, plate 0.39, fork
-0.44, cup 0.29 cm; largest 1.49 cm (v7: 2.48 cm).
+**Lost tables, final configuration** (full agent, OpenVINO, four held-out sets of 50: `ov_w8_report11.json`,
+`ov_w8_fresh200-249_v11.json`, `ov_w8_set3_250-299_v11.json`, `ov_w8_set4_850-899_v11.json`; a table counts at its
+first step, in task order, still undone at the end): 17 of 200 — plate 8 (40, 217, 230, 256, 298, 857, 874, 884),
+cup 6 (25, 41, 243, 262, 281, 881), spoon 3 (26, 37, 236), drawer 0, fork 0. Before the plate, fork and spoon
+fine-tunes (v7, 100 tables): 19 — plate 8, spoon 5, fork 4, cup 2. Steps over the 200 tables: drawer 200, spoon 197,
+fork 193, cup 192, plate 191. Placement error, placed objects: medians spoon 0.33, plate 0.38, fork 0.44, cup
+0.29 cm; largest 2.44 cm, inside the 2.5 cm tolerance.
 
 Mechanisms, tuning seeds 100–199 (fixed sequence, first attempts, recorded start/end states, `out/eval/chain/lever1_base/rows.json`):
 - Spoon: drawer at the spoon's start < 7.4 cm 0/7 placed, ≥ 7.4 cm 88/93. The seven short drawers (5.9–7.0 cm,

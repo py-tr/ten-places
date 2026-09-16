@@ -5,7 +5,8 @@ cutlery drawer open and hands the spoon and the fork across to arm B, which plac
 vision-language model plans; one learned ACT policy per skill drives both arms from three cameras; a camera classifier
 checks every step. Every model runs on an Intel CPU with OpenVINO; speech goes through Speechmatics.
 
-- **92 of 100 held-out tables set completely** — two sets of 50 randomised tables, the shipped configuration, each run once.
+- **183 of 200 held-out tables set completely** — four sets of 50 randomised tables (45, 46, 46, 46), the shipped
+  configuration, each run once.
 - Grasps are friction contact only (~17 N gripper). No weld or attach constraint.
 - At run time: cameras and joint angles only. No simulator object poses.
 - The learned policies drive the arms: about 9 in 10 control steps; the rest is the return to the home pose between
@@ -86,7 +87,7 @@ change the plan after the current step, verified like any plan. Replies by Speec
 ## Results
 
 **Seeds 0–49** — 50 held-out randomised tables, every selection frozen beforehand, each run once
-(`out/eval/final9/`, `out/eval/agent_table/ov_w8_report9.json`):
+(`out/eval/final11/`, `out/eval/agent_table/ov_w8_report11.json`):
 
 | Run | Full tables (95% CI) | Mean steps of 5 | Drawer | Spoon | Plate | Fork | Cup |
 |---|---|---|---|---|---|---|---|
@@ -99,42 +100,44 @@ change the plan after the current step, verified like any plan. Replies by Speec
 - Configuration chosen on tuning seeds (fixed sequence with retries, seeds 100–199: 81/100 with the fork fine-tuned
   on its own stuck hand-offs, 76/100 before; `docs/findings.md`).
 
-**Seeds 200–249** — a second held-out set, same frozen configuration, each run once; robustness rows on the same
-tables (`out/eval/agent_table/ov_w8_fresh200-249_v9.json`, `ov_w8_fresh_*_v9.json`, `out/eval/v9_*/`):
+**Seeds 200–249, 250–299 and 850–899** — three more held-out sets, same frozen configuration, each run once;
+the robustness rows run on 200–249 (`out/eval/agent_table/ov_w8_fresh200-249_v11.json`, `ov_w8_set3_250-299_v11.json`,
+`ov_w8_set4_850-899_v11.json`, `ov_w8_fresh_*_v11.json`, `out/eval/v11_*/`):
 
 | Run | Full tables (95% CI) |
 |---|---|
-| **Full agent, OpenVINO** | **45/50 (79–96%)** |
-| Full agent; friction, masses, light, colours widened ×2.0 beyond the training ranges | 38/50 (63–86%) |
-| Full agent; plate and cup sizes ±20%, cutlery length ±10% | 28/50 (42–69%) |
-| Fixed five-step sequence, OpenVINO | 44/50 (76–94%) |
-| Fixed sequence; friction, masses, light, colours widened ×1.5 beyond the training ranges | 42/50 (71–92%) |
-| … widened ×2.0 | 36/50 (58–83%) |
-| Fixed sequence; plate and cup sizes ±10%, cutlery length ±10% | 32/50 (50–76%) |
-| Fixed sequence; plate and cup sizes ±20%, cutlery length ±10% | 30/50 (46–72%) |
+| **Full agent, OpenVINO — seeds 200–249** | **46/50 (81–97%)** |
+| **Full agent — seeds 250–299** | **46/50 (81–97%)** |
+| **Full agent — seeds 850–899** | **46/50 (81–97%)** |
+| Fixed five-step sequence, OpenVINO — 200–249 / 250–299 / 850–899 | 44 / 44 / 44 of 50 |
+| Full agent; friction, masses, light, colours widened ×2.0 beyond the training ranges | 40/50 (67–89%) |
+| Full agent; plate and cup sizes ±20%, cutlery length ±10% | 27/50 (40–67%) |
+| Fixed sequence; friction, masses, light, colours widened ×1.5 beyond the training ranges | 45/50 (79–96%) |
+| … widened ×2.0 | 40/50 (67–89%) |
+| Fixed sequence; plate and cup sizes ±10%, cutlery length ±10% | 35/50 (58–81%) |
+| Fixed sequence; plate and cup sizes ±20%, cutlery length ±10% | 25/50 (37–63%) |
 | Fixed sequence; cup size only ±20% | 38/50 (63–86%) |
 
-- Both held-out sets, full agent: 92/100. The last change — the fork fine-tuned on its own stuck hand-offs — paired
-  against the run before it on the same tables: full agent 81 → 92 (+11 / −0, p = 0.001); fixed sequence 86 → 88
-  (+9 / −7); the fork placed on 243 of 250 held-out runs at trained sizes, 235 before. Frozen runs of the five shipped
-  configurations set 86, 82, 81, 81 and 92 of 100 (`docs/findings.md`); identical systems differ on 10–16 tables per
-  100, so every comparison here is paired.
-- Agent vs fixed sequence, same tables: 0–49 +4 / −1, 200–249 +3 / −2. Fixed sequence with vs without the drawer
-  re-pull (an earlier run, same tables): 40/50 vs 30/50 (+11 / −1, p = 0.006).
-- Robustness vs the same run at the training ranges and sizes, same tables. Fixed sequence (44/50): ×1.5 +5 / −7
-  (p = 0.77), ×2.0 +5 / −13 (p = 0.10); sizes ±10% +2 / −14 (p = 0.004), ±20% +2 / −16 (p = 0.001), cup size only
-  +2 / −8 (p = 0.11). Full agent (45/50): ×2.0 +4 / −11 (p = 0.12), sizes ±20% +1 / −18 (p < 0.001). Widened ranges:
-  ×1.5 no loss, ×2.0 7–8 tables (not significant). Object sizes: a clear loss — plate, fork and cup each placed
-  36–38/50 at ±20% against 47–50/50 at trained sizes.
+- All four held-out sets, full agent: **183/200 (87–95%)** — 45, 46, 46, 46 of 50; fixed sequence 180/200. The last
+  change — the spoon fine-tuned on its own failed grasps — paired against the run before it on the same tables: fixed
+  sequence 130 → 136 of 150, full agent level (137/150 both), spoon step 238 → 243 in 250 runs. Frozen runs of the six
+  shipped configurations set 86, 82, 81, 81, 92 and 91 of the first 100 held-out tables (`docs/findings.md`);
+  identical systems differ on 10–16 tables per 100, so every comparison here is paired.
+- Agent vs fixed sequence, same tables: 0–49 −3 / +0, 200–249 +3 / −1, 250–299 +3 / −1, 850–899 +3 / −1.
+- Robustness vs the same run at the training ranges and sizes, same tables (seeds 200–249). Fixed sequence (44/50):
+  ×1.5 +5 / −4 (p = 1.0), ×2.0 +5 / −9 (p = 0.42); sizes ±10% +3 / −12 (p = 0.035), ±20% +1 / −20 (p < 0.001), cup
+  size only +3 / −9 (p = 0.15). Full agent (46/50): ×2.0 +3 / −9 (p = 0.15), sizes ±20% +1 / −20 (p < 0.001). Widened
+  ranges: ×1.5 no loss, ×2.0 4–6 tables (not significant). Object sizes: a clear loss — at ±20% the plate is placed
+  36/50, the fork 39/50 and the cup 31/50, against 47–50/50 at trained sizes.
 - Sizes: the cup was trained on ×0.77–1.25 sizes; plate and cutlery on one size each. Two further size fine-tunes
   (plate ×0.8–1.2, more cup sizes) lost the trained size and were not shipped (`docs/findings.md`). The grader is
   size-proof (an object set on its target passes on all 50 tables at ±20%).
 - Video: the first 10 seeds as a grid, pass/fail per seed. The first look (on in `run_agent.py`) is off in these rows;
   on fresh tables it skips nothing (`docs/findings.md`).
 
-**Placement accuracy**, full agent, 100 held-out tables (simulator measurement): median error spoon 0.36 cm, plate
-0.39 cm, cup 0.29 cm, fork 0.44 cm; every placed object within 1.5 cm of its target (largest 1.49 cm; tolerance
-2.5 cm). Spoon and fork, each handed from arm to arm, placed on 191 of 200.
+**Placement accuracy**, full agent, 200 held-out tables (simulator measurement): median error spoon 0.33 cm, plate
+0.38 cm, cup 0.29 cm, fork 0.44 cm; every placed object inside the 2.5 cm tolerance (largest 2.44 cm). Spoon and
+fork, each handed from arm to arm, placed on 390 of 400.
 
 | Component | Result | Evidence |
 |---|---|---|
@@ -288,10 +291,10 @@ python scripts/run_agent.py --mic --listen --speak --seed 3 --video out/video/vo
 
 ## Limitations
 
-- 8 of 100 held-out tables not set completely. First failed step: spoon 4, cup 2, plate 1, drawer 1
+- 17 of 200 held-out tables not set completely. First failed step: plate 8, cup 6, spoon 3, fork 0, drawer 0
   (`docs/findings.md`).
 - Object sizes: plate and cutlery trained on one size each, the cup on ×0.77–1.25. Sizes ±20% cost tables: fixed
-  sequence 30/50 vs 44/50, full agent 28/50 vs 45/50 (p ≤ 0.001). The size-trained cup improved the cup alone at ±20%
+  sequence 25/50 vs 44/50, full agent 27/50 vs 46/50 (p < 0.001). The size-trained cup improved the cup alone at ±20%
   on untouched tuning tables (80 → 99 of 150); two further size fine-tunes lost the trained size (the rim grasps have
   millimetres of margin) and were not shipped.
 - First look: a table half-set out of the trained order (plate out before the spoon) can make a later skill fail; the
