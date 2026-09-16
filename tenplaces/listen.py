@@ -19,6 +19,10 @@ from pathlib import Path
 import numpy as np
 
 STOP = re.compile(r"\b(stop|halt|freeze)\b", re.IGNORECASE)
+# A released sentence carries at least one letter or digit. Speechmatics punctuates, and the tail of a sentence
+# can arrive as a final segment of its own ("."), which is not an instruction: it costs a planner call and holds
+# the arms until the answer comes back.
+WORD = re.compile(r"[^\W_]")
 
 
 class ScriptedVoice:
@@ -80,7 +84,7 @@ class LiveVoice:
 
     def _release(self):
         text = " ".join(self.buf.split())
-        if text:
+        if text and WORD.search(text):
             self.ready.append(text)
             now = time.time()
             start, end = self.span or (None, None)
