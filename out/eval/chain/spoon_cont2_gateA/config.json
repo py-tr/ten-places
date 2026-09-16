@@ -1,6 +1,6 @@
 {
  "name": "spoon_cont2_gateA",
- "out": "C:\\Users\\Makrela\\Documents\\Work\\Hackathons\\ai-infra\\build\\out\\eval\\chain\\spoon_cont2_gateA",
+ "out": "out/eval/chain/spoon_cont2_gateA",
  "runs": [
   "out/train/skills_v1",
   "out/train/skills_v2",
