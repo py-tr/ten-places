@@ -46,7 +46,8 @@ def main():
     sets = []  # (label, agent rows, fixed rows); ASCII only in the generated page (no encoding surprises)
     for label, agent, fixed in (("seeds 0-49", f"agent_table/ov_w8_report{v}.json", f"final{v}/ov_w8.csv"),
                                 ("seeds 200-249", f"agent_table/ov_w8_fresh200-249_v{v}.json", f"v{v}_stress_1.0/ov_w8.csv"),
-                                ("seeds 250-299", f"agent_table/ov_w8_set3_250-299_v{v}.json", f"v{v}_set3/ov_w8.csv")):
+                                ("seeds 250-299", f"agent_table/ov_w8_set3_250-299_v{v}.json", f"v{v}_set3/ov_w8.csv"),
+                                ("seeds 850-899", f"agent_table/ov_w8_set4_850-899_v{v}.json", f"v{v}_set4/ov_w8.csv")):
         pa, pf = OUT / agent, OUT / fixed
         if pa.exists():
             sets.append((label, rows_json(pa), rows_csv(pf) if pf.exists() else None))
